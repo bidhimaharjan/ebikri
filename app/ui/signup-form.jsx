@@ -1,7 +1,6 @@
 import { lusitana } from '@/app/ui/fonts';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
-import Link from 'next/link';
 
 export default function SignupForm() {
   return (
@@ -164,12 +163,12 @@ export default function SignupForm() {
 
         {/* Submit Button */}
         <div className="flex justify-center items-center h-full">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-4 rounded-3xl bg-red-500 px-4 py-2 mt-8 text-base font-medium text-white transition-colors hover:bg-red-400"
+          <Button
+            type="submit" // This triggers form submission
+            className="flex items-center gap-4 rounded-xl bg-red-500 px-4 py-2 mt-8 text-base font-medium text-white transition-colors hover:bg-red-400"
           >
             <span>Sign up</span> <ArrowRightIcon className="w-4" />
-          </Link>
+          </Button>
         </div>
       </div>
     </form>

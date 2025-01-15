@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { generatePagination } from '@/app/lib/utils';
 
-export default function Pagination({ totalPages }: { totalPages: number }) {
+export default function Pagination({ totalPages }) {
   // NOTE: Uncomment this code in Chapter 11
 
   // const allPages = generatePagination(currentPage, totalPages);
@@ -57,11 +57,6 @@ function PaginationNumber({
   href,
   isActive,
   position,
-}: {
-  page: number | string;
-  href: string;
-  position?: 'first' | 'last' | 'middle' | 'single';
-  isActive: boolean;
 }) {
   const className = clsx(
     'flex h-10 w-10 items-center justify-center text-sm border',
@@ -87,10 +82,6 @@ function PaginationArrow({
   href,
   direction,
   isDisabled,
-}: {
-  href: string;
-  direction: 'left' | 'right';
-  isDisabled?: boolean;
 }) {
   const className = clsx(
     'flex h-10 w-10 items-center justify-center rounded-md border',

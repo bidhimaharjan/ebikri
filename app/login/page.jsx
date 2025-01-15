@@ -1,6 +1,7 @@
 import EbikriLogo from '@/app/ui/ebikri-logo';
 import LoginForm from '@/app/ui/login-form';
 import Link from 'next/link';
+import { Button } from '@/app/ui/button';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
  
 export default function LoginPage() {
@@ -30,11 +31,10 @@ export default function LoginPage() {
 
                 <div className="flex items-center gap-3">
                     <p className="text-base">Don't have an account?</p>
-                    <Link
-                        href="/signup"
-                        className="flex items-center gap-4 rounded-3xl bg-red-500 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-red-400"
-                    >
-                    <span>Register</span> <ArrowRightIcon className="w-4" />
+                    <Link href="/signup">
+                        <Button className="flex items-center gap-4 rounded-xl bg-red-500 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-red-400">
+                            <span>Register</span> <ArrowRightIcon className="w-4" />
+                        </Button>
                     </Link>
                 </div>
             </div>

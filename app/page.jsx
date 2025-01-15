@@ -1,8 +1,12 @@
 // import EbikriLogo from '@/app/ui/ebikri-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { Button } from '@/app/ui/button';
 import Link from 'next/link';
 
 export default function Page() {
+  const currentUrl = process.env.NEXT_PUBLIC_VERCEL_URL || `http://localhost:${process.env.PORT || 3000}`;
+  console.log('App running at:', currentUrl);
+  
   return (
     <main className="flex min-h-screen flex-col p-6">
       {/* <div className="flex h-20 shrink-0 items-end rounded-lg bg-red-500 p-4 md:h-20">
@@ -19,14 +23,14 @@ export default function Page() {
 
         <div className="flex items-center gap-3">
           <p className="text-base">Don't have an account?</p>
-          <Link
-            href="/signup"
-            className="flex items-center gap-4 rounded-3xl bg-red-500 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-red-400"
-          >
-            <span>Register</span> <ArrowRightIcon className="w-4" />
+          <Link href="/signup">
+            <Button className="flex items-center gap-4 rounded-xl bg-red-500 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-red-400">
+              <span>Register</span> <ArrowRightIcon className="w-4" />
+            </Button>
           </Link>
         </div>
       </div>
+
         {/* <div className="flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12">
           // Add Hero Images Here
         </div> */}
