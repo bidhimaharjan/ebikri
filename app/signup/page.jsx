@@ -1,7 +1,7 @@
 'use client';
 
 // import EbikriLogo from '@/app/ui/ebikri-logo';
-import SignupForm from '@/app/ui/signup-form';
+import SignupForm from '@/app/ui/users/signup-form';
 import { Button } from '@/app/ui/button';
 import Link from 'next/link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
