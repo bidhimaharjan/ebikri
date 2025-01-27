@@ -24,49 +24,39 @@ export default function SignupPage() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+      e.preventDefault();
     
-        // Ensure passwords match
-        if (formData.password !== formData.confirmPassword) {
-          alert('Passwords do not match!');
-          return;
-        }
+      if (formData.password !== formData.confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+      }
     
-        try {
-          const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              businessName: formData.businessName,
-              businessType: formData.businessType,
-              email: formData.email,
-              phoneNumber: formData.phoneNumber,
-              panNumber: formData.panNumber,
-              password: formData.password,
-            }),
+      try {
+        const response = await fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+    
+        if (response.ok) {
+          alert('User registered successfully!');
+          setFormData({
+            businessName: '',
+            businessType: '',
+            email: '',
+            phoneNumber: '',
+            panNumber: '',
+            password: '',
+            confirmPassword: '',
           });
-    
-          if (response.ok) {
-            alert('User registered successfully!');
-            setFormData({
-              businessName: '',
-              businessType: '',
-              email: '',
-              phoneNumber: '',
-              panNumber: '',
-              password: '',
-              confirmPassword: '',
-            });
-          } else {
-            const data = await response.json();
-            alert(data.error || 'Failed to register user');
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          alert('Something went wrong');
+        } else {
+          const data = await response.json();
+          alert(data.error || 'Registration failed');
         }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong');
+      }
     };
 
   return (
@@ -100,7 +90,7 @@ export default function SignupPage() {
 
             {/* Right Section */}
                 <div className="flex flex-col justify-center gap-6 px-6 py-10 md:w-1/2 md:px-20">
-                <SignupForm />
+                <SignupForm formData={formData} onChange={handleChange} onSubmit={handleSubmit} />
             </div>
         </div>
     </main>

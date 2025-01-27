@@ -1,40 +1,49 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { db } from '../../../src/index';
-import { usersTable } from '../../../src/db/schema/users';
+// import { NextApiRequest, NextApiResponse } from 'next';
+import { db } from '@/src/index';
+import { usersTable } from '@/src/db/schema/users';
+import { hash } from 'bcrypt';
+import { eq } from 'drizzle-orm';
 
-export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    try {
-      const user = req.body;
+export async function POST(req) {
+  try {
+    const { businessName, businessType, email, phoneNumber, panNumber, password } = await req.json();
+    
+    // Log the received data for debugging
+    console.log('Received data:', { businessName, businessType, email, phoneNumber, panNumber, password });
 
-      // Validate the incoming data
-      if (
-        !user.businessName ||
-        !user.businessType ||
-        !user.email ||
-        !user.phoneNumber ||
-        !user.panNumber ||
-        !user.password
-      ) {
-        return res.status(400).json({ error: 'All fields are required!' });
-      }
-
-      // Insert user into the database
-      await db.insert(usersTable).values({
-        businessName: user.businessName,
-        businessType: user.businessType,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        panNumber: user.panNumber,
-        password: user.password, // Hash the password before storing in production!
-      });
-
-      res.status(200).json({ message: 'User registered successfully!' });
-    } catch (error) {
-      console.error('Error creating user:', error);
-      res.status(500).json({ error: 'Failed to create user' });
+    // Validate input
+    if (!businessName || !businessType || !email || !phoneNumber || !panNumber || !password) {
+      return new Response(JSON.stringify({ error: 'All fields are required' }), { status: 400 });
     }
-  } else {
-    res.status(405).json({ error: 'Method not allowed' });
+
+    // Check if user already exists
+    const existingUser = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, email))
+
+    if (existingUser.length > 0) {
+      return new Response(JSON.stringify({ error: 'User already exists' }), { status: 400 });
+    }
+
+    // Hash password
+    const hashedPassword = await hash(password, 10);
+
+    // Insert new user into the database
+    await db.insert(usersTable).values({
+      businessName,
+      businessType,
+      email,
+      phoneNumber,
+      panNumber,
+      password: hashedPassword,
+    });
+
+    return new Response(JSON.stringify({ message: 'User registered successfully' }), { status: 201 });
+  } catch (error) {
+    // Log the error for debugging
+    console.error('Error registering user:', error);
+    
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
 }

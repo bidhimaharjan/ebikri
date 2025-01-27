@@ -5,7 +5,43 @@ import { Button } from '@/app/ui/button';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
  
 export default function LoginPage() {
-  return (
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+      
+        try {
+          const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+          });
+      
+          if (response.ok) {
+            alert('Welcome to eBikri');
+            setFormData({
+              email: '',
+              password: '',
+            });
+          } else {
+            const data = await response.json();
+            alert(data.error || 'Log in failed');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Something went wrong');
+        }
+      };
+
+    return (
     <main className="flex min-h-screen flex-col bg-gray-50 p-6">
         {/* <div className="flex h-20 shrink-0 items-end rounded-lg bg-red-500 p-4 md:h-20">
         <EbikriLogo />
@@ -14,7 +50,7 @@ export default function LoginPage() {
         <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
             {/* Left Section */}
             <div className="flex flex-col justify-center gap-6 px-6 py-10 md:w-1/2 md:px-20">
-            <LoginForm />
+            <LoginForm formData={formData} onChange={handleChange} onSubmit={handleSubmit} />
             </div>
 
             {/* Vertical line */}
