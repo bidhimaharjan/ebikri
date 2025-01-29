@@ -7,7 +7,7 @@ import {
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from '@/app/ui/button';
 
-export default function LoginForm({ formData, onChange, onSubmit }) {
+export default function LoginForm({ formData, onChange, onSubmit, error }) {
   return (
     <form 
       onSubmit={onSubmit}
@@ -79,6 +79,9 @@ export default function LoginForm({ formData, onChange, onSubmit }) {
               Remember me
             </label>
           </div>
+
+          {/* Error Message */}
+          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
         </div>
 
         {/* Login Button */}
