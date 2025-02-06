@@ -15,6 +15,13 @@
       "when": 1738852267036,
       "tag": "0001_familiar_doctor_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1738859422152,
+      "tag": "0002_closed_enchantress",
+      "breakpoints": true
     }
   ]
 }
