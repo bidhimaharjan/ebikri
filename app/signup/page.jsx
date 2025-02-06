@@ -9,13 +9,15 @@ import { useState } from 'react';
  
 export default function SignupPage() {
     const [formData, setFormData] = useState({
-        businessName: '',
-        businessType: '',
-        email: '',
+        name: '',
         phoneNumber: '',
-        panNumber: '',
+        email: '',
         password: '',
         confirmPassword: '',
+        businessName: '',
+        businessType: '',
+        businessEmail: '',
+        panNumber: '',
     });
 
     const handleChange = (e) => {
@@ -30,6 +32,15 @@ export default function SignupPage() {
         alert('Passwords do not match!');
         return;
       }
+
+      // check for empty fields
+    const requiredFields = ['name', 'phoneNumber', 'email', 'password', 'businessName', 'businessType'];
+    for (let field of requiredFields) {
+      if (!formData[field]) {
+        alert(`${field} is required!`);
+        return;
+      }
+    }
     
       try {
         const response = await fetch('/api/signup', {
@@ -41,13 +52,15 @@ export default function SignupPage() {
         if (response.ok) {
           alert('User registered successfully!');
           setFormData({
-            businessName: '',
-            businessType: '',
-            email: '',
+            name: '',
             phoneNumber: '',
-            panNumber: '',
+            email: '',
             password: '',
             confirmPassword: '',
+            businessName: '',
+            businessType: '',
+            businessEmail: '',
+            panNumber: '',
           });
         } else {
           const data = await response.json();
@@ -65,7 +78,7 @@ export default function SignupPage() {
         <EbikriLogo />
         </div> */}
 
-        <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
+        <div className="flex grow flex-col gap-4 md:flex-row">
             {/* Left Section */}
             <div className="flex flex-col justify-center gap-10 px-6 py-10 md:w-1/2 md:px-20">
                 <p className={`text-xl text-gray-800 md:text-4xl md:leading-normal`}>

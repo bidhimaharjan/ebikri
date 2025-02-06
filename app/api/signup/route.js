@@ -1,49 +1,61 @@
 // import { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '@/src/index';
 import { usersTable } from '@/src/db/schema/users';
+import { businessTable } from '@/src/db/schema/business';
 import { hash } from 'bcrypt';
 import { eq } from 'drizzle-orm';
 
 export async function POST(req) {
   try {
-    const { businessName, businessType, email, phoneNumber, panNumber, password } = await req.json();
+    const { name, phoneNumber, email, password, businessName, businessType, businessEmail,  panNumber } = await req.json();
     
-    // Log the received data for debugging
-    console.log('Received data:', { businessName, businessType, email, phoneNumber, panNumber, password });
+    // log the received data for debugging
+    console.log('Received data:', { name, phoneNumber, email, password, businessName, businessType, businessEmail,  panNumber });
 
-    // Validate input
-    if (!businessName || !businessType || !email || !phoneNumber || !panNumber || !password) {
-      return new Response(JSON.stringify({ error: 'All fields are required' }), { status: 400 });
+    // validate required fields
+    if (!name || !phoneNumber || !email || !password || !businessName || !businessType) {
+      return new Response(JSON.stringify({ error: 'Fields with * are required' }), { status: 400 });
     }
 
-    // Check if user already exists
+    // check if user already exists
     const existingUser = await db
       .select()
       .from(usersTable)
       .where(eq(usersTable.email, email))
 
     if (existingUser.length > 0) {
-      return new Response(JSON.stringify({ error: 'User already exists' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'User already exists. Try with a new email.' }), { status: 400 });
     }
 
-    // Hash password
+    // hash password
     const hashedPassword = await hash(password, 10);
 
-    // Insert new user into the database
-    await db.insert(usersTable).values({
-      businessName,
-      businessType,
-      email,
+    // insert new user and get the inserted ID using .returning
+    const [newUser] = await db.insert(usersTable).values({
+      name,
       phoneNumber,
-      panNumber,
+      email,
       password: hashedPassword,
-    });
+    }).returning();
 
-    return new Response(JSON.stringify({ message: 'User registered successfully' }), { status: 201 });
+    // check if newUser is valid and contains the userId
+    if (newUser && newUser.id) {
+      await db.insert(businessTable).values({
+        userId: newUser.id,
+        businessName,
+        businessType,
+        businessEmail,
+        panNumber
+      });
+    } else {
+      console.error("Failed to create user, userId is missing.");
+      return new Response(JSON.stringify({ error: 'Failed to register user' }), { status: 500 });
+    }
+
+    return new Response(JSON.stringify({ message: 'User and business registered successfully' }), { status: 201 });
   } catch (error) {
-    // Log the error for debugging
+    // log the error for debugging
     console.error('Error registering user:', error);
-    
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
 }

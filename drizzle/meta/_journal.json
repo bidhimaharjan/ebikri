@@ -8,6 +8,13 @@
       "when": 1737818411754,
       "tag": "0000_hot_scarlet_spider",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1738852267036,
+      "tag": "0001_familiar_doctor_spectrum",
+      "breakpoints": true
     }
   ]
 }
