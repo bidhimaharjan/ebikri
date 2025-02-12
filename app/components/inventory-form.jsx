@@ -5,16 +5,28 @@ const InventoryForm = ({ isOpen, onClose, onConfirm }) => {
   const [stock, setStock] = useState('');
   const [price, setPrice] = useState('');
 
-  if (!isOpen) return null;
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onConfirm({ productName, stock, price });
-    setProductName('');
-    setStock('');
-    setPrice('');
-    onClose();
+
+    const response = await fetch('/api/inventory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        productName,
+        stockAvailability: stock,
+        unitPrice: price,
+      }),
+    });
+
+    if (response.ok) {
+      alert('Product added successfully!');
+      onClose();
+    } else {
+      alert('Error adding product');
+    }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -57,13 +69,13 @@ const InventoryForm = ({ isOpen, onClose, onConfirm }) => {
           <div className="flex justify-between">
             <button
               type="submit"
-              className="px-4 py-2 bg-red-500 text-white rounded-md"
+              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
             >
               Add Product
             </button>
             <button
               type="button"
-              className="px-4 py-2 bg-gray-600 text-white rounded-md"
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-400"
               onClick={onClose}
             >
               Cancel

@@ -1,11 +1,27 @@
 'use client';
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import Navbar from '@/app/components/navbar';
 import { ShoppingCartIcon, UserIcon, UserCircleIcon, CurrencyDollarIcon, Bars3Icon } from '@heroicons/react/24/outline';
 
 const DashboardLayout = () => {
+  const { data: session, status } = useSession();
+
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+
+  if (status === 'loading') {
+    return <p>Loading...</p>;
+  }
+
+  console.log("Session in Dashboard: ", session);
+
+  if (!session) {
+    return <p>You are not authenticated. Please log in to access the dashboard.</p>;
+  }
+
+  // get the user's name from the session, default to "User" if not available
+  const userName = session?.user?.name || 'User';
 
   return (
     <div className="flex h-screen">
@@ -16,9 +32,10 @@ const DashboardLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button and Hello Text */}
         <div className="flex justify-between mb-2">
-          <span className="text-xl font-semibold text-gray-800">Hello, Shriya! Hope you have a great sales day!</span>
-          <button className="text-gray-800">
-            <UserCircleIcon className="h-8 w-8" />
+          <span className="text-xl font-semibold text-gray-800">Hello, {userName}! Hope you have a great sales day!</span>
+          <button className="flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-full">
+            <UserCircleIcon className="h-5 w-5 mr-2" />
+            <span>{session.user.name}</span>
           </button>
         </div>
 

@@ -1,19 +1,18 @@
 import { useState } from 'react';
 import { Bars3Icon, HomeIcon, CubeIcon, ShoppingCartIcon, UserIcon, ChartBarIcon, PaperClipIcon, CogIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import ConfirmationDialog from './confirmation-dialog'
 
 const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleLogout = () => {
-    setIsDialogOpen(true); // Show the confirmation dialog when logout is clicked
+    setIsDialogOpen(true); // show the confirmation dialog when logout is clicked
   };
 
   const handleConfirmLogout = () => {
-    // Perform logout logic here
-    localStorage.removeItem('authToken'); // Example of clearing token
-    window.location.href = '/login'; // Redirect to login page
+    signOut({ callbackUrl: '/login' }); // log out the user and redirect to the login page
   };
 
   return (

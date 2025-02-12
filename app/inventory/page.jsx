@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import Navbar from '@/app/components/navbar';
 import { UserCircleIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@heroicons/react/24/outline';
 import InventoryForm from '@/app/components/inventory-form'
@@ -9,22 +10,46 @@ const InventoryLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFormOpen, setIsFormOpen] = useState(false);
-
+  const { data: session, status } = useSession();
+  const [inventory, setInventory] = useState([]);
+  // pagination setup
   const rowsPerPage = 10;
 
-  // Sample inventory data
-  const inventoryData = new Array(20).fill({
-    id: 'XXX',
-    name: 'Lorem Ipsum',
-    stock: 'XX',
-    price: 'XXXX.XX',
-  });
+  console.log("Session in InventoryPage:", session);
+
+  useEffect(() => {
+    if (session) {
+      // Fetch user-specific inventory data
+      const fetchInventory = async () => {
+        try {
+          const response = await fetch(`/api/inventory?businessId=${session.user.businessId}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch inventory');
+          }
+          const data = await response.json();
+          setInventory(data);
+        } catch (error) {
+          console.error('Error fetching inventory:', error);
+        }
+      };
+  
+      fetchInventory();
+    }
+  }, [session]);
+
+  if (status === 'loading') {
+    return <p>Loading...</p>;
+  }
+
+  if (!session) {
+    return <p>You are not authenticated. Please log in to access the inventory.</p>;
+  }
 
   // calculate pagination
-  const totalPages = Math.ceil(inventoryData.length / rowsPerPage);
+  const totalPages = Math.ceil(inventory.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const displayedRows = inventoryData.slice(startIndex, endIndex);
+  const displayedRows = inventory.slice(startIndex, endIndex);
 
   return (
     <div className="flex h-screen">
@@ -34,7 +59,7 @@ const InventoryLayout = () => {
         <div className="flex justify-end mb-2">
           <button className="flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-full">
             <UserCircleIcon className="h-5 w-5 mr-2" />
-            <span>Lorem Ipsum</span>
+            <span>{session.user.name}</span>
           </button>
         </div>
 
@@ -44,7 +69,7 @@ const InventoryLayout = () => {
 
         <div className="flex justify-between items-center mb-4">
           <button 
-            className="h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md flex items-center"
+            className="h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md flex items-center hover:bg-red-600"
             onClick={() => setIsFormOpen(true)}>
             <PlusIcon className="h-5 w-5 mr-1" /> Add
           </button>
@@ -57,7 +82,7 @@ const InventoryLayout = () => {
               />
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
             </div>
-            <button className="ml-2 h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md">Search</button>
+            <button className="ml-2 h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600">Search</button>
           </div>
         </div>
 
