@@ -4,8 +4,7 @@ import Link from 'next/link';
 import ConfirmationDialog from './confirmation-dialog'
 
 const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
-  // Define the state for the dialog visibility
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // Fix here
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleLogout = () => {
     setIsDialogOpen(true); // Show the confirmation dialog when logout is clicked

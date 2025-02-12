@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Navbar from '@/app/components/navbar';
-import Link from 'next/link';
 import { ShoppingCartIcon, UserIcon, UserCircleIcon, CurrencyDollarIcon, Bars3Icon } from '@heroicons/react/24/outline';
 
 const DashboardLayout = () => {
@@ -16,15 +15,16 @@ const DashboardLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button and Hello Text */}
-        <div className="flex justify-between mb-6">
+        <div className="flex justify-between mb-2">
           <span className="text-xl font-semibold text-gray-800">Hello, Shriya! Hope you have a great sales day!</span>
           <button className="text-gray-800">
             <UserCircleIcon className="h-8 w-8" />
           </button>
         </div>
 
-        <div className="relative mb-6">
-          <h1 className="text-xl font-semibold text-gray-800 mt-6">Dashboard</h1>
+        {/* Dashboard Title */}
+        <div className="relative mb-4">
+          <h1 className="text-xl font-semibold text-gray-800 mt-2">Dashboard</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -53,6 +53,11 @@ const DashboardLayout = () => {
         {/* Additional Content */}
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-gray-800">Sales Insights</h2>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center text-gray-500 text-sm mt-4">
+          ©2025 eBikri. All Rights Reserved
         </div>
       </div>
     </div>

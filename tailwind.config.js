@@ -15,6 +15,9 @@ const config = {
           500: '#BF211E',
           600: '#8f1917',
         },
+        blue: {
+          600: '#2c60d1',
+        }
       },
     },
     keyframes: {
