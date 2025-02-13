@@ -14,8 +14,7 @@ const InventoryLayout = () => {
   const [inventory, setInventory] = useState([]);
   // pagination setup
   const rowsPerPage = 10;
-
-  console.log("Session in InventoryPage:", session);
+  // console.log("Session in InventoryPage:", session);
 
   useEffect(() => {
     if (session) {

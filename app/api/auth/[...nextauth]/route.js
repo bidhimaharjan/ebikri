@@ -6,7 +6,7 @@ import { businessTable } from '@/src/db/schema/business';
 import { eq } from 'drizzle-orm';
 import { compare } from 'bcrypt';
 
-const authOptions = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -60,16 +60,16 @@ const authOptions = {
         token.name = user.name;
         token.businessId = user.businessId;
       }
-      console.log("JWT Token: ", token);
+      // console.log("JWT Token: ", token);
       return token;
     },
     async session({ session, token }) {
-      console.log("Session Callback - Token: ", token);
+      // console.log("Session Callback - Token: ", token);
       session.user.id = token.id;
       session.user.email = token.email;
       session.user.name = token.name;
       session.user.businessId = token.businessId;
-      console.log("Session: ", session);
+      // console.log("Session: ", session);
       return session;
     },
   },
