@@ -1,4 +1,4 @@
-// import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import { db } from '@/src/index';
 import { usersTable } from '@/src/db/schema/users';
 import { businessTable } from '@/src/db/schema/business';
@@ -14,7 +14,7 @@ export async function POST(req) {
 
     // validate required fields
     if (!name || !phoneNumber || !email || !password || !businessName || !businessType) {
-      return new Response(JSON.stringify({ error: 'Fields with * are required' }), { status: 400 });
+      return new NextResponse(JSON.stringify({ error: 'Fields with * are required' }), { status: 400 });
     }
 
     // check if user already exists
@@ -24,7 +24,7 @@ export async function POST(req) {
       .where(eq(usersTable.email, email))
 
     if (existingUser.length > 0) {
-      return new Response(JSON.stringify({ error: 'User already exists. Try with a new email.' }), { status: 400 });
+      return new NextResponse(JSON.stringify({ error: 'User already exists. Try with a new email.' }), { status: 400 });
     }
 
     // hash password
@@ -49,13 +49,13 @@ export async function POST(req) {
       });
     } else {
       console.error("Failed to create user, userId is missing.");
-      return new Response(JSON.stringify({ error: 'Failed to register user' }), { status: 500 });
+      return new NextResponse(JSON.stringify({ error: 'Failed to register user' }), { status: 500 });
     }
 
-    return new Response(JSON.stringify({ message: 'User and business registered successfully' }), { status: 201 });
+    return new NextResponse(JSON.stringify({ message: 'User and business registered successfully' }), { status: 201 });
   } catch (error) {
     // log the error for debugging
     console.error('Error registering user:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
+    return new NextResponse(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
 }
