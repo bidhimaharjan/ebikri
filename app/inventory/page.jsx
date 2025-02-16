@@ -4,37 +4,65 @@ import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import Navbar from '@/app/components/navbar';
 import { UserCircleIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@heroicons/react/24/outline';
-import InventoryForm from '@/app/components/inventory-form'
+import AddProductForm from '@/app/components/add-product-form'
+import EditProductForm from '@/app/components/edit-product-form'
+import ConfirmationDialog from '@/app/components/confirmation-dialog';
 
 const InventoryLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null); // track the selected product for editing
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false); // state for confirmation dialog
+  const [productToDelete, setProductToDelete] = useState(null); // track the product ID to delete
   const { data: session, status } = useSession();
   const [inventory, setInventory] = useState([]);
-  // pagination setup
-  const rowsPerPage = 10;
-  // console.log("Session in InventoryPage:", session);
+  const rowsPerPage = 10; // pagination setup
+
+  // fetch inventory data
+  const fetchInventory = async () => {
+    try {
+      const response = await fetch(`/api/inventory?businessId=${session.user.businessId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch inventory');
+      }
+      const data = await response.json();
+      setInventory(data);
+    } catch (error) {
+      console.error('Error fetching inventory:', error);
+    }
+  };
 
   useEffect(() => {
     if (session) {
-      // Fetch user-specific inventory data
-      const fetchInventory = async () => {
-        try {
-          const response = await fetch(`/api/inventory?businessId=${session.user.businessId}`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch inventory');
-          }
-          const data = await response.json();
-          setInventory(data);
-        } catch (error) {
-          console.error('Error fetching inventory:', error);
-        }
-      };
-  
       fetchInventory();
     }
   }, [session]);
+
+  // handle Edit button click
+  const handleEdit = (product) => {
+    setSelectedProduct(product); // set the selected product
+    setIsEditFormOpen(true); // open the edit form
+  };
+
+  // handle Delete button click
+  const handleDelete = async (productId) => {
+    try {
+      const response = await fetch(`/api/inventory/${productId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        alert('Product deleted successfully!');
+        fetchInventory(); // refresh the inventory data
+      } else {
+        alert('Error deleting product');
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
 
   if (status === 'loading') {
     return <p>Loading...</p>;
@@ -52,8 +80,10 @@ const InventoryLayout = () => {
 
   return (
     <div className="flex h-screen">
+      {/* Navigation Bar */}
       <Navbar isNavbarOpen={isNavbarOpen} setIsNavbarOpen={setIsNavbarOpen} />
 
+      {/* Profile Button */}
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         <div className="flex justify-end mb-2">
           <button className="flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-full">
@@ -62,16 +92,19 @@ const InventoryLayout = () => {
           </button>
         </div>
 
+        {/* Inventory */}
         <div className="relative mb-4">
           <h1 className="text-xl font-semibold text-gray-800 mt-2">Inventory</h1>
         </div>
 
         <div className="flex justify-between items-center mb-4">
+          {/* Add Product Button */}
           <button 
             className="h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md flex items-center hover:bg-red-600"
-            onClick={() => setIsFormOpen(true)}>
+            onClick={() => setIsAddFormOpen(true)}>
             <PlusIcon className="h-5 w-5 mr-1" /> Add
           </button>
+          {/* Search Bar */}
           <div className="flex-1 flex justify-center">
             <div className="relative w-1/3">
               <input
@@ -85,6 +118,7 @@ const InventoryLayout = () => {
           </div>
         </div>
 
+        {/* Inventory Table */}
         <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
           <table className="w-full border-collapse">
             <thead>
@@ -100,12 +134,28 @@ const InventoryLayout = () => {
               {displayedRows.map((item, index) => (
                 <tr key={index} className="border-b">
                   <td className="px-4 py-2">{item.id}</td>
-                  <td className="px-4 py-2">{item.name}</td>
-                  <td className="px-4 py-2">{item.stock}</td>
-                  <td className="px-4 py-2">{item.price}</td>
+                  <td className="px-4 py-2">{item.productName}</td>
+                  <td className="px-4 py-2">{item.stockAvailability}</td>
+                  <td className="px-4 py-2">{item.unitPrice}</td>
                   <td className="px-4 py-2 flex justify-center space-x-2">
-                    <button className="px-4 py-1 text-sm bg-green-600 text-white rounded-md">Edit</button>
-                    <button className="px-4 py-1 text-sm bg-red-500 text-white rounded-md">Delete</button>
+                    {/* Edit Product Button */}
+                    <button 
+                    className="px-4 py-1 text-sm bg-green-600 text-white rounded-md"
+                    onClick={() => handleEdit(item)}
+                    >
+                      Edit
+                    </button>
+
+                    {/* Delete Product Button */}
+                    <button 
+                    className="px-4 py-1 text-sm bg-red-500 text-white rounded-md"
+                    onClick={() => {
+                      setProductToDelete(item.id); // set the product ID to delete
+                      setIsConfirmationDialogOpen(true); // open the confirmation dialog
+                    }}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -113,6 +163,7 @@ const InventoryLayout = () => {
           </table>
         </div>
 
+        {/* Pagination */}
         <div className="flex justify-end mt-4 space-x-2">
           <button
             className={`p-2 bg-gray-500 text-white rounded-md ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -141,12 +192,39 @@ const InventoryLayout = () => {
           </button>
         </div>
 
+        {/* Footer */}
         <div className="text-center text-gray-500 text-sm mt-2">
           ©2025 eBikri. All Rights Reserved
         </div>
 
-        {/* Pop-up form */}
-        {isFormOpen && <InventoryForm isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} />}
+        {/* Add Product Form */}
+        {isAddFormOpen && (
+          <AddProductForm
+            isOpen={isAddFormOpen}
+            onClose={() => setIsAddFormOpen(false)}
+          />
+        )}
+
+        {/* Edit Product Form */}
+        {isEditFormOpen && (
+          <EditProductForm
+            isOpen={isEditFormOpen}
+            onClose={() => setIsEditFormOpen(false)}
+            // onConfirm={fetchInventory} // Pass the fetchInventory function
+            product={selectedProduct}
+          />
+        )}
+
+        {/* Confirmation Dialog */}
+        <ConfirmationDialog
+          isOpen={isConfirmationDialogOpen}
+          onClose={() => setIsConfirmationDialogOpen(false)}
+          onConfirm={() => {
+            handleDelete(productToDelete); // call handleDelete with the product ID
+            setIsConfirmationDialogOpen(false); // close the dialog
+          }}
+          message="Are you sure you want to delete this product?"
+        />
       </div>
     </div>
   );

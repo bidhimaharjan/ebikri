@@ -5,18 +5,18 @@ import { db } from '@/src/index';
 import { inventoryTable } from '@/src/db/schema/inventory';
 import { eq } from 'drizzle-orm';
 
+// fetch inventory data
 export async function GET(request) {
   const session = await getServerSession(authOptions);
-  // console.log("Session from Inventory: ", session);
 
   if (!session) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
     });
   }
 
   try {
-    // Ensure businessId is being passed correctly from the session
+    // ensure businessId is being passed correctly from the session
     const inventory = await db
       .select()
       .from(inventoryTable)
@@ -24,19 +24,20 @@ export async function GET(request) {
 
     console.log(inventory);
 
-    return new Response(JSON.stringify(inventory), {
+    return new NextResponse(JSON.stringify(inventory), {
       status: 200,
     });
   } catch (error) {
     console.error('Error fetching inventory:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+    return new NextResponse(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
     });
   }
 }
 
+// add new product data
 export async function POST(request) {
-  const session = await getServerSession(authOptions); // Pass authOptions here
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json(
@@ -49,7 +50,7 @@ export async function POST(request) {
     const body = await request.json();
     const { productName, stockAvailability, unitPrice } = body;
 
-    // Validate input fields
+    // validate input fields
     if (!productName || !stockAvailability || !unitPrice) {
       return NextResponse.json(
         { message: 'Missing required fields' },
@@ -64,7 +65,7 @@ export async function POST(request) {
       unitPrice,
     }).returning();
 
-    // Return a success message with the added product
+    // return a success message with the added product
     return NextResponse.json(
       { message: 'Product added successfully', product: newProduct },
       { status: 201 }

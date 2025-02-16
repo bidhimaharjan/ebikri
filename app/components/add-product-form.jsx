@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const InventoryForm = ({ isOpen, onClose, onConfirm }) => {
+const AddProductForm = ({ isOpen, onClose, onConfirm }) => {
   const [productName, setProductName] = useState('');
   const [stock, setStock] = useState('');
   const [price, setPrice] = useState('');
@@ -21,6 +21,7 @@ const InventoryForm = ({ isOpen, onClose, onConfirm }) => {
     if (response.ok) {
       alert('Product added successfully!');
       onClose();
+      window.location.reload();
     } else {
       alert('Error adding product');
     }
@@ -87,5 +88,5 @@ const InventoryForm = ({ isOpen, onClose, onConfirm }) => {
   );
 };
 
-export default InventoryForm;
+export default AddProductForm;
 
