@@ -4,11 +4,12 @@ import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Navbar from '@/app/components/navbar';
 import { UserCircleIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@heroicons/react/24/outline';
+import AddOrderForm from '@/app/components/orders/add-order-form'
 
 const OrdersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isNewOrderFormOpen, setNewOrderFormOpen] = useState(false);
+  const [isAddOrderFormOpen, setIsAddOrderFormOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(''); // state for search query
   const { data: session, status } = useSession();
   const [orders, setOrders] = useState([]);
@@ -79,8 +80,8 @@ const OrdersLayout = () => {
           {/* New Order Button */}
           <button 
             className="h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md flex items-center hover:bg-red-600"
-            onClick={() => setNewOrderFormOpen(true)}>
-            <PlusIcon className="h-5 w-5 mr-1" /> Add
+            onClick={() => setIsAddOrderFormOpen(true)}>
+            <PlusIcon className="h-5 w-5 mr-1" /> New Order
           </button>
           {/* Search Bar */}
           <div className="flex-1 flex justify-center">
@@ -101,6 +102,53 @@ const OrdersLayout = () => {
               Search
             </button>
           </div>
+        </div>
+
+        {/* Orders Table */}
+        <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-800 text-white text-left">
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Customer Details</th>
+                <th className="px-4 py-2">Order Details</th>
+                <th className="px-4 py-2">Total Amount</th>
+                <th className="px-4 py-2">Order Date</th>
+                <th className="px-4 py-2">Payments</th>
+                <th className="px-4 py-2 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayedRows.map((item, index) => (
+                <tr key={index} className="border-b">
+                  <td className="px-4 py-2">{item.id}</td>
+                  <td className="px-4 py-2">{item.productName}</td>
+                  <td className="px-4 py-2">{item.stockAvailability}</td>
+                  <td className="px-4 py-2">{item.unitPrice}</td>
+                  <td className="px-4 py-2 flex justify-center space-x-2">
+                    {/* Edit Order Button */}
+                    <button 
+                    className="px-4 py-1 text-sm bg-green-600 text-white rounded-md"
+                    onClick={() => handleEdit(item)}
+                    >
+                      Edit
+                    </button>
+
+                    {/* Delete Order Button */}
+                    <button 
+                    className="px-4 py-1 text-sm bg-red-500 text-white rounded-md"
+                    onClick={() => {
+                      setProductToDelete(item.id); // set the order ID to delete
+                      setIsConfirmationDialogOpen(true); // open the confirmation dialog
+                    }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination */}
@@ -136,6 +184,14 @@ const OrdersLayout = () => {
         <div className="text-center text-gray-500 text-sm mt-2">
           ©2025 eBikri. All Rights Reserved
         </div>
+
+        {/* Add Order Form */}
+        {isAddOrderFormOpen && (
+          <AddOrderForm
+            isOpen={isAddOrderFormOpen}
+            onClose={() => setIsAddOrderFormOpen(false)}
+          />
+        )}
 
       </div>
     </div>
