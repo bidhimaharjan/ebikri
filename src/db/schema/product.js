@@ -1,7 +1,7 @@
 import { numeric, integer, pgTable, varchar } from "drizzle-orm/pg-core";
 import { businessTable } from "./business";
 
-export const inventoryTable = pgTable("inventory", {
+export const productTable = pgTable("product", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
 
   businessId: integer().notNull().references(() => businessTable.id, { onDelete: "cascade" }),

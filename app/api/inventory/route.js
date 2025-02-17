@@ -2,10 +2,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { NextResponse } from 'next/server';
 import { db } from '@/src/index';
-import { inventoryTable } from '@/src/db/schema/inventory';
+import { productTable } from '@/src/db/schema/product';
 import { eq } from 'drizzle-orm';
 
-// fetch inventory data
+// fetch product data
 export async function GET(request) {
   const session = await getServerSession(authOptions);
 
@@ -19,8 +19,8 @@ export async function GET(request) {
     // ensure businessId is being passed correctly from the session
     const inventory = await db
       .select()
-      .from(inventoryTable)
-      .where(eq(inventoryTable.businessId, session.user.businessId));
+      .from(productTable)
+      .where(eq(productTable.businessId, session.user.businessId));
 
     console.log(inventory);
 
@@ -58,7 +58,7 @@ export async function POST(request) {
       );
     }
 
-    const [newProduct] = await db.insert(inventoryTable).values({
+    const [newProduct] = await db.insert(productTable).values({
       businessId: session.user.businessId,
       productName,
       stockAvailability,

@@ -8,7 +8,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { sql } from 'drizzle-orm';
 
 import { usersTable } from "./db/schema/users.js";
-import { inventoryTable } from "./db/schema/inventory.js";
+import { inventoryTable } from "./db/schema/product.js";
 
 // create a new Pool using DATABASE_URL from the environment
 const pool = new Pool({

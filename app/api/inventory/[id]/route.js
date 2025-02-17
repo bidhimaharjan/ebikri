@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { NextResponse } from 'next/server';
 import { db } from '@/src/index';
-import { inventoryTable } from '@/src/db/schema/inventory';
+import { productTable } from '@/src/db/schema/product';
 import { eq } from 'drizzle-orm';
 
 // update existing product data
@@ -30,13 +30,13 @@ export async function PUT(request, { params }) {
     }
 
     const [updatedProduct] = await db
-      .update(inventoryTable)
+      .update(productTable)
       .set({
         productName,
         stockAvailability,
         unitPrice,
       })
-      .where(eq(inventoryTable.id, id))
+      .where(eq(productTable.id, id))
       .returning();
 
     return new NextResponse(JSON.stringify({ message: 'Product updated successfully', product: updatedProduct }), {
@@ -66,8 +66,8 @@ export async function DELETE(request, { params }) {
     console.log("Deleting Product with ID:", id);
 
     await db
-      .delete(inventoryTable)
-      .where(eq(inventoryTable.id, id));
+      .delete(productTable)
+      .where(eq(productTable.id, id));
 
     return new NextResponse(JSON.stringify({ message: 'Product deleted successfully' }), {
       status: 200,

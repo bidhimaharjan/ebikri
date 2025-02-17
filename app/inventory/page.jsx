@@ -1,11 +1,11 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/app/components/navbar';
 import { UserCircleIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@heroicons/react/24/outline';
-import AddProductForm from '@/app/components/add-product-form'
-import EditProductForm from '@/app/components/edit-product-form'
+import AddProductForm from '@/app/components/inventory/add-product-form'
+import EditProductForm from '@/app/components/inventory/edit-product-form'
 import ConfirmationDialog from '@/app/components/confirmation-dialog';
 
 const InventoryLayout = () => {
@@ -16,6 +16,7 @@ const InventoryLayout = () => {
   const [selectedProduct, setSelectedProduct] = useState(null); // track the selected product for editing
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false); // state for confirmation dialog
   const [productToDelete, setProductToDelete] = useState(null); // track the product ID to delete
+  const [searchQuery, setSearchQuery] = useState(''); // state for search query
   const { data: session, status } = useSession();
   const [inventory, setInventory] = useState([]);
   const rowsPerPage = 10; // pagination setup
@@ -64,6 +65,18 @@ const InventoryLayout = () => {
     }
   };
 
+  // filter inventory based on search query
+  const filteredInventory = inventory.filter((item) =>
+    item.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.id.toString().includes(searchQuery)
+  );
+
+  // calculate pagination
+  const totalPages = Math.ceil(filteredInventory.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const displayedRows = filteredInventory.slice(startIndex, endIndex);
+
   if (status === 'loading') {
     return <p>Loading...</p>;
   }
@@ -72,19 +85,14 @@ const InventoryLayout = () => {
     return <p>You are not authenticated. Please log in to access the inventory.</p>;
   }
 
-  // calculate pagination
-  const totalPages = Math.ceil(inventory.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const displayedRows = inventory.slice(startIndex, endIndex);
-
   return (
     <div className="flex h-screen">
       {/* Navigation Bar */}
       <Navbar isNavbarOpen={isNavbarOpen} setIsNavbarOpen={setIsNavbarOpen} />
 
-      {/* Profile Button */}
+      {/* Main Content Area */}
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
+        {/* Profile Button */} 
         <div className="flex justify-end mb-2">
           <button className="flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-full">
             <UserCircleIcon className="h-5 w-5 mr-2" />
@@ -92,7 +100,7 @@ const InventoryLayout = () => {
           </button>
         </div>
 
-        {/* Inventory */}
+        {/* Inventory Title */}
         <div className="relative mb-4">
           <h1 className="text-xl font-semibold text-gray-800 mt-2">Inventory</h1>
         </div>
@@ -111,10 +119,17 @@ const InventoryLayout = () => {
                 type="text"
                 placeholder="Search a product..."
                 className="w-full h-10 px-4 pl-10 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} // update search query
               />
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
             </div>
-            <button className="ml-2 h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600">Search</button>
+            <button 
+              className="ml-2 h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600"
+              onClick={() => setSearchQuery('')} // clear search query
+            >
+              Search
+            </button>
           </div>
         </div>
 

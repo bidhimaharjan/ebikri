@@ -14,8 +14,6 @@ const DashboardLayout = () => {
     return <p>Loading...</p>;
   }
 
-  console.log("Session in Dashboard: ", session);
-
   if (!session) {
     return <p>You are not authenticated. Please log in to access the dashboard.</p>;
   }
