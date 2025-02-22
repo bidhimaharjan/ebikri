@@ -1,5 +1,5 @@
 {
-  "id": "23308ac5-d3ad-43a9-bbf3-755130561a47",
+  "id": "b435ca26-de83-4f8a-9b0b-4a4ce5de5f9d",
   "prevId": "0521d179-93ab-4d10-94ae-62ac52171f1a",
   "version": "7",
   "dialect": "postgresql",
@@ -86,6 +86,101 @@
           "nullsNotDistinct": false,
           "columns": [
             "panNumber"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.customer": {
+      "name": "customer",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "customer_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "businessId": {
+          "name": "businessId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phoneNumber": {
+          "name": "phoneNumber",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "added_date": {
+          "name": "added_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "totalOrders": {
+          "name": "totalOrders",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "customer_businessId_business_id_fk": {
+          "name": "customer_businessId_business_id_fk",
+          "tableFrom": "customer",
+          "tableTo": "business",
+          "columnsFrom": [
+            "businessId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "customer_phoneNumber_unique": {
+          "name": "customer_phoneNumber_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "phoneNumber"
+          ]
+        },
+        "customer_email_unique": {
+          "name": "customer_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
           ]
         }
       },
