@@ -29,6 +29,27 @@
       "when": 1740201821063,
       "tag": "0003_simple_the_enforcers",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1740333810245,
+      "tag": "0004_violet_nitro",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1740334012480,
+      "tag": "0005_stiff_steel_serpent",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1740334051411,
+      "tag": "0006_brainy_the_enforcers",
+      "breakpoints": true
     }
   ]
 }

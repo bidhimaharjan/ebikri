@@ -1,10 +1,13 @@
 import { numeric, integer, pgTable, varchar, date } from "drizzle-orm/pg-core";
 import { businessTable } from "./business";
+import { customerTable } from "./customer";
 
 export const orderTable = pgTable("order", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
 
   businessId: integer().notNull().references(() => businessTable.id, { onDelete: "cascade" }),
+
+  customerId: integer().notNull().references(() => customerTable.id, { onDelete: "cascade" }),
 
   customerName: varchar({ length: 255 }).notNull(),
 

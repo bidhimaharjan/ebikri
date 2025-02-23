@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [products, setProducts] = useState([{ productId: "", quantity: "" }]);
   const [availableProducts, setAvailableProducts] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [customer, setCustomer] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -10,25 +11,59 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [deliveryLocation, setDeliveryLocation] = useState("");
   const [showCustomerDetails, setShowCustomerDetails] = useState(false);
 
-  // fetch products when the form is opened
+  // Fetch products and customers when the form is opened
   useEffect(() => {
     if (isOpen) {
-      const fetchProducts = async () => {
+      const fetchData = async () => {
         try {
-          const response = await fetch("/api/inventory");
-          if (!response.ok) {
+          // Fetch products
+          const productsResponse = await fetch("/api/inventory");
+          if (!productsResponse.ok) {
             throw new Error("Failed to fetch products");
           }
-          const data = await response.json();
-          setAvailableProducts(data);
+          const productsData = await productsResponse.json();
+          setAvailableProducts(productsData);
+
+          // Fetch customers
+          const customersResponse = await fetch("/api/customers");
+          if (!customersResponse.ok) {
+            throw new Error("Failed to fetch customers");
+          }
+          const customersData = await customersResponse.json();
+          setCustomers(customersData);
         } catch (error) {
-          console.error("Error fetching products:", error);
+          console.error("Error fetching data:", error);
         }
       };
 
-      fetchProducts();
+      fetchData();
     }
   }, [isOpen]);
+
+  // Handle customer selection
+  const handleCustomerChange = (e) => {
+    const selectedCustomerId = e.target.value;
+    setCustomer(selectedCustomerId);
+
+    if (selectedCustomerId) {
+      // Find the selected customer from the customers list
+      const selectedCustomer = customers.find(
+        (cust) => cust.id === parseInt(selectedCustomerId)
+      );
+
+      if (selectedCustomer) {
+        // Populate the form fields with the selected customer's details
+        setName(selectedCustomer.name);
+        setEmail(selectedCustomer.email);
+        setPhoneNumber(selectedCustomer.phoneNumber);
+      }
+    } else {
+      // Clear the form fields if no customer is selected
+      setName("");
+      setEmail("");
+      setPhoneNumber("");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,7 +142,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                 <label className="block text-sm font-medium">Quantity *</label>
                 <input
                   type="number"
-                  className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200 pr-8" // Adjust padding to prevent overlap
+                  className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200 pr-8"
                   value={product.quantity}
                   onChange={(e) =>
                     updateProductField(index, "quantity", e.target.value)
@@ -147,10 +182,14 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
               <select
                 className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200"
                 value={customer}
-                onChange={(e) => setCustomer(e.target.value)}
+                onChange={handleCustomerChange} // Updated handler
               >
                 <option value="">Select a customer</option>
-                {/* Options should be dynamically loaded */}
+                {customers.map((cust) => (
+                  <option key={cust.id} value={cust.id}>
+                    ID{cust.id} {cust.name} ({cust.phoneNumber})
+                  </option>
+                ))}
               </select>
             </div>
 

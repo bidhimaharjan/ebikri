@@ -1,0 +1,2 @@
+ALTER TABLE "order" ADD COLUMN "customerId" integer NOT NULL;--> statement-breakpoint
+ALTER TABLE "order" ADD CONSTRAINT "order_customerId_customer_id_fk" FOREIGN KEY ("customerId") REFERENCES "public"."customer"("id") ON DELETE cascade ON UPDATE no action;
