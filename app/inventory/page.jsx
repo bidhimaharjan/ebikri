@@ -155,7 +155,7 @@ const InventoryLayout = () => {
                   <td className="px-4 py-2 flex justify-center space-x-2">
                     {/* Edit Product Button */}
                     <button 
-                    className="px-4 py-1 text-sm bg-green-600 text-white rounded-md"
+                    className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-400"
                     onClick={() => handleEdit(item)}
                     >
                       Edit
@@ -163,7 +163,7 @@ const InventoryLayout = () => {
 
                     {/* Delete Product Button */}
                     <button 
-                    className="px-4 py-1 text-sm bg-red-500 text-white rounded-md"
+                    className="px-4 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
                     onClick={() => {
                       setProductToDelete(item.id); // set the product ID to delete
                       setIsConfirmationDialogOpen(true); // open the confirmation dialog

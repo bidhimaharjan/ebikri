@@ -15,7 +15,7 @@ const OrdersLayout = () => {
   const [orders, setOrders] = useState([]);
   const rowsPerPage = 3;
 
-  // Fetch order data
+  // fetch order data
   const fetchOrders = async () => {
     try {
       const response = await fetch(`/api/orders?businessId=${session.user.businessId}`);
@@ -35,21 +35,25 @@ const OrdersLayout = () => {
     }
   }, [session]);
 
-  // Filter orders based on search query
-  const filteredOrders = orders.filter((item) =>
-    item.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.id.toString().includes(searchQuery)
-  );
+  // filter orders based on search query
+  const filteredOrders = orders.filter((item) => {
+    const orderIdMatch = item.id.toString().includes(searchQuery);
+    const customerIdMatch = item.customer?.id.toString().includes(searchQuery);
+    const customerNameMatch = item.customer?.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const orderDateMatch = new Date(item.orderDate).toLocaleDateString().includes(searchQuery);
+  
+    return orderIdMatch || customerIdMatch || customerNameMatch || orderDateMatch;
+  });
 
-  // Calculate pagination
+  // calculate pagination
   const totalPages = Math.ceil(filteredOrders.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const displayedRows = filteredOrders.slice(startIndex, endIndex);
 
-  // Handle payments button click
+  // handle payments button click
   const handlePayments = (orderId) => {
-    // Implement payments logic here (e.g., open a modal or navigate to a payments page)
+    // implement payments logic here
     console.log(`Payments clicked for order ID: ${orderId}`);
   };
 
@@ -84,7 +88,7 @@ const OrdersLayout = () => {
         <div className="flex justify-between items-center mb-4">
           {/* New Order Button */}
           <button 
-            className="h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md flex items-center hover:bg-red-600"
+            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-blue-600"
             onClick={() => setIsAddOrderFormOpen(true)}>
             <PlusIcon className="h-5 w-5 mr-1" /> New Order
           </button>
@@ -101,7 +105,7 @@ const OrdersLayout = () => {
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
             </div>
             <button 
-              className="ml-2 h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600"
+              className="ml-2 h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600"
               onClick={() => setSearchQuery('')}
             >
               Search
@@ -159,19 +163,19 @@ const OrdersLayout = () => {
                   <td className="px-4 py-2 text-center">{new Date(item.orderDate).toLocaleDateString()}</td>
                   <td className="px-4 py-2 flex justify-center space-x-2">
                     <button 
-                      className="px-4 py-1 text-sm bg-green-500 text-white rounded-md flex items-center"
+                      className="px-4 py-1 text-sm bg-green-500 text-white rounded-md flex items-center hover:bg-green-600"
                       onClick={() => handlePayments(item.id)}
                     >
                       <CreditCardIcon className="h-4 w-4 mr-1" /> Payments
                     </button>
                     <button 
-                      className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md"
+                      className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-400"
                       onClick={() => handleEdit(item)}
                     >
                       Edit
                     </button>
                     <button 
-                      className="px-4 py-1 text-sm bg-red-500 text-white rounded-md"
+                      className="px-4 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
                       onClick={() => {
                         setProductToDelete(item.id);
                         setIsConfirmationDialogOpen(true);
