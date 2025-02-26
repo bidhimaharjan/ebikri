@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import Navbar from '@/app/components/navbar';
+import Navbar from '@/components/navbar';
 import { ShoppingCartIcon, UserIcon, UserCircleIcon, CurrencyDollarIcon, Bars3Icon } from '@heroicons/react/24/outline';
 
 const DashboardLayout = () => {

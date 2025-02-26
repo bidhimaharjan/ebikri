@@ -2,9 +2,9 @@
 
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import Navbar from '@/app/components/navbar';
+import Navbar from '@/components/navbar';
 import { UserCircleIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon, CreditCardIcon } from '@heroicons/react/24/outline';
-import AddOrderForm from '@/app/components/orders/add-order-form';
+import AddOrderForm from '@/components/orders/add-order-form';
 
 const OrdersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);

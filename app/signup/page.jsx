@@ -1,11 +1,13 @@
 'use client';
 
-// import EbikriLogo from '@/app/ui/ebikri-logo';
-import SignupForm from '@/app/components/users/signup-form';
+// import EbikriLogo from '@/ui/ebikri-logo';
+import { useState } from 'react';
+import SignupForm from '@/components/users/signup-form';
 import { Button } from '@/app/ui/button';
 import Link from 'next/link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { toast } from 'react-toastify';
+import ToastifyContainer from '@/components/toastifycontainer';
  
 export default function SignupPage() {
     const [formData, setFormData] = useState({
@@ -29,7 +31,7 @@ export default function SignupPage() {
       e.preventDefault();
     
       if (formData.password !== formData.confirmPassword) {
-        alert('Passwords do not match!');
+        toast.error('Passwords do not match!');
         return;
       }
 
@@ -37,7 +39,7 @@ export default function SignupPage() {
     const requiredFields = ['name', 'phoneNumber', 'email', 'password', 'businessName', 'businessType'];
     for (let field of requiredFields) {
       if (!formData[field]) {
-        alert(`${field} is required!`);
+        toast.warn(`${field} is required!`);
         return;
       }
     }
@@ -50,7 +52,7 @@ export default function SignupPage() {
         });
     
         if (response.ok) {
-          alert('User registered successfully!');
+          toast.success('User registered successfully!');
           setFormData({
             name: '',
             phoneNumber: '',
@@ -64,11 +66,11 @@ export default function SignupPage() {
           });
         } else {
           const data = await response.json();
-          alert(data.error || 'Registration failed');
+          toast.error(data.error || 'Registration failed');
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('Something went wrong');
+        toast.error('Something went wrong');
       }
     };
 
@@ -105,6 +107,8 @@ export default function SignupPage() {
                 <div className="flex flex-col justify-center gap-6 px-6 py-10 md:w-1/2 md:px-20">
                 <SignupForm formData={formData} onChange={handleChange} onSubmit={handleSubmit} />
             </div>
+
+            <ToastifyContainer />
         </div>
     </main>
     // <main className="flex items-center justify-center md:h-screen">
