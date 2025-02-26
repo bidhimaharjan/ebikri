@@ -43,7 +43,7 @@ const OrdersLayout = () => {
     const orderDateMatch = new Date(item.orderDate).toLocaleDateString().includes(searchQuery);
   
     return orderIdMatch || customerIdMatch || customerNameMatch || orderDateMatch;
-  });
+  }).sort((a, b) => a.id - b.id);
 
   // calculate pagination
   const totalPages = Math.ceil(filteredOrders.length / rowsPerPage);

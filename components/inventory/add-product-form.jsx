@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
+import ToastifyContainer from '@/components/toastifycontainer';
 
 const AddProductForm = ({ isOpen, onClose, onConfirm }) => {
   const [productName, setProductName] = useState('');
@@ -19,11 +21,11 @@ const AddProductForm = ({ isOpen, onClose, onConfirm }) => {
     });
 
     if (response.ok) {
-      alert('Product added successfully!');
+      toast.success('Product added successfully!');
       onClose();
       window.location.reload();
     } else {
-      alert('Error adding product');
+      toast.error('Error adding product');
     }
   };
 
@@ -84,6 +86,8 @@ const AddProductForm = ({ isOpen, onClose, onConfirm }) => {
           </div>
         </form>
       </div>
+
+      <ToastifyContainer />
     </div>
   );
 };

@@ -3,6 +3,7 @@
 import '@/app/ui/global.css';
 import { lusitana } from '@/app/ui/fonts';
 import { SessionProvider } from 'next-auth/react';  // import the SessionProvider
+import ToastifyContainer from '@/components/toastifycontainer';
 
 export default function RootLayout({ children }) {
   return (
@@ -12,6 +13,8 @@ export default function RootLayout({ children }) {
         <SessionProvider>
           {children}
         </SessionProvider>
+
+        <ToastifyContainer />
       </body>
     </html>
   );

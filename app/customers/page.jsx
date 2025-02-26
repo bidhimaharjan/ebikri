@@ -10,9 +10,11 @@ import {
   ChevronRightIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
-import AddCustomerForm from '@/components/customers/add-customer-form'
-import EditCustomerForm from '@/components/customers/edit-customer-form'
+import AddCustomerForm from '@/components/customers/add-customer-form';
+import EditCustomerForm from '@/components/customers/edit-customer-form';
 import ConfirmationDialog from "@/components/confirmation-dialog";
+import { toast } from 'react-toastify';
+import ToastifyContainer from '@/components/toastifycontainer';
 
 const CustomersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -61,10 +63,10 @@ const CustomersLayout = () => {
       });
 
       if (response.ok) {
-        alert('Customer deleted successfully!');
+        toast.success('Customer deleted successfully!');
         fetchCustomer(); // refresh the customer data
       } else {
-        alert('Error deleting customer');
+        toast.error('Error deleting customer');
       }
     } catch (error) {
       console.error('Error deleting customer:', error);
@@ -77,7 +79,8 @@ const CustomersLayout = () => {
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.id.toString().includes(searchQuery) ||
       item.phoneNumber.toString().includes(searchQuery)
-  );
+  )
+  .sort((a, b) => a.id - b.id);
 
   // calculate pagination
   const totalPages = Math.ceil(filteredCustomer.length / rowsPerPage);
@@ -265,6 +268,8 @@ const CustomersLayout = () => {
           message="Are you sure you want to delete this customer?"
         />
       </div>
+
+      <ToastifyContainer />
     </div>
   );
 };

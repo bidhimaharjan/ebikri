@@ -1,11 +1,7 @@
 'use client';
 
-<<<<<<< HEAD
-// import EbikriLogo from '@/app/ui/ebikri-logo';
-=======
-// import EbikriLogo from '@/ui/ebikri-logo';
+// import EbikriLogo from '@app/ui/ebikri-logo';
 import { useState } from 'react';
->>>>>>> origin/main
 import SignupForm from '@/components/users/signup-form';
 import { Button } from '@/app/ui/button';
 import Link from 'next/link';

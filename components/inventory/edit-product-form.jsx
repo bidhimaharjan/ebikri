@@ -36,6 +36,7 @@ const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
   
       if (response.ok) {
         alert('Product updated successfully!');
+        window.location.reload();
         onClose();
       } else {
         const errorData = await response.json();

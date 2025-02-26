@@ -37,6 +37,7 @@ const EditCustomerForm = ({ isOpen, onClose, onConfirm, customer }) => {
       if (response.ok) {
         alert('Customer updated successfully!');
         onClose();
+        window.location.reload();
       } else {
         const errorData = await response.json();
         console.error("Error updating customer:", errorData);

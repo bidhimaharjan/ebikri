@@ -7,6 +7,8 @@ import { UserCircleIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon,
 import AddProductForm from '@/components/inventory/add-product-form'
 import EditProductForm from '@/components/inventory/edit-product-form'
 import ConfirmationDialog from '@/components/confirmation-dialog';
+import { toast } from 'react-toastify';
+import ToastifyContainer from '@/components/toastifycontainer';
 
 const InventoryLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -55,10 +57,10 @@ const InventoryLayout = () => {
       });
 
       if (response.ok) {
-        alert('Product deleted successfully!');
+        toast.success('Product deleted successfully!');
         fetchInventory(); // refresh the inventory data
       } else {
-        alert('Error deleting product');
+        toast.error('Error deleting product');
       }
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -69,7 +71,8 @@ const InventoryLayout = () => {
   const filteredInventory = inventory.filter((item) =>
     item.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.id.toString().includes(searchQuery)
-  );
+  )
+  .sort((a, b) => a.id - b.id);
 
   // calculate pagination
   const totalPages = Math.ceil(filteredInventory.length / rowsPerPage);
@@ -241,6 +244,8 @@ const InventoryLayout = () => {
           message="Are you sure you want to delete this product?"
         />
       </div>
+
+      <ToastifyContainer />
     </div>
   );
 };
