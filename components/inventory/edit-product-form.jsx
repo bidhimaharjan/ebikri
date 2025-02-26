@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
   const [productName, setProductName] = useState(product?.productName || '');
@@ -35,17 +36,19 @@ const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
       });
   
       if (response.ok) {
-        alert('Product updated successfully!');
-        window.location.reload();
+        toast.success('Product updated successfully!');
         onClose();
+        onConfirm();
       } else {
         const errorData = await response.json();
         console.error("Error updating product:", errorData);
-        alert('Error updating product');
+        toast.error('Error updating product');
+        onConfirm();
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      alert('Error updating product');
+      toast.error('Error updating product');
+      onConfirm();
     }
   };
 

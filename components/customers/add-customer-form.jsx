@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
   const [name, setName] = useState('');
@@ -19,11 +20,12 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
     });
 
     if (response.ok) {
-      alert('Customer added successfully!');
+      toast.success('Customer added successfully!');
       onClose();
-      window.location.reload();
+      onConfirm();
     } else {
-      alert('Error adding customer');
+      toast.error('Error adding customer');
+      onConfirm();
     }
   };
 
@@ -70,7 +72,7 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
           <div className="flex justify-between">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-red-600"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
             >
               Add Customer
             </button>

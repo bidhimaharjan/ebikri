@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
-import ToastifyContainer from '@/components/toastifycontainer';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -77,8 +76,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
-      <ToastifyContainer />
     </main>
   );
 }

@@ -7,7 +7,6 @@ import { Button } from '@/app/ui/button';
 import Link from 'next/link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
-import ToastifyContainer from '@/components/toastifycontainer';
  
 export default function SignupPage() {
     const [formData, setFormData] = useState({
@@ -107,8 +106,6 @@ export default function SignupPage() {
                 <div className="flex flex-col justify-center gap-6 px-6 py-10 md:w-1/2 md:px-20">
                 <SignupForm formData={formData} onChange={handleChange} onSubmit={handleSubmit} />
             </div>
-
-            <ToastifyContainer />
         </div>
     </main>
     // <main className="flex items-center justify-center md:h-screen">

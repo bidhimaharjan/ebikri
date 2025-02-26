@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from 'react-toastify';
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [products, setProducts] = useState([{ productId: "", quantity: "" }]);
@@ -82,11 +83,12 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
     });
 
     if (response.ok) {
-      alert("Order created successfully!");
+      toast.success("Order created successfully!");
       onClose();
-      window.location.reload();
+      onConfirm();
     } else {
-      alert("Error creating order");
+      toast.error("Error creating order");
+      onConfirm();
     }
   };
 

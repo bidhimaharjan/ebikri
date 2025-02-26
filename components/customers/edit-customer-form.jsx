@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const EditCustomerForm = ({ isOpen, onClose, onConfirm, customer }) => {
   const [name, setName] = useState(customer?.name || '');
@@ -35,17 +36,19 @@ const EditCustomerForm = ({ isOpen, onClose, onConfirm, customer }) => {
       });
   
       if (response.ok) {
-        alert('Customer updated successfully!');
+        toast.success('Customer updated successfully!');
         onClose();
-        window.location.reload();
+        onConfirm();
       } else {
         const errorData = await response.json();
         console.error("Error updating customer:", errorData);
-        alert('Error updating customer');
+        toast.error('Error updating customer');
+        onConfirm();
       }
     } catch (error) {
       console.error('Error updating customer:', error);
-      alert('Error updating customer');
+      toast.error('Error updating customer');
+      onConfirm();
     }
   };
 
@@ -92,7 +95,7 @@ const EditCustomerForm = ({ isOpen, onClose, onConfirm, customer }) => {
           <div className="flex justify-between">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-red-600"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
             >
               Update Customer
             </button>

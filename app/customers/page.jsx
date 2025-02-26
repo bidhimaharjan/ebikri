@@ -14,7 +14,6 @@ import AddCustomerForm from '@/components/customers/add-customer-form';
 import EditCustomerForm from '@/components/customers/edit-customer-form';
 import ConfirmationDialog from "@/components/confirmation-dialog";
 import { toast } from 'react-toastify';
-import ToastifyContainer from '@/components/toastifycontainer';
 
 const CustomersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -245,6 +244,7 @@ const CustomersLayout = () => {
           <AddCustomerForm
             isOpen={isAddFormOpen}
             onClose={() => setIsAddFormOpen(false)}
+            onConfirm={fetchCustomer} // refresh data
           />
         )}
 
@@ -254,6 +254,7 @@ const CustomersLayout = () => {
             isOpen={isEditFormOpen}
             onClose={() => setIsEditFormOpen(false)}
             customer={selectedCustomer}
+            onConfirm={fetchCustomer} // refresh data
           />
         )}
 
@@ -268,8 +269,6 @@ const CustomersLayout = () => {
           message="Are you sure you want to delete this customer?"
         />
       </div>
-
-      <ToastifyContainer />
     </div>
   );
 };

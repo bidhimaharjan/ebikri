@@ -14,6 +14,7 @@ export default function RootLayout({ children }) {
           {children}
         </SessionProvider>
 
+        {/* Toastify Container for alerts */}
         <ToastifyContainer />
       </body>
     </html>

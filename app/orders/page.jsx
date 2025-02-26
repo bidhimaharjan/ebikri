@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '@/components/navbar';
 import { UserCircleIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import AddOrderForm from '@/components/orders/add-order-form';
+import { toast } from 'react-toastify';
 
 const OrdersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -229,6 +230,7 @@ const OrdersLayout = () => {
           <AddOrderForm
             isOpen={isAddOrderFormOpen}
             onClose={() => setIsAddOrderFormOpen(false)}
+            onConfirm={fetchOrders} // refresh data
           />
         )}
       </div>

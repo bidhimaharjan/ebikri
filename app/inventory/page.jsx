@@ -8,7 +8,6 @@ import AddProductForm from '@/components/inventory/add-product-form'
 import EditProductForm from '@/components/inventory/edit-product-form'
 import ConfirmationDialog from '@/components/confirmation-dialog';
 import { toast } from 'react-toastify';
-import ToastifyContainer from '@/components/toastifycontainer';
 
 const InventoryLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -220,6 +219,7 @@ const InventoryLayout = () => {
           <AddProductForm
             isOpen={isAddFormOpen}
             onClose={() => setIsAddFormOpen(false)}
+            onConfirm={fetchInventory} // refresh data
           />
         )}
 
@@ -228,7 +228,7 @@ const InventoryLayout = () => {
           <EditProductForm
             isOpen={isEditFormOpen}
             onClose={() => setIsEditFormOpen(false)}
-            // onConfirm={fetchInventory} // Pass the fetchInventory function
+            onConfirm={fetchInventory} // refresh data
             product={selectedProduct}
           />
         )}
@@ -245,7 +245,6 @@ const InventoryLayout = () => {
         />
       </div>
 
-      <ToastifyContainer />
     </div>
   );
 };
