@@ -7,6 +7,8 @@ import LoginForm from '@/components/users/login-form';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { toast } from 'react-toastify';
+import ToastifyContainer from '@/components/toastifycontainer';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -26,26 +28,23 @@ export default function LoginPage() {
     setError(null); // reset error state
 
     const response = await signIn('credentials', {
-      redirect: false, // We want to handle the redirect manually
+      redirect: false, // handle the redirect manually
       email: formData.email,
       password: formData.password,
     });
 
     if (response?.error) {
       setError(response.error); // set error message if login fails
+      toast.error(response.error || 'Login failed!');
     } else {
-      alert('Welcome to eBikri');
+      toast.success('Welcome to eBikri');
       setFormData({
         email: '',
         password: '',
       });
 
-      if (response?.error) {
-        setError(response.error); // set error message if login fails
-      } else {
-        // Redirect to the dashboard page after successful login
-        router.push('/dashboard');
-      }
+      // redirect to the dashboard page after successful login
+      router.push('/dashboard');
     }
   };
 
@@ -78,6 +77,8 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      <ToastifyContainer />
     </main>
   );
 }
