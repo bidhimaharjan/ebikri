@@ -88,7 +88,7 @@ const OrdersLayout = () => {
         <div className="flex justify-between items-center mb-4">
           {/* New Order Button */}
           <button 
-            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-blue-600"
+            className="h-10 px-4 py-2 bg-white text-blue-500 text-sm font-semibold rounded-md border border-blue-500 flex items-center hover:bg-blue-500 hover:text-white"
             onClick={() => setIsAddOrderFormOpen(true)}>
             <PlusIcon className="h-5 w-5 mr-1" /> New Order
           </button>
@@ -193,7 +193,7 @@ const OrdersLayout = () => {
         {/* Pagination */}
         <div className="flex justify-end mt-4 space-x-2">
           <button
-            className={`p-2 bg-gray-500 text-white rounded-md ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`p-2 text-white-200 rounded-md ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -211,7 +211,7 @@ const OrdersLayout = () => {
           ))}
 
           <button
-            className={`p-2 bg-gray-500 text-white rounded-md ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`p-2 text-white-200 rounded-md ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >

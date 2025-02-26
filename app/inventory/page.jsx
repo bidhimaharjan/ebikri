@@ -181,7 +181,7 @@ const InventoryLayout = () => {
         {/* Pagination */}
         <div className="flex justify-end mt-4 space-x-2">
           <button
-            className={`p-2 bg-gray-500 text-white rounded-md ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`p-2 text-white-200 rounded-md ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -199,7 +199,7 @@ const InventoryLayout = () => {
           ))}
 
           <button
-            className={`p-2 bg-gray-500 text-white rounded-md ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`p-2 text-white-200 rounded-md ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >

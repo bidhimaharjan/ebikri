@@ -266,7 +266,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
           <div className="flex justify-between mt-6">
             <button
               type="submit"
-              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-red-600"
             >
               Generate QR Code
             </button>
