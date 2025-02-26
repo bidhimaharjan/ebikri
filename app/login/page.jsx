@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react'; // import signIn from NextAuth
 import { useRouter } from 'next/navigation';
-import LoginForm from '@/app/components/users/login-form';
+import LoginForm from '@/components/users/login-form';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';

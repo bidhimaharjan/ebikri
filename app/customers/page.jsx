@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import Navbar from "@/app/components/navbar";
+import Navbar from "@/components/navbar";
 import {
   UserCircleIcon,
   MagnifyingGlassIcon,
@@ -10,9 +10,9 @@ import {
   ChevronRightIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
-import AddCustomerForm from '@/app/components/customers/add-customer-form'
-import EditCustomerForm from '@/app/components/customers/edit-customer-form'
-import ConfirmationDialog from "@/app/components/confirmation-dialog";
+import AddCustomerForm from '@/components/customers/add-customer-form'
+import EditCustomerForm from '@/components/customers/edit-customer-form'
+import ConfirmationDialog from "@/components/confirmation-dialog";
 
 const CustomersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);

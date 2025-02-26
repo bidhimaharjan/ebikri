@@ -2,11 +2,11 @@
 
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import Navbar from '@/app/components/navbar';
+import Navbar from '@/components/navbar';
 import { UserCircleIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@heroicons/react/24/outline';
-import AddProductForm from '@/app/components/inventory/add-product-form'
-import EditProductForm from '@/app/components/inventory/edit-product-form'
-import ConfirmationDialog from '@/app/components/confirmation-dialog';
+import AddProductForm from '@/components/inventory/add-product-form'
+import EditProductForm from '@/components/inventory/edit-product-form'
+import ConfirmationDialog from '@/components/confirmation-dialog';
 
 const InventoryLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
