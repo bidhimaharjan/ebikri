@@ -14,5 +14,5 @@ export async function middleware(request) {
 
 // protect specific routes
 export const config = {
-  matcher: ['/dashboard', '/inventory'],
+  matcher: [ '/dashboard', '/inventory', '/orders', '/customers' ],
 };

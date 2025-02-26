@@ -6,7 +6,7 @@ const Layout = ({ children }) => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
 
   const handleLogout = () => {
-    alert('Logging out...');
+    // alert('Logging out...');
     window.location.href = '/login'; // Redirect to login page
   };
 

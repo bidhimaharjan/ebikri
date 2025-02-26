@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Bars3Icon, HomeIcon, CubeIcon, ShoppingCartIcon, UserIcon, ChartBarIcon, PaperClipIcon, CogIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import { usePathname } from 'next/navigation';
+import { Bars3Icon, HomeIcon, CubeIcon, ShoppingCartIcon, UserIcon, ChartBarIcon, PaperClipIcon, CogIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import ConfirmationDialog from './confirmation-dialog'
 
 const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const pathname = usePathname(); // get the current route
 
   const handleLogout = () => {
     setIsDialogOpen(true); // show the confirmation dialog when logout is clicked
@@ -13,6 +15,11 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
 
   const handleConfirmLogout = () => {
     signOut({ callbackUrl: '/login' }); // log out the user and redirect to the login page
+  };
+
+  // function to determine if a link is active
+  const isActive = (href) => {
+    return pathname === href;
   };
 
   return (
@@ -41,43 +48,84 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
         <nav className="mt-4">
           <ul>
             <li>
-              <Link href="/dashboard" className="block px-6 py-6 text-lg text-white hover:border-l-4 border-white-400 transition-transform hover:font-bold flex items-center gap-3">
+              <Link
+                href="/dashboard"
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                  isActive('/dashboard') ? '!border-l-4 !border-white-400 font-bold' : ''
+                }`}
+              >
                 <HomeIcon className="h-5 w-5" />
                 Dashboard
               </Link>
             </li>
+
             <li>
-              <Link href="/inventory" className="block px-6 py-6 text-lg text-white hover:border-l-4 border-white-400 transition-transform hover:font-bold flex items-center gap-3">
+              <Link 
+                href="/inventory" 
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                  isActive('/inventory') ? '!border-l-4 !border-white-400 font-bold' : ''
+                }`}
+              >
                 <CubeIcon className="h-5 w-5" />
                 Inventory
               </Link>
             </li>
+
             <li>
-              <Link href="/orders" className="block px-6 py-6 text-lg text-white hover:border-l-4 border-white-400 transition-transform hover:font-bold flex items-center gap-3">
+              <Link 
+                href="/orders" 
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                  isActive('/orders') ? '!border-l-4 !border-white-400 font-bold' : ''
+                }`}
+              >
                 <ShoppingCartIcon className="h-5 w-5" />
                 Orders and Payments
               </Link>
             </li>
+
             <li>
-              <Link href="/customers" className="block px-6 py-6 text-lg text-white hover:border-l-4 border-white-400 transition-transform hover:font-bold flex items-center gap-3">
+              <Link 
+                href="/customers"
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                  isActive('/customers') ? '!border-l-4 !border-white-400 font-bold' : ''
+                }`}
+              >
                 <UserIcon className="h-5 w-5" />
                 Customers
               </Link>
             </li>
+
             <li>
-              <Link href="/sales" className="block px-6 py-6 text-lg text-white hover:border-l-4 border-white-400 transition-transform hover:font-bold flex items-center gap-3">
+              <Link 
+                href="/sales"
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                  isActive('/sales') ? '!border-l-4 !border-white-400 font-bold' : ''
+                }`}
+              >
                 <ChartBarIcon className="h-5 w-5" />
                 Sales Analytics
               </Link>
             </li>
+
             <li>
-              <Link href="/marketing" className="block px-6 py-6 text-lg text-white hover:border-l-4 border-white-400 transition-transform hover:font-bold flex items-center gap-3">
+              <Link 
+                href="/marketing"
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                  isActive('/marketing') ? '!border-l-4 !border-white-400 font-bold' : ''
+                }`}
+              >
                 <PaperClipIcon className="h-5 w-5" />
                 Marketing Tools
               </Link>
             </li>
+
             <li>
-              <Link href="/settings" className="block px-6 py-6 text-lg text-white hover:border-l-4 border-white-400 transition-transform hover:font-bold flex items-center gap-3">
+              <Link 
+                href="/settings"
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                  isActive('/settings') ? '!border-l-4 !border-white-400 font-bold' : ''
+                }`}
+              >
                 <CogIcon className="h-5 w-5" />
                 Settings
               </Link>
@@ -89,9 +137,9 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
         <div className="mt-auto">
           <button
             onClick={handleLogout}
-            className="block w-full text-lg text-gray-300 hover:border-l-4 border-white-400 transition-transform hover:font-bold flex items-center gap-3 px-6 py-6"
+            className="block w-full text-lg text-gray-300 hover:border-l-4 border-blue-500 transition-transform hover:font-bold flex items-center gap-3 px-6 py-6"
           >
-            <ArrowRightOnRectangleIcon className="h-5 w-5" />
+            <ArrowLeftIcon className="h-5 w-5" />
             <span>Logout</span>
           </button>
         </div>

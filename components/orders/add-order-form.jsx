@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
+// import Select from 'react-select'; // Import react-select
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [products, setProducts] = useState([{ productId: "", quantity: "" }]);
@@ -12,12 +13,50 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [deliveryLocation, setDeliveryLocation] = useState("");
   const [showCustomerDetails, setShowCustomerDetails] = useState(false);
 
-  // Fetch products and customers when the form is opened
+  // const customStyles = {
+  //   control: (provided) => ({
+  //     ...provided,
+  //     backgroundColor: "#f3f4f6", // Match Tailwind's bg-gray-200
+  //     borderColor: "#d1d5db", // Match Tailwind's border-gray-300
+  //     borderRadius: "0.25rem", // Match Tailwind's rounded-md
+  //     padding: "0.1rem", // Match Tailwind's p-2
+  //     marginTop: "0.28rem",
+  //     boxShadow: "none", // Remove default box shadow
+  //     "&:hover": {
+  //       borderColor: "#d1d5db", // Match Tailwind's border-gray-300 on hover
+  //     },
+  //   }),
+  //   option: (provided, state) => ({
+  //     ...provided,
+  //     backgroundColor: state.isSelected ? "#3b82f6" : "#fff", // Match Tailwind's bg-blue-500 for selected option
+  //     color: state.isSelected ? "#fff" : "#000", // Match Tailwind's text color
+  //     "&:hover": {
+  //       backgroundColor: "#e5e7eb", // Match Tailwind's bg-gray-300 on hover
+  //     },
+  //   }),
+  //   menu: (provided) => ({
+  //     ...provided,
+  //     backgroundColor: "#f3f4f6", // Match Tailwind's bg-gray-200
+  //     borderColor: "#d1d5db", // Match Tailwind's border-gray-300
+  //     borderRadius: "0.375rem", // Match Tailwind's rounded-md
+  //     boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", // Match Tailwind's shadow-sm
+  //   }),
+  //   placeholder: (provided) => ({
+  //     ...provided,
+  //     color: "#6b7280", // Match Tailwind's text-gray-500
+  //   }),
+  //   singleValue: (provided) => ({
+  //     ...provided,
+  //     color: "#1f2937", // Match Tailwind's text-gray-900
+  //   }),
+  // };
+
+  // fetch products and customers when the form is opened
   useEffect(() => {
     if (isOpen) {
       const fetchData = async () => {
         try {
-          // Fetch products
+          // fetch products
           const productsResponse = await fetch("/api/inventory");
           if (!productsResponse.ok) {
             throw new Error("Failed to fetch products");
@@ -25,7 +64,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
           const productsData = await productsResponse.json();
           setAvailableProducts(productsData);
 
-          // Fetch customers
+          // fetch customers
           const customersResponse = await fetch("/api/customers");
           if (!customersResponse.ok) {
             throw new Error("Failed to fetch customers");
@@ -41,30 +80,37 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
     }
   }, [isOpen]);
 
-  // Handle customer selection
+  // handle customer selection
   const handleCustomerChange = (e) => {
     const selectedCustomerId = e.target.value;
     setCustomer(selectedCustomerId);
 
     if (selectedCustomerId) {
-      // Find the selected customer from the customers list
+      // find the selected customer from the customers list
       const selectedCustomer = customers.find(
         (cust) => cust.id === parseInt(selectedCustomerId)
       );
 
       if (selectedCustomer) {
-        // Populate the form fields with the selected customer's details
+        // populate the form fields with the selected customer's details
         setName(selectedCustomer.name);
         setEmail(selectedCustomer.email);
         setPhoneNumber(selectedCustomer.phoneNumber);
       }
     } else {
-      // Clear the form fields if no customer is selected
+      // clear the form fields if no customer is selected
       setName("");
       setEmail("");
       setPhoneNumber("");
     }
   };
+
+  // // handle product selection
+  // const handleProductChange = (index, selectedOption) => {
+  //   const updatedProducts = [...products];
+  //   updatedProducts[index].productId = selectedOption.value;
+  //   setProducts(updatedProducts);
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -97,7 +143,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   };
 
   const removeProductField = (index) => {
-    if (index === 0) return; // Prevent removing the first product field
+    if (index === 0) return; // prevent removing the first product field
     const updatedProducts = products.filter((_, i) => i !== index);
     setProducts(updatedProducts);
   };
@@ -139,6 +185,28 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                     </option>
                   ))}
                 </select>
+
+                {/* <Select
+                  options={availableProducts.map((prod) => ({
+                    value: prod.id,
+                    label: `ID${prod.id} ${prod.productName} (Stock: ${prod.stockAvailability}, Price: ${prod.unitPrice})`,
+                  }))}
+                  styles={customStyles}
+                  placeholder="Search a Product"
+                  value={availableProducts.find(
+                    (prod) => prod.id === product.productId
+                  )}
+                  onChange={(selectedOption) =>
+                    handleProductChange(index, selectedOption)
+                  }
+                  filterOption={(option, inputValue) => {
+                    const searchLower = inputValue.toLowerCase();
+                    return (
+                      option.label.toLowerCase().includes(searchLower) ||
+                      option.value.toString().includes(searchLower)
+                    );
+                  }}
+                /> */}
               </div>
               <div className="w-1/2 relative">
                 <label className="block text-sm font-medium">Quantity *</label>
@@ -184,7 +252,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
               <select
                 className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200"
                 value={customer}
-                onChange={handleCustomerChange} // Updated handler
+                onChange={handleCustomerChange}
               >
                 <option value="">Select a customer</option>
                 {customers.map((cust) => (
