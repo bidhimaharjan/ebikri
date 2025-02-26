@@ -71,12 +71,12 @@ const CustomersLayout = () => {
     }
   };
 
-
   // filter customer based on search query
   const filteredCustomer = customer.filter(
     (item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.id.toString().includes(searchQuery)
+      item.id.toString().includes(searchQuery) ||
+      item.phoneNumber.toString().includes(searchQuery)
   );
 
   // calculate pagination
