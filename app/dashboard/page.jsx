@@ -9,6 +9,24 @@ import BusinessName from "@/components/businessname";
 const DashboardLayout = () => {
   const { data: session, status } = useSession();
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const [dashboardData, setDashboardData] = useState({ revenue: 0, totalOrders: 0, totalCustomers: 0 });
+
+  useEffect(() => {
+    if (session) {
+      const fetchDashboardData = async () => {
+        try {
+          const response = await fetch('/api/dashboard');
+          if (!response.ok) throw new Error('Failed to fetch data');
+          const data = await response.json();
+          setDashboardData(data);
+        } catch (error) {
+          console.error("Error fetching dashboard data:", error);
+        }
+      };
+
+      fetchDashboardData();
+    }
+  }, [session]);
 
   if (status === 'loading') {
     return <p>Loading...</p>;
@@ -47,21 +65,21 @@ const DashboardLayout = () => {
             <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
                 <CurrencyDollarIcon className="h-10 w-10 text-green-500" />
                 <h3 className="text-lg font-semibold text-green-500 mt-4">Revenue</h3>
-                <p className="text-2xl font-bold text-green-500 mt-2">Rs. 1,23,456</p>
+                <p className="text-2xl font-bold text-green-500 mt-2">Rs. {dashboardData.revenue.toLocaleString()}</p>
             </div>
 
             {/* Orders Card */}
             <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
                 <ShoppingCartIcon className="h-10 w-10 text-red-500" />
                 <h3 className="text-lg font-semibold text-red-500 mt-4">Orders</h3>
-                <p className="text-2xl font-bold text-red-500 mt-2">21</p>
+                <p className="text-2xl font-bold text-red-500 mt-2">{dashboardData.totalOrders}</p>
             </div>
 
             {/* Customers Card */}
             <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
                 <UserIcon className="h-10 w-10 text-orange-500" />
                 <h3 className="text-lg font-semibold text-orange-500 mt-4">Customers</h3>
-                <p className="text-2xl font-bold text-orange-500 mt-2">97</p>
+                <p className="text-2xl font-bold text-orange-500 mt-2">{dashboardData.totalCustomers}</p>
             </div>
         </div>
 
