@@ -14,6 +14,7 @@ import AddCustomerForm from '@/components/customers/add-customer-form';
 import EditCustomerForm from '@/components/customers/edit-customer-form';
 import ConfirmationDialog from "@/components/confirmation-dialog";
 import { toast } from 'react-toastify';
+import BusinessName from "@/components/businessname";
 
 const CustomersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -106,15 +107,15 @@ const CustomersLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <button className="flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-full">
+        <button className="flex items-center px-4 py-2 bg-white text-blue-500 font-bold border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
             <UserCircleIcon className="h-5 w-5 mr-2" />
-            <span>{session.user.name}</span>
+            <BusinessName userId={session.user.id} />
           </button>
         </div>
 
         {/* Customers Title */}
         <div className="relative mb-4">
-          <h1 className="text-xl font-semibold text-gray-800 mt-2">
+          <h1 className="text-xl font-semibold text-gray-700 mt-2">
             Customers
           </h1>
         </div>
@@ -122,7 +123,7 @@ const CustomersLayout = () => {
         <div className="flex justify-between items-center mb-4">
           {/* Add Customer Button */}
           <button
-            className="h-10 px-4 py-2 bg-white text-blue-500 text-sm font-semibold rounded-md border border-blue-500 flex items-center hover:bg-blue-500 hover:text-white"
+            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-blue-600"
             onClick={() => setIsAddFormOpen(true)}
           >
             <PlusIcon className="h-5 w-5 mr-1" /> Add
@@ -174,7 +175,7 @@ const CustomersLayout = () => {
                   <td className="px-4 py-2 flex justify-center space-x-2">
                     {/* Edit Customer Button */}
                     <button
-                      className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-400"
+                      className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-300"
                       onClick={() => handleEdit(item)}
                     >
                       Edit

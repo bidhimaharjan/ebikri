@@ -6,6 +6,7 @@ import Navbar from '@/components/navbar';
 import { UserCircleIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import AddOrderForm from '@/components/orders/add-order-form';
 import { toast } from 'react-toastify';
+import BusinessName from "@/components/businessname";
 
 const OrdersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -75,21 +76,21 @@ const OrdersLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <button className="flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-full">
+          <button className="flex items-center px-4 py-2 bg-white text-blue-500 font-bold border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
             <UserCircleIcon className="h-5 w-5 mr-2" />
-            <span>{session.user.name}</span>
+            <BusinessName userId={session.user.id} />
           </button>
         </div>
 
         {/* Orders and Payments Title */}
         <div className="relative mb-4">
-          <h1 className="text-xl font-semibold text-gray-800 mt-2">Orders and Payments</h1>
+          <h1 className="text-xl font-semibold text-gray-700 mt-2">Orders and Payments</h1>
         </div>
 
         <div className="flex justify-between items-center mb-4">
           {/* New Order Button */}
           <button 
-            className="h-10 px-4 py-2 bg-white text-blue-500 text-sm font-semibold rounded-md border border-blue-500 flex items-center hover:bg-blue-500 hover:text-white"
+            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-blue-600"
             onClick={() => setIsAddOrderFormOpen(true)}>
             <PlusIcon className="h-5 w-5 mr-1" /> New Order
           </button>
@@ -170,7 +171,7 @@ const OrdersLayout = () => {
                       <CreditCardIcon className="h-4 w-4 mr-1" /> Payments
                     </button>
                     <button 
-                      className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-400"
+                      className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-300"
                       onClick={() => handleEdit(item)}
                     >
                       Edit

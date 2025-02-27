@@ -137,7 +137,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
         <div className="mt-auto">
           <button
             onClick={handleLogout}
-            className="block w-full text-lg text-gray-300 hover:border-l-4 border-blue-500 transition-transform hover:font-bold flex items-center gap-3 px-6 py-6"
+            className="block w-full text-lg text-white hover:border-l-4 border-blue-500 transition-transform hover:font-bold flex items-center gap-3 px-6 py-6"
           >
             <ArrowLeftIcon className="h-5 w-5" />
             <span>Logout</span>
