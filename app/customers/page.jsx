@@ -6,15 +6,14 @@ import Navbar from "@/components/navbar";
 import {
   UserCircleIcon,
   MagnifyingGlassIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
-import AddCustomerForm from '@/components/customers/add-customer-form';
-import EditCustomerForm from '@/components/customers/edit-customer-form';
+import AddCustomerForm from "@/components/customers/add-customer-form";
+import EditCustomerForm from "@/components/customers/edit-customer-form";
 import ConfirmationDialog from "@/components/confirmation-dialog";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import BusinessName from "@/components/businessname";
+import Pagination from "@/components/pagination";
 
 const CustomersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -32,7 +31,9 @@ const CustomersLayout = () => {
   // fetch customer data
   const fetchCustomer = async () => {
     try {
-      const response = await fetch(`/api/customers?businessId=${session.user.businessId}`);
+      const response = await fetch(
+        `/api/customers?businessId=${session.user.businessId}`
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch customer");
       }
@@ -59,34 +60,32 @@ const CustomersLayout = () => {
   const handleDelete = async (customerId) => {
     try {
       const response = await fetch(`/api/customers/${customerId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
-        toast.success('Customer deleted successfully!');
+        toast.success("Customer deleted successfully!");
         fetchCustomer(); // refresh the customer data
       } else {
-        toast.error('Error deleting customer');
+        toast.error("Error deleting customer");
       }
     } catch (error) {
-      console.error('Error deleting customer:', error);
+      console.error("Error deleting customer:", error);
     }
   };
 
   // filter customer based on search query
-  const filteredCustomer = customer.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.id.toString().includes(searchQuery) ||
-      item.phoneNumber.toString().includes(searchQuery)
-  )
-  .sort((a, b) => a.id - b.id);
+  const filteredCustomer = customer
+    .filter(
+      (item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.id.toString().includes(searchQuery) ||
+        item.phoneNumber.toString().includes(searchQuery)
+    )
+    .sort((a, b) => a.id - b.id);
 
-  // calculate pagination
+  // calculate total pages
   const totalPages = Math.ceil(filteredCustomer.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const displayedRows = filteredCustomer.slice(startIndex, endIndex);
 
   if (status === "loading") {
     return <p>Loading...</p>;
@@ -107,7 +106,7 @@ const CustomersLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-        <button className="flex items-center px-4 py-2 bg-white text-blue-500 font-bold border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
+          <button className="flex items-center px-4 py-2 bg-white text-blue-500 font-bold border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
             <UserCircleIcon className="h-5 w-5 mr-2" />
             <BusinessName userId={session.user.id} />
           </button>
@@ -164,7 +163,9 @@ const CustomersLayout = () => {
               </tr>
             </thead>
             <tbody>
-              {displayedRows.map((item, index) => (
+              {filteredCustomer
+                .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+                .map((item, index) => (
                 <tr key={index} className="border-b">
                   <td className="px-4 py-2">{item.id}</td>
                   <td className="px-4 py-2">{item.name}</td>
@@ -199,41 +200,13 @@ const CustomersLayout = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-end mt-4 space-x-2">
-          <button
-            className={`p-2 text-white-200 rounded-md ${
-              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-          >
-            <ChevronLeftIcon className="h-5 w-5" />
-          </button>
-
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index}
-              className={`px-4 py-2 rounded-md text-sm font-bold ${
-                currentPage === index + 1
-                  ? "bg-blue-500 text-white"
-                  : "text-gray-800"
-              }`}
-              onClick={() => setCurrentPage(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
-
-          <button
-            className={`p-2 text-white-200 rounded-md ${
-              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-          >
-            <ChevronRightIcon className="h-5 w-5" />
-          </button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          rowsPerPage={rowsPerPage}
+          data={filteredCustomer}
+        />
 
         {/* Footer */}
         <div className="text-center text-gray-500 text-sm mt-2">
