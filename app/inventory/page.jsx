@@ -121,7 +121,7 @@ const InventoryLayout = () => {
         <div className="flex justify-between items-center mb-4">
           {/* Add Product Button */}
           <button
-            className="h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md flex items-center hover:bg-red-600"
+            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-red-600"
             onClick={() => setIsAddFormOpen(true)}
           >
             <PlusIcon className="h-5 w-5 mr-1" /> Add
@@ -132,18 +132,12 @@ const InventoryLayout = () => {
               <input
                 type="text"
                 placeholder="Search a product..."
-                className="w-full h-10 px-4 pl-10 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-10 px-4 pl-10 py-2 text-sm border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)} // update search query
               />
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
             </div>
-            <button
-              className="ml-2 h-10 px-4 py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600"
-              onClick={() => setSearchQuery("")} // clear search query
-            >
-              Search
-            </button>
           </div>
         </div>
 
@@ -151,7 +145,7 @@ const InventoryLayout = () => {
         <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-800 text-white text-left">
+              <tr className="bg-blue-500 text-white text-left">
                 <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2">Product Name</th>
                 <th className="px-4 py-2">Stock Availability</th>

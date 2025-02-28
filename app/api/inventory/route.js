@@ -22,8 +22,7 @@ export async function GET(request) {
       .from(productTable)
       .where(eq(productTable.businessId, session.user.businessId));
 
-    console.log(inventory);
-
+    // console.log(inventory);
     return new NextResponse(JSON.stringify(inventory), {
       status: 200,
     });
