@@ -246,9 +246,9 @@ export async function POST(request) {
     .insert(paymentTable)
     .values({
       orderId: newOrder.id,
-      pidx: paymentMethod === "Other" ? "NA" : undefined,
+      pidx: "NA",
       amount: totalAmount,
-      status: paymentMethod === "pending",
+      status: "pending",
       paymentDate: new Date(),
       paymentMethod: paymentMethod,
     })
