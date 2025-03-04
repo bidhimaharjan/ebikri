@@ -1,0 +1,10 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { NextResponse } from "next/server";
+import { db } from "@/src/index";
+import { orderTable } from "@/src/db/schema/order";
+import { orderProductTable } from "@/src/db/schema/orderproduct";
+import { customerTable } from "@/src/db/schema/customer";
+import { productTable } from "@/src/db/schema/product";
+import { paymentTable } from "@/src/db/schema/payment";
+import { eq, and, sql } from "drizzle-orm";

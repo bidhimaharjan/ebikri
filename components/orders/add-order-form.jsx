@@ -181,7 +181,7 @@ return (
             <div className="w-1/2">
               <label className="block text-sm font-medium">Product ID *</label>
               <select
-                className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200 truncate"
+                className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200 select-truncate"
                 value={product.productId}
                 onChange={(e) =>
                   updateProductField(index, "productId", e.target.value)
@@ -237,7 +237,7 @@ return (
           <div>
             <label className="block text-sm font-medium">Choose a Customer</label>
             <select
-              className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200 truncate"
+              className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200 select-truncate"
               value={customer}
               onChange={handleCustomerChange}
             >
@@ -254,7 +254,7 @@ return (
             <label className="block text-sm font-medium">Delivery Location *</label>
             <input
               type="text"
-              className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200 truncate"
+              className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200 select-truncate"
               value={deliveryLocation}
               onChange={(e) => setDeliveryLocation(e.target.value)}
               required
