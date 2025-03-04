@@ -5,7 +5,9 @@ import { orderTable } from "@/src/db/schema/order";
 import { orderProductTable } from "@/src/db/schema/orderproduct";
 import { customerTable } from "@/src/db/schema/customer";
 import { productTable } from "@/src/db/schema/product";
+import { paymentTable } from '@/src/db/schema/payment';
 import { eq, and, sql } from "drizzle-orm";
+import axios from "axios";
 
 // fetch order data
 export async function GET(request) {
@@ -86,10 +88,10 @@ export async function POST(request) {
   
     try {
       const body = await request.json();
-      const { products, customer, name, email, phoneNumber, deliveryLocation } =
+      const { products, customer, name, email, phoneNumber, deliveryLocation, paymentMethod } =
         body;
   
-      // Validate required fields
+      // validate required fields
       if (
         !products ||
         !products.length ||
@@ -108,7 +110,7 @@ export async function POST(request) {
   
       let customerId = customer;
   
-      // If customer ID is not provided, check for an existing customer or create a new one
+      // if customer ID is not provided, check for an existing customer or create a new one
       if (!customerId) {
         const [existingCustomer] = await db
           .select()
@@ -122,11 +124,11 @@ export async function POST(request) {
           );
   
         if (existingCustomer) {
-          // Use the existing customer
+          // use the existing customer
           customerId = existingCustomer.id;
         } else {
           try {
-            // Create a new customer
+            // create a new customer
             const [newCustomer] = await db
               .insert(customerTable)
               .values({
@@ -142,7 +144,7 @@ export async function POST(request) {
             customerId = newCustomer.id;
           } catch (error) {
             if (error.code === "23505") {
-              // Handle duplicate email error
+              // handle duplicate email error
               return new Response(
                 JSON.stringify({ error: "Customer with this email already exists" }),
                 { status: 400 }
@@ -157,7 +159,7 @@ export async function POST(request) {
           }
         }
       } else {
-        // Increment totalOrders for the existing customer
+        // increment totalOrders for the existing customer
         await db
           .update(customerTable)
           .set({
@@ -166,7 +168,7 @@ export async function POST(request) {
           .where(eq(customerTable.id, customerId));
       }
   
-      // Calculate the total amount for the order and validate product stock
+      // calculate the total amount for the order and validate product stock
       let totalAmount = 0;
       for (const product of products) {
         const [productData] = await db
@@ -185,7 +187,7 @@ export async function POST(request) {
           );
         }
   
-        // Check if there is enough stock
+        // check if there is enough stock
         if (productData.stockAvailability < product.quantity) {
           return new Response(
             JSON.stringify({
@@ -200,7 +202,7 @@ export async function POST(request) {
         totalAmount += productData.unitPrice * product.quantity;
       }
   
-      // Create the order
+      // create the order
       const [newOrder] = await db
         .insert(orderTable)
         .values({
@@ -215,7 +217,7 @@ export async function POST(request) {
         })
         .returning();
   
-      // Add order products and deduct stock
+      // add order products and deduct stock
       for (const product of products) {
         const [productData] = await db
           .select()
@@ -230,7 +232,7 @@ export async function POST(request) {
           amount: productData.unitPrice * product.quantity,
         });
   
-        // Deduct the stock from the product table
+        // deduct the stock from the product table
         await db
           .update(productTable)
           .set({
@@ -238,20 +240,95 @@ export async function POST(request) {
           })
           .where(eq(productTable.id, product.productId));
       }
-  
-      return new Response(
-        JSON.stringify({
-          message: "Order created successfully",
-          order: newOrder,
-        }),
-        {
-          status: 201,
-        }
-      );
-    } catch (error) {
-      console.error("Error creating order:", error);
-      return new Response(JSON.stringify({ error: "Internal server error" }), {
-        status: 500,
-      });
-    }
+
+    // Create a payment record
+    const [newPayment] = await db
+    .insert(paymentTable)
+    .values({
+      orderId: newOrder.id,
+      pidx: paymentMethod === "Other" ? "NA" : undefined,
+      amount: totalAmount,
+      status: paymentMethod === "pending",
+      paymentDate: new Date(),
+      paymentMethod: paymentMethod,
+    })
+    .returning();
+
+  // If payment method is Khalti, initiate Khalti payment
+  if (paymentMethod === "Khalti") {
+    const khaltiResponse = await axios.post(
+      "https://dev.khalti.com/api/v2/epayment/initiate/",
+      {
+        return_url: "http://localhost:3000/api/payment/callback",
+        website_url: "http://localhost:3000",
+        amount: totalAmount * 100, // amount in paisa
+        purchase_order_id: newOrder.id, // use the order ID as the purchase order ID
+        purchase_order_name: `Order #${newOrder.id}`,
+        customer_info: {
+          name: name,
+          email: email,
+          phone: phoneNumber,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Key ${process.env.KHALTI_SECRET_KEY}`,
+        },
+      }
+    );
+
+    // Update payment record with Khalti details
+    await db
+      .update(paymentTable)
+      .set({
+        pidx: khaltiResponse.data.pidx, // payment ID from Khalti
+      })
+      .where(eq(paymentTable.id, newPayment.id));
+
+    // Return the Khalti payment URL to the client
+    return new Response(
+      JSON.stringify({
+        message: "Order created successfully",
+        order: newOrder,
+        payment_url: khaltiResponse.data.payment_url,
+      }),
+      {
+        status: 201,
+      }
+    );
   }
+
+  // Return success response for non-Khalti payments
+  return new Response(
+    JSON.stringify({
+      message: "Order created successfully",
+      order: newOrder,
+    }),
+    {
+      status: 201,
+    }
+  );
+} catch (error) {
+  console.error("Error creating order:", error);
+  return new Response(JSON.stringify({ error: "Internal server error" }), {
+    status: 500,
+  });
+}
+}
+  
+  //     return new Response(
+  //       JSON.stringify({
+  //         message: "Order created successfully",
+  //         order: newOrder,
+  //       }),
+  //       {
+  //         status: 201,
+  //       }
+  //     );
+  //   } catch (error) {
+  //     console.error("Error creating order:", error);
+  //     return new Response(JSON.stringify({ error: "Internal server error" }), {
+  //       status: 500,
+  //     });
+  //   }
+  // }

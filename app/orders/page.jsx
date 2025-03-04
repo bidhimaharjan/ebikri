@@ -13,6 +13,8 @@ import AddOrderForm from "@/components/orders/add-order-form";
 import { toast } from "react-toastify";
 import BusinessName from "@/components/businessname";
 import Pagination from "@/components/pagination";
+import PaymentDetails from "@/components/payments/page";
+import ConfirmationDialog from "@/components/confirmation-dialog";
 
 const OrdersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -21,6 +23,9 @@ const OrdersLayout = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: session, status } = useSession();
   const [orders, setOrders] = useState([]);
+  const [selectedOrderId, setSelectedOrderId] = useState(null); // track selected order ID
+  const [orderToDelete, setOrderToDelete] = useState(null); // track order to delete
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false); // confirmation dialog state
   const rowsPerPage = 3;
 
   // fetch order data
@@ -70,8 +75,36 @@ const OrdersLayout = () => {
 
   // handle payments button click
   const handlePayments = (orderId) => {
-    // implement payments logic here
-    console.log(`Payments clicked for order ID: ${orderId}`);
+    setSelectedOrderId(orderId); // Set the selected order ID
+  };
+
+  // handle delete button click
+  const handleDeleteClick = (orderId) => {
+    setOrderToDelete(orderId); // Set the order to delete
+    setIsConfirmationDialogOpen(true); // Open the confirmation dialog
+  };
+
+  // handle order deletion
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/orders/${orderToDelete}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete order");
+      }
+
+      const data = await response.json();
+      toast.success(data.message); // Show success message
+      fetchOrders(); // Refresh the orders list
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      toast.error("Failed to delete order");
+    } finally {
+      setIsConfirmationDialogOpen(false); // Close the confirmation dialog
+      setOrderToDelete(null); // Reset the order to delete
+    }
   };
 
   if (status === "loading") {
@@ -206,10 +239,7 @@ const OrdersLayout = () => {
                     </button>
                     <button
                       className="px-4 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
-                      onClick={() => {
-                        setProductToDelete(item.id);
-                        setIsConfirmationDialogOpen(true);
-                      }}
+                      onClick={() => handleDeleteClick(item.id)}
                     >
                       Delete
                     </button>
@@ -240,6 +270,24 @@ const OrdersLayout = () => {
             isOpen={isAddOrderFormOpen}
             onClose={() => setIsAddOrderFormOpen(false)}
             onConfirm={fetchOrders} // refresh data
+          />
+        )}
+
+        {/* Render PaymentDetails component if an order is selected */}
+        {selectedOrderId && (
+          <PaymentDetails
+            orderId={selectedOrderId}
+            onClose={() => setSelectedOrderId(null)} // close the modal
+          />
+        )}
+
+        {/* Confirmation Dialog for Delete */}
+        {isConfirmationDialogOpen && (
+          <ConfirmationDialog
+            isOpen={isConfirmationDialogOpen}
+            onClose={() => setIsConfirmationDialogOpen(false)}
+            onConfirm={handleDelete}
+            message="Are you sure you want to delete this order?"
           />
         )}
       </div>

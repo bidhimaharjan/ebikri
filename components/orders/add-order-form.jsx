@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
-import QRCode from '@/components/qrcode';
-import KhaltiCheckout from 'khalti-checkout-web'; 
+import { QRCodeSVG } from "qrcode.react";
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [products, setProducts] = useState([{ productId: "", quantity: "" }]);
@@ -13,6 +12,8 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [deliveryLocation, setDeliveryLocation] = useState("");
   const [showCustomerDetails, setShowCustomerDetails] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState(null); // state to store the QR Code URL
+  const [totalAmount, setTotalAmount] = useState(null);
 
   // fetch products and customers when the form is opened
   useEffect(() => {
@@ -73,29 +74,92 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   const response = await fetch("/api/orders", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       products,
+  //       customer,
+  //       name,
+  //       email,
+  //       phoneNumber,
+  //       deliveryLocation,
+  //     }),
+  //   });
+
+  //   if (response.ok) {
+  //     toast.success("Order created successfully!");
+  //     onClose();
+  //     onConfirm();
+  //   } else {
+  //     toast.error("Error creating order");
+  //     onConfirm();
+  //   }
+  // };
+
+  // Handle form submission for "Generate QR Code"
+  const handleGenerateQRCode = async (e) => {
     e.preventDefault();
+    await handleSubmit("Khalti");
+  };
 
-    const response = await fetch("/api/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        products,
-        customer,
-        name,
-        email,
-        phoneNumber,
-        deliveryLocation,
-      }),
-    });
+  // Handle form submission for "Confirm"
+  const handleConfirm = async (e) => {
+    e.preventDefault();
+    await handleSubmit("Other");
+  };
 
-    if (response.ok) {
-      toast.success("Order created successfully!");
-      onClose();
-      onConfirm();
-    } else {
-      toast.error("Error creating order");
-      onConfirm();
+   // Handle form submission
+   const handleSubmit = async (paymentMethod) => {
+    try {
+      // Create the order
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          products,
+          customer,
+          name,
+          email,
+          phoneNumber,
+          deliveryLocation,
+          paymentMethod, // pass the payment method
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create order");
+      }
+
+      const orderData = await response.json();
+
+      // Store the total amount for later display
+      setTotalAmount(orderData.order.totalAmount);
+
+      // If payment method is Khalti, generate QR code
+      if (paymentMethod === "Khalti") {
+        const khaltiResponse = await fetch(
+          `/api/orders/generate-qr/${orderData.order.id}`
+        );
+        if (!khaltiResponse.ok) {
+          throw new Error("Failed to generate Khalti payment link");
+        }
+
+        const khaltiData = await khaltiResponse.json();
+
+        // Set the QR code URL
+        setQrCodeUrl(khaltiData.payment_url);
+
+        toast.success("Order created successfully! Scan the QR code to pay.");
+      } else {
+        toast.success("Order created successfully!");
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast.error("Failed to create order");
     }
   };
 
@@ -271,13 +335,22 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Submit Buttons */}
           <div className="flex justify-between mt-6">
             <button
-              type="submit"
+              type="button"
+              onClick={handleGenerateQRCode}
               className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
             >
               Generate QR Code
+            </button>
+
+            <button
+              type="button"
+              onClick={handleConfirm}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            >
+              Confirm
             </button>
 
             <button
@@ -288,6 +361,21 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
               Cancel
             </button>
           </div>
+
+          {/* Display QR Code */}
+          {qrCodeUrl && (
+            <div className="flex flex-col items-center mt-6">
+              <QRCodeSVG value={qrCodeUrl} size={200} />
+              {totalAmount && (
+                <p className="mt-2 text-lg font-semibold text-gray-800">
+                  Total: Rs. {totalAmount}
+                </p>
+              )}
+              <p className="mt-1 text-sm text-gray-600">
+                Scan this QR code to complete the payment.
+              </p>
+            </div>
+          )}
         </form>
       </div>
     </div>
