@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { NextResponse } from "next/server";
 import { db } from "@/src/index";
 import { orderTable } from "@/src/db/schema/order";
 import { orderProductTable } from "@/src/db/schema/orderproduct";
@@ -14,7 +15,7 @@ export async function GET(request) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
     });
   }
@@ -65,12 +66,12 @@ export async function GET(request) {
       })
     );
 
-    return new Response(JSON.stringify(populatedOrders), {
+    return new NextResponse(JSON.stringify(populatedOrders), {
       status: 200,
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
+    return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
     });
   }
@@ -81,7 +82,7 @@ export async function POST(request) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
     });
   }
@@ -107,7 +108,7 @@ export async function POST(request) {
       !email ||
       !phoneNumber
     ) {
-      return new Response(
+      return new NextResponse(
         JSON.stringify({ error: "Missing required fields" }),
         {
           status: 400,
@@ -152,7 +153,7 @@ export async function POST(request) {
         } catch (error) {
           if (error.code === "23505") {
             // handle duplicate email error
-            return new Response(
+            return new NextResponse(
               JSON.stringify({
                 error: "Customer with this email already exists",
               }),
@@ -160,7 +161,7 @@ export async function POST(request) {
             );
           } else {
             console.error("Error creating customer:", error);
-            return new Response(
+            return new NextResponse(
               JSON.stringify({ error: "Internal server error" }),
               { status: 500 }
             );
@@ -186,7 +187,7 @@ export async function POST(request) {
         .where(eq(productTable.id, product.productId));
 
       if (!productData) {
-        return new Response(
+        return new NextResponse(
           JSON.stringify({
             error: `Product with ID ${product.productId} not found`,
           }),
@@ -198,7 +199,7 @@ export async function POST(request) {
 
       // check if there is enough stock
       if (productData.stockAvailability < product.quantity) {
-        return new Response(
+        return new NextResponse(
           JSON.stringify({
             error: `Insufficient stock for product ${product.productId}`,
           }),
@@ -298,7 +299,7 @@ export async function POST(request) {
       console.log("Khalti Payment URL:", khaltiResponse.data.payment_url);
 
       // return the Khalti payment URL to the client
-      return new Response(
+      return new NextResponse(
         JSON.stringify({
           message: "Order created successfully",
           order: newOrder,
@@ -311,7 +312,7 @@ export async function POST(request) {
     }
 
     // Return success response for non-Khalti payments
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: "Order created successfully",
         order: newOrder,
@@ -322,7 +323,7 @@ export async function POST(request) {
     );
   } catch (error) {
     console.error("Error creating order:", error);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
+    return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
     });
   }

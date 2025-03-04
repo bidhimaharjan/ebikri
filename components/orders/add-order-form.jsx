@@ -169,9 +169,9 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
 
 return (
   <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50`}>
-  <div className={`bg-white p-8 rounded-lg shadow-lg transition-all duration-300 ${qrCodeUrl ? "w-[900px]" : "w-[700px]"} flex flex-col md:flex-row`}>
+  <div className={`bg-white p-8 rounded-lg shadow-lg transition-all duration-300 ${qrCodeUrl ? "w-[900px]" : "w-[700px]"} flex flex-col md:flex-row max-h-[90vh] overflow-hidden`}>
     {/* Left Section - Form */}
-    <div className="w-full p-4">
+    <div className={`w-full ${qrCodeUrl ? "pr-6" : ""} overflow-y-auto`}>
       <h2 className="text-lg font-semibold mb-4">New Order</h2>
       <form onSubmit={handleSubmit}>
         {/* Order Details */}
@@ -181,7 +181,7 @@ return (
             <div className="w-1/2">
               <label className="block text-sm font-medium">Product ID *</label>
               <select
-                className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200"
+                className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200 truncate"
                 value={product.productId}
                 onChange={(e) =>
                   updateProductField(index, "productId", e.target.value)
@@ -237,7 +237,7 @@ return (
           <div>
             <label className="block text-sm font-medium">Choose a Customer</label>
             <select
-              className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200"
+              className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200 truncate"
               value={customer}
               onChange={handleCustomerChange}
             >
@@ -254,7 +254,7 @@ return (
             <label className="block text-sm font-medium">Delivery Location *</label>
             <input
               type="text"
-              className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200"
+              className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200 truncate"
               value={deliveryLocation}
               onChange={(e) => setDeliveryLocation(e.target.value)}
               required
@@ -274,6 +274,42 @@ return (
             Enter Customer Details
           </button>
         </div>
+
+        {/* Manual Customer Entry Fields (Conditional Rendering) */}
+        {showCustomerDetails && (
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div>
+              <label className="block text-sm font-medium">Name *</label>
+              <input
+                type="text"
+                className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Email *</label>
+              <input
+                type="email"
+                className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Phone Number *</label>
+              <input
+                type="text"
+                className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+        )}
 
         {/* Submit Buttons */}
         <div className="flex justify-center mt-6 gap-4">
@@ -306,17 +342,28 @@ return (
 
     {/* Right Section - QR Code (Only visible when QR exists) */}
     {qrCodeUrl && (
-      <div className="w-1/3 p-4 border-l border-gray-300 flex flex-col items-center">
-        <h3 className="text-md font-semibold mb-2">Payment QR Code</h3>
+      <div className="pl-6 border-l border-gray-300 flex flex-col items-center">
+        <h3 className="text-md font-semibold mb-3 mt-2">Payment QR Code</h3>
         <QRCodeSVG value={qrCodeUrl} size={200} />
         {totalAmount && (
-          <p className="mt-2 text-lg font-semibold text-gray-800">
+          <p className="mt-3 text-lg font-semibold text-gray-800">
             Total: Rs. {totalAmount}
           </p>
         )}
-        <p className="mt-1 text-sm text-gray-600 text-center">
+        <p className="mt-2 text-sm text-gray-800 text-center">
           Scan this QR code to complete the payment.
         </p>
+        <p className="mt-10 text-sm text-gray-800 text-center">
+          You can also follow this link for payment:
+        </p>
+        <a
+          href={qrCodeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 text-sm text-blue-400 hover:text-blue-500 underline break-all"
+        >
+          {qrCodeUrl}
+        </a>
       </div>
     )}
   </div>
