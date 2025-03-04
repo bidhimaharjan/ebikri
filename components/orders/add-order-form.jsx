@@ -74,39 +74,13 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   const response = await fetch("/api/orders", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       products,
-  //       customer,
-  //       name,
-  //       email,
-  //       phoneNumber,
-  //       deliveryLocation,
-  //     }),
-  //   });
-
-  //   if (response.ok) {
-  //     toast.success("Order created successfully!");
-  //     onClose();
-  //     onConfirm();
-  //   } else {
-  //     toast.error("Error creating order");
-  //     onConfirm();
-  //   }
-  // };
-
-  // Handle form submission for "Generate QR Code"
+  // handle form submission for "Generate QR Code"
   const handleGenerateQRCode = async (e) => {
     e.preventDefault();
     await handleSubmit("Khalti");
   };
 
-  // Handle form submission for "Confirm"
+  // handle form submission for "Confirm"
   const handleConfirm = async (e) => {
     e.preventDefault();
     await handleSubmit("Other");
@@ -115,25 +89,25 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
    // handle form submission
    const handleSubmit = async (paymentMethod) => {
     try {
-      // Validate product selection
+      // validate product selection
       if (products.length === 0 || products.some(p => !p.productId || !p.quantity || p.quantity <= 0)) {
         toast.error("Please select a valid product and quantity.");
         return;
       }
   
-      // Validate customer details
+      // validate customer details
       if (!customer && (!name || !email || !phoneNumber)) {
         toast.error("Please select a customer or enter customer details.");
         return;
       }
   
-      // Validate delivery location
+      // validate delivery location
       if (!deliveryLocation.trim()) {
         toast.error("Please enter a delivery location.");
         return;
       }
   
-      // Proceed with order creation
+      // proceed with order creation
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -156,13 +130,15 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       setTotalAmount(orderData.order.totalAmount);
   
       if (paymentMethod === "Khalti") {
-        const khaltiResponse = await fetch(`/api/orders/generate-qr/${orderData.order.id}`);
-        if (!khaltiResponse.ok) {
-          throw new Error("Failed to generate Khalti payment link");
+        // use the Khalti payment URL from the order creation response
+        const paymentUrl = orderData.payment_url;
+  
+        if (!paymentUrl) {
+          throw new Error("Khalti payment URL not found");
         }
   
-        const khaltiData = await khaltiResponse.json();
-        setQrCodeUrl(khaltiData.payment_url);
+        // set the QR code URL
+        setQrCodeUrl(paymentUrl);
         toast.success("Order created successfully! Scan the QR code to pay.");
       } else {
         toast.success("Order created successfully!");
@@ -171,8 +147,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       console.error("Error creating order:", error);
       toast.error("Failed to create order");
     }
-  };
-  
+  }; 
 
   const addProductField = () => {
     setProducts([...products, { productId: "", quantity: "" }]);
