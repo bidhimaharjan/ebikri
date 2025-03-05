@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 
 // fetch order details by ID
 export async function GET(request, { params }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -17,7 +18,7 @@ export async function GET(request, { params }) {
   }
 
   try {
-    const orderId = params.id;
+    const orderId = id;
     console.log("Fetching Order with ID:", orderId);
 
     // Fetch the order
@@ -42,13 +43,13 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     }
 
-    // Fetch the products associated with the order
+    // fetch the products associated with the order
     const products = await db
       .select()
       .from(orderProductTable)
       .where(eq(orderProductTable.orderId, orderId));
 
-    // Fetch the payment status associated with the order
+    // fetch the payment status associated with the order
     const payment = await db
       .select()
       .from(paymentTable)
@@ -59,7 +60,7 @@ export async function GET(request, { params }) {
     // handle cases where no payment record exists
     const paymentStatus = payment.length > 0 ? payment[0].status : "pending";
 
-    // Create the response
+    // create the response
     const response = {
       id: order[0].id,
       customer: {
@@ -74,7 +75,7 @@ export async function GET(request, { params }) {
       })),
       deliveryLocation: order[0].deliveryLocation,
       totalAmount: order[0].totalAmount,
-      paymentStatus: paymentStatus, // Include the payment status in the response
+      paymentStatus: paymentStatus,
     };
 
     return NextResponse.json(response, { status: 200 });
@@ -86,6 +87,8 @@ export async function GET(request, { params }) {
 
 // update an order
 export async function PUT(request, { params }) {
+  const { id } = await params;
+  
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -93,44 +96,69 @@ export async function PUT(request, { params }) {
   }
 
   try {
-    const orderId = params.id;
+    const orderId = id;
     const { products, deliveryLocation } = await request.json();
 
     console.log("Updating Order with ID:", orderId);
 
-    // Validate input
-    if (!products || !Array.isArray(products)) {
-      return NextResponse.json({ error: "Invalid products data" }, { status: 400 });
-    }
-
+    // validate input
     if (!deliveryLocation || typeof deliveryLocation !== "string") {
       return NextResponse.json({ error: "Invalid delivery location" }, { status: 400 });
     }
 
-    // update the order's delivery location
-    await db
-      .update(orderTable)
-      .set({ deliveryLocation })
-      .where(eq(orderTable.id, orderId));
+    // fetch existing products
+    const existingProducts = await db
+      .select()
+      .from(orderProductTable)
+      .where(eq(orderProductTable.orderId, orderId));
 
-    // delete existing order products
-    await db.delete(orderProductTable).where(eq(orderProductTable.orderId, orderId));
+    const existingProductsMap = new Map(
+      existingProducts.map((p) => [p.productId, p.quantity])
+    );
 
-    // insert updated products
-    for (const product of products) {
-      await db.insert(orderProductTable).values({
-        orderId,
-        productId: product.productId,
-        quantity: product.quantity,
-      });
+    const newProductsMap = new Map(
+      (products || []).map((p) => [p.productId, p.quantity])
+    );
+
+    // check if products have changed
+    const productsChanged =
+      existingProducts.length !== (products || []).length ||
+      existingProducts.some((p) => newProductsMap.get(p.productId) !== p.quantity);
+
+    // update only the delivery location if products haven't changed
+    if (!productsChanged) {
+      await db
+        .update(orderTable)
+        .set({ deliveryLocation })
+        .where(eq(orderTable.id, orderId));
+      return NextResponse.json({ message: "Order updated successfully" }, { status: 200 });
     }
 
-    return NextResponse.json({ message: "Order updated successfully" }, { status: 200 });
+    // // delete existing order products only if they have changed
+    // await db.delete(orderProductTable).where(eq(orderProductTable.orderId, orderId));
+
+    // // insert updated products
+    // for (const product of products || []) {
+    //   // ensure `unitPrice` is provided in the request or use a default value
+    //   if (!product.unitPrice) {
+    //     throw new Error("Product unitPrice is required");
+    //   }
+
+    //   await db.insert(orderProductTable).values({
+    //     orderId,
+    //     productId: product.productId,
+    //     quantity: product.quantity,
+    //     unitPrice: product.unitPrice, // Add the unitPrice
+    //   });
+    // }
+
+    // return NextResponse.json({ message: "Order updated successfully" }, { status: 200 });
   } catch (error) {
     console.error("Error updating order:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
 
 // delete an order
 export async function DELETE(request, { params }) {

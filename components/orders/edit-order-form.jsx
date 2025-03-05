@@ -86,27 +86,33 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          products,
-          deliveryLocation,
-          paymentMethod,
+          products: products,
+          deliveryLocation: deliveryLocation,
+          // paymentMethod
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to update order");
-
-      const updatedOrderData = await response.json();
-      setTotalAmount(updatedOrderData.order.totalAmount);
-
-      if (paymentMethod === "Khalti") {
-        const paymentUrl = updatedOrderData.payment_url;
-        if (!paymentUrl) throw new Error("Khalti payment URL not found");
-        setQrCodeUrl(paymentUrl);
-        toast.success("Order updated successfully! Scan the QR code to pay.");
+      if (response.ok) {
+        const data = await response.json();  // Parse the JSON response body
+        toast.success(data.message);
       } else {
-        toast.success("Order updated successfully! Please change the payment status after payment is completed");
+        toast.error("Failed to update order");
+        throw new Error("Failed to update order");
       }
 
-      onClose();
+      // const updatedOrderData = await response.json();
+      // setTotalAmount(updatedOrderData.order.totalAmount);
+
+      // if (paymentMethod === "Khalti") {
+      //   const paymentUrl = updatedOrderData.payment_url;
+      //   if (!paymentUrl) throw new Error("Khalti payment URL not found");
+      //   setQrCodeUrl(paymentUrl);
+      //   toast.success("Order updated successfully! Scan the QR code to pay.");
+      // } else {
+      //   toast.success("Order updated successfully! Please change the payment status after payment is completed");
+      // }
+
+      // onClose();
       onConfirm();
     } catch (error) {
       console.error("Error updating order:", error);
