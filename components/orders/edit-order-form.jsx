@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { QRCodeSVG } from "qrcode.react";
+import {
+  PlusIcon,
+  ShoppingCartIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 
 const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   const [products, setProducts] = useState([{ productId: "", quantity: "" }]);
@@ -155,7 +160,10 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
         <h2 className="text-lg font-semibold mb-4">Modify Order</h2>
         <form onSubmit={handleSubmit}>
           {/* Order Details */}
-          <h3 className="text-md font-semibold mb-2">Order Details</h3>
+          <h3 className="text-md font-semibold mt-6 mb-2 flex items-center">
+            <ShoppingCartIcon className="h-5 w-5 mr-1" />
+            Order Details
+          </h3>
           {products.map((product, index) => (
             <div key={index} className="flex gap-4 mb-4 items-center">
               <div className="w-1/2">
@@ -200,14 +208,19 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
             <button
               type="button"
               onClick={addProductField}
-              className="px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className="px-4 py-2 text-sm bg-blue-500 border-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
             >
-              + Add Another Product
+              <PlusIcon className="w-4 h-4 mr-1" />
+              Add Another Product
             </button>
           </div>
 
-          {/* Customer Details (Disabled) */}
-          <h3 className="text-md font-semibold mt-4 mb-2">Customer Details</h3>
+          {/* Customer Details (for display only) */}
+          <h3 className="text-md font-semibold mt-6 mb-2 flex items-center">
+            <UserIcon className="h-5 w-5 mr-1" />
+            Customer Details
+          </h3>
+
           <div className="space-y-2">
             <div>
               <span className="font-semibold">Name:</span> {name}
@@ -219,19 +232,22 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
               <span className="font-semibold">Email:</span> {email}
             </div>
           </div>
-          <div className="mt-4">
-            <label className="block text-sm font-medium">Change Delivery Location *</label>
-            <input
-              type="text"
-              className="w-full p-2 mt-1 border-gray-200 rounded bg-gray-200"
-              value={deliveryLocation}
-              onChange={(e) => setDeliveryLocation(e.target.value)}
-              required
-            />
+
+          <div className="flex gap-4 mb-4 mr-4 items-center">
+            <div className="w-1/2">
+              <label className="mt-6 block font-semibold">Change Delivery Location *</label>
+              <input
+                type="text"
+                className="w-full p-2 mt-1 border-gray-200 rounded bg-gray-200"
+                value={deliveryLocation}
+                onChange={(e) => setDeliveryLocation(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           {/* Submit Buttons */}
-          <div className="flex justify-between mt-6">
+          <div className="flex justify-center mt-6 gap-4">
             <button
               type="button"
               onClick={() => handleSubmit("Other")}

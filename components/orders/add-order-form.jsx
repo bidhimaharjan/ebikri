@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
 import { QRCodeSVG } from "qrcode.react";
+import {
+  PlusIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [products, setProducts] = useState([{ productId: "", quantity: "" }]);
@@ -222,15 +226,16 @@ return (
           </div>
         ))}
 
-        <div className="flex justify-center my-2">
-          <button
-            type="button"
-            onClick={addProductField}
-            className="px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            + Add Another Product
-          </button>
-        </div>
+          <div className="flex justify-center my-2">
+            <button
+              type="button"
+              onClick={addProductField}
+              className="px-4 py-2 text-sm bg-blue-500 border-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
+            >
+              <PlusIcon className="w-4 h-4 mr-1" />
+              Add Another Product
+            </button>
+          </div>
 
         {/* Customer Details */}
         <h3 className="text-md font-semibold mt-4 mb-2">Customer Details</h3>
@@ -270,9 +275,10 @@ return (
         <div className="flex justify-center my-2">
           <button
             type="button"
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm flex items-center"
             onClick={() => setShowCustomerDetails(!showCustomerDetails)}
           >
+            <UserIcon className="h-4 w-4 mr-1" />
             Enter Customer Details
           </button>
         </div>
