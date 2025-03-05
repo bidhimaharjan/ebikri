@@ -10,20 +10,23 @@ import {
   CreditCardIcon,
 } from "@heroicons/react/24/outline";
 import AddOrderForm from "@/components/orders/add-order-form";
+import EditOrderForm from "@/components/orders/edit-order-form";
 import { toast } from "react-toastify";
 import BusinessName from "@/components/businessname";
 import Pagination from "@/components/pagination";
-import PaymentDetails from "@/components/payments/page";
+import PaymentDetails from "@/components/payments/payment-details";
 import ConfirmationDialog from "@/components/confirmation-dialog";
 
 const OrdersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddOrderFormOpen, setIsAddOrderFormOpen] = useState(false);
+  const [isEditOrderFormOpen, setIsEditOrderFormOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { data: session, status } = useSession();
   const [orders, setOrders] = useState([]);
   const [selectedOrderId, setSelectedOrderId] = useState(null); // track selected order ID
+  const [orderToEdit, setOrderToEdit] = useState(null); // track order to edit
   const [orderToDelete, setOrderToDelete] = useState(null); // track order to delete
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false); // confirmation dialog state
   const rowsPerPage = 3;
@@ -50,6 +53,47 @@ const OrdersLayout = () => {
     }
   }, [session]);
 
+  // handle payments button click
+  const handlePayments = (orderId) => {
+    setSelectedOrderId(orderId); // set the selected order ID
+  };
+
+  // handle edit button click
+  const handleEdit = (order) => {
+    console.log("Order to edit:", order); // Add this line
+    setOrderToEdit(order); // track selected order ID
+    setIsEditOrderFormOpen(true);
+  };
+  
+  // handle delete button click
+  const handleDeleteClick = (orderId) => {
+    setOrderToDelete(orderId); // set the order to delete
+    setIsConfirmationDialogOpen(true); // open the confirmation dialog
+  };
+
+  // handle order deletion
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/orders/${orderToDelete}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete order");
+      }
+
+      const data = await response.json();
+      toast.success(data.message); // show success message
+      fetchOrders(); // refresh the orders list
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      toast.error("Failed to delete order");
+    } finally {
+      setIsConfirmationDialogOpen(false); // close the confirmation dialog
+      setOrderToDelete(null); // reset the order to delete
+    }
+  };
+
   // filter orders based on search query
   const filteredOrders = orders
     .filter((item) => {
@@ -72,40 +116,6 @@ const OrdersLayout = () => {
 
   // calculate total pages
   const totalPages = Math.ceil(filteredOrders.length / rowsPerPage);
-
-  // handle payments button click
-  const handlePayments = (orderId) => {
-    setSelectedOrderId(orderId); // Set the selected order ID
-  };
-
-  // handle delete button click
-  const handleDeleteClick = (orderId) => {
-    setOrderToDelete(orderId); // Set the order to delete
-    setIsConfirmationDialogOpen(true); // Open the confirmation dialog
-  };
-
-  // handle order deletion
-  const handleDelete = async () => {
-    try {
-      const response = await fetch(`/api/orders/${orderToDelete}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete order");
-      }
-
-      const data = await response.json();
-      toast.success(data.message); // Show success message
-      fetchOrders(); // Refresh the orders list
-    } catch (error) {
-      console.error("Error deleting order:", error);
-      toast.error("Failed to delete order");
-    } finally {
-      setIsConfirmationDialogOpen(false); // Close the confirmation dialog
-      setOrderToDelete(null); // Reset the order to delete
-    }
-  };
 
   if (status === "loading") {
     return <p>Loading...</p>;
@@ -270,6 +280,16 @@ const OrdersLayout = () => {
             isOpen={isAddOrderFormOpen}
             onClose={() => setIsAddOrderFormOpen(false)}
             onConfirm={fetchOrders} // refresh data
+          />
+        )}
+
+        {/* Edit Order Form */}
+        {isEditOrderFormOpen && (
+          <EditOrderForm
+            isOpen={isEditOrderFormOpen}
+            onClose={() => setIsEditOrderFormOpen(false)}
+            onConfirm={fetchOrders} // refresh data
+            order={orderToEdit} // pass the order data to edit
           />
         )}
 

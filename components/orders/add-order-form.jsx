@@ -140,12 +140,14 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
         // set the QR code URL
         setQrCodeUrl(paymentUrl);
         toast.success("Order created successfully! Scan the QR code to pay.");
+        onConfirm();
       } else {
-        toast.success("Order created successfully!");
+        toast.success("Order created successfully! Please change the payment status after payment is completed");
       }
     } catch (error) {
       console.error("Error creating order:", error);
       toast.error("Failed to create order");
+      onConfirm();
     }
   }; 
 
