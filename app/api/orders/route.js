@@ -7,6 +7,7 @@ import { orderProductTable } from "@/src/db/schema/orderproduct";
 import { customerTable } from "@/src/db/schema/customer";
 import { productTable } from "@/src/db/schema/product";
 import { paymentTable } from "@/src/db/schema/payment";
+import { salesTable } from "@/src/db/schema/sales";
 import { eq, and, sql } from "drizzle-orm";
 import axios from "axios";
 
@@ -249,6 +250,16 @@ export async function POST(request) {
           stockAvailability: productData.stockAvailability - product.quantity,
         })
         .where(eq(productTable.id, product.productId));
+
+      // insert sales data into the sales table
+      await db.insert(salesTable).values({
+        businessId: session.user.businessId,
+        productId: product.productId,
+        quantitySold: product.quantity,
+        revenue: productData.unitPrice * product.quantity,
+        saleDate: new Date(),
+        // discountAmount: 0, 
+      });
     }
 
     // create a payment record

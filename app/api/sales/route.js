@@ -2,9 +2,44 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
 import { db } from "@/src/index";
-import { orderTable } from "@/src/db/schema/order";
-import { orderProductTable } from "@/src/db/schema/orderproduct";
-import { customerTable } from "@/src/db/schema/customer";
+import { salesTable } from "@/src/db/schema/sales";
 import { productTable } from "@/src/db/schema/product";
-import { paymentTable } from "@/src/db/schema/payment";
-import { eq, and, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+
+// fetch sales data
+export async function GET(request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
+  try {
+    // fetch all sales for the current business
+    const sales = await db
+    .select({
+        ...salesTable, // select all fields from sales table
+      productName: productTable.productName,
+      unitPrice: productTable.unitPrice,
+    })
+    .from(salesTable)
+    .innerJoin(productTable, eq(salesTable.productId, productTable.id)) // Corrected join
+    .where(eq(salesTable.businessId, session.user.businessId));
+
+      console.log('Fetched Sales:', sales);
+
+    // return the sales data as JSON
+    return new NextResponse(JSON.stringify(sales), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error fetching sales data:", error);
+    return new NextResponse(
+      JSON.stringify({ error: "Error fetching sales data" }),
+      { status: 500 }
+    );
+  }
+}

@@ -64,6 +64,20 @@
       "when": 1741098578474,
       "tag": "0008_blue_abomination",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1742365142742,
+      "tag": "0009_blushing_ravenous",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1742366086741,
+      "tag": "0010_bored_the_executioner",
+      "breakpoints": true
     }
   ]
 }
