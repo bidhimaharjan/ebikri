@@ -121,7 +121,7 @@ const InventoryLayout = () => {
         <div className="flex justify-between items-center mb-4">
           {/* Add Product Button */}
           <button
-            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-red-600"
+            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-blue-600"
             onClick={() => setIsAddFormOpen(true)}
           >
             <PlusIcon className="h-5 w-5 mr-1" /> Add
