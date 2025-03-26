@@ -1,0 +1,1 @@
+ALTER TABLE "marketing" ADD COLUMN "recipients" text DEFAULT 'all' NOT NULL;

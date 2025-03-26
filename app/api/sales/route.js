@@ -28,8 +28,6 @@ export async function GET(request) {
     .innerJoin(productTable, eq(salesTable.productId, productTable.id)) // Corrected join
     .where(eq(salesTable.businessId, session.user.businessId));
 
-      console.log('Fetched Sales:', sales);
-
     // return the sales data as JSON
     return new NextResponse(JSON.stringify(sales), {
       status: 200,
