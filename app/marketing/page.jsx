@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
-import { UserCircleIcon, PlusIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, PlusIcon, MagnifyingGlassIcon, PaperAirplaneIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import BusinessName from "@/components/businessname";
 import Pagination from "@/components/pagination";
 import AddCampaignForm from "@/components/marketing/add-campaign-form";
@@ -19,6 +19,7 @@ const MarketingLayout = () => {
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
   const [campaignToDelete, setCampaignToDelete] = useState(null);
+  const [sendingCampaigns, setSendingCampaigns] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const { data: session, status } = useSession();
   const [campaigns, setCampaigns] = useState([]);
@@ -27,14 +28,16 @@ const MarketingLayout = () => {
   // fetch marketing campaigns data
   const fetchCampaigns = async () => {
     console.log("Fetching campaigns...");
-  
+
     try {
-      const response = await fetch(`/api/marketing?businessId=${session.user.businessId}`);
-  
+      const response = await fetch(
+        `/api/marketing?businessId=${session.user.businessId}`
+      );
+
       if (!response.ok) {
         throw new Error("Failed to fetch marketing campaigns");
       }
-  
+
       const data = await response.json();
       setCampaigns(data);
     } catch (error) {
@@ -42,8 +45,6 @@ const MarketingLayout = () => {
       toast.error("Failed to load campaigns");
     }
   };
-  
-  
 
   useEffect(() => {
     if (session) {
@@ -75,35 +76,73 @@ const MarketingLayout = () => {
     }
   };
 
-  // filter campaigns based on search query
+  // handle Send button click
+  const handleSend = async (campaignId) => {
+    setSendingCampaigns((prev) => ({ ...prev, [campaignId]: true }));
+
+    try {
+      const response = await fetch("/api/marketing/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ campaignId }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success(
+          `Emails sent: ${result.sent}. Failed: ${result.failed}. ` +
+            (result.failed > 0 ? "Check console for details." : "")
+        );
+        if (result.failed > 0) {
+          console.log("Failed emails:", result.errors);
+        }
+      } else {
+        toast.error(result.message || "Error sending emails");
+      }
+    } catch (error) {
+      console.error("Error sending emails:", error);
+      toast.error("Failed to send emails");
+    } finally {
+      setSendingCampaigns((prev) => ({ ...prev, [campaignId]: false }));
+    }
+  };
+
+  // filter campaigns based on search query and sort campaigns (active first, then inactive)
   const filteredCampaigns = campaigns
-  .filter((campaign) => {
-    const isStatusMatch =
-      !searchQuery ||
-      (searchQuery.toLowerCase() === "active" && campaign.active) ||
-      (searchQuery.toLowerCase() === "inactive" && !campaign.active);
+    .filter((campaign) => {
+      const isStatusMatch =
+        !searchQuery ||
+        (searchQuery.toLowerCase() === "active" && campaign.active) ||
+        (searchQuery.toLowerCase() === "inactive" && !campaign.active);
 
-    return (
-      isStatusMatch ||
-      campaign.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  })
-  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-
-
+      return (
+        isStatusMatch ||
+        campaign.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    })
+    .sort((a, b) => {
+      // sort by active status first (active comes before inactive)
+      if (a.active === b.active) {
+        // if same status, sort by creation date
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+      return a.active ? -1 : 1;
+    });
 
   // calculate total pages
   const totalPages = Math.ceil(filteredCampaigns.length / rowsPerPage);
 
   // format date for display
   const formatDate = (dateString) => {
-    if (!dateString) return '-';
+    if (!dateString) return "-";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -112,7 +151,12 @@ const MarketingLayout = () => {
   }
 
   if (!session) {
-    return <p>You are not authenticated. Please log in to access the marketing campaigns.</p>;
+    return (
+      <p>
+        You are not authenticated. Please log in to access the marketing
+        campaigns.
+      </p>
+    );
   }
 
   return (
@@ -132,7 +176,9 @@ const MarketingLayout = () => {
 
         {/* Marketing Title */}
         <div className="relative mb-4">
-          <h1 className="text-xl font-semibold text-gray-700 mt-2">Marketing Tools</h1>
+          <h1 className="text-xl font-semibold text-gray-700 mt-2">
+            Marketing Tools
+          </h1>
         </div>
 
         <div className="flex justify-between items-center mb-4">
@@ -143,7 +189,7 @@ const MarketingLayout = () => {
           >
             <PlusIcon className="h-5 w-5 mr-1" /> Create
           </button>
-          
+
           {/* Search Bar */}
           <div className="flex-1 flex justify-center">
             <div className="relative w-1/3">
@@ -185,39 +231,82 @@ const MarketingLayout = () => {
                   <tr key={campaign.id} className="border-b">
                     <td className="px-4 py-2 text-center">{campaign.id}</td>
                     <td className="px-4 py-2">{campaign.campaignName}</td>
-                    <td className="px-4 py-2 text-center">{parseFloat(campaign.discountPercent)}%</td>
-                    <td className="px-4 py-2 text-center">{campaign.promoCode}</td>
-                    <td className="px-4 py-2 text-center">{formatDate(campaign.startDate)}</td>
-                    <td className="px-4 py-2 text-center">{formatDate(campaign.endDate)}</td>
                     <td className="px-4 py-2 text-center">
-                      {campaign.recipients === 'all' ? 'All Customers' : 'Selected Customers'}
+                      {parseFloat(campaign.discountPercent)}%
                     </td>
                     <td className="px-4 py-2 text-center">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        campaign.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      {campaign.promoCode}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {formatDate(campaign.startDate)}
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      {formatDate(campaign.endDate)}
+                    </td>
+
+                    <td className="px-4 py-2 text-center">
+                      {campaign.recipients === "all"
+                        ? "All Customers"
+                        : "Selected Customers"}
+                    </td>
+
+                    <td className="px-4 py-2 text-center">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          campaign.active
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
                         {campaign.active ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="px-4 py-2 flex justify-center space-x-2">
-                      {/* Edit Button */}
-                      <button
-                        className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-300"
-                        onClick={() => handleEdit(campaign)}
-                      >
-                        Edit
-                      </button>
 
-                      {/* Delete Button */}
-                      <button
-                        className="px-4 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
-                        onClick={() => {
-                          setCampaignToDelete(campaign.id);
-                          setIsConfirmationDialogOpen(true);
-                        }}
-                      >
-                        Delete
-                      </button>
+                    <td className="px-4 py-2 border-b">
+                      <div className="flex justify-center space-x-2 h-full items-center">
+                        {/* Send Button (disabled if campaign is inactive) */}
+                        <button
+                          className={`px-4 py-1 text-sm rounded-md flex items-center ${
+                            campaign.active
+                              ? "bg-green-500 text-white hover:bg-green-600"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          }`}
+                          onClick={() =>
+                            campaign.active && handleSend(campaign.id)
+                          }
+                          disabled={
+                            !campaign.active || sendingCampaigns[campaign.id]
+                          }
+                        >
+                          <PaperAirplaneIcon className="h-4 w-4 mr-1" />
+                          {sendingCampaigns[campaign.id]
+                            ? "Sending..."
+                            : campaign.active
+                            ? "Send"
+                            : "Inactive"}
+                        </button>
+
+                        {/* Edit Button */}
+                        <button
+                          className="p-1 border border-blue-300 rounded-md text-blue-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50"
+                          onClick={() => handleEdit(campaign)}
+                          title="Edit"
+                        >
+                          <PencilIcon className="h-5 w-5" />
+                        </button>
+
+                        {/* Delete Button */}
+                        <button
+                          className="p-1 border border-red-500 rounded-md text-red-500 hover:text-red-600 hover:border-red-500 hover:bg-red-50"
+                          onClick={() => {
+                            setCampaignToDelete(campaign.id);
+                            setIsConfirmationDialogOpen(true);
+                          }}
+                          title="Delete"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
