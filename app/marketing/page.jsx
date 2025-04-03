@@ -243,19 +243,17 @@ const MarketingLayout = () => {
                     <td className="px-4 py-2 text-center">
                       {formatDate(campaign.endDate)}
                     </td>
-
                     <td className="px-4 py-2 text-center">
                       {campaign.recipients === "all"
                         ? "All Customers"
                         : "Selected Customers"}
                     </td>
-
                     <td className="px-4 py-2 text-center">
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${
                           campaign.active
                             ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
+                            : "bg-gray-200 text-gray-600"
                         }`}
                       >
                         {campaign.active ? "Active" : "Inactive"}
@@ -264,48 +262,63 @@ const MarketingLayout = () => {
 
                     <td className="px-4 py-2 border-b">
                       <div className="flex justify-center space-x-2 h-full items-center">
-                        {/* Send Button (disabled if campaign is inactive) */}
-                        <button
-                          className={`px-4 py-1 text-sm rounded-md flex items-center ${
-                            campaign.active
-                              ? "bg-green-500 text-white hover:bg-green-600"
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          }`}
-                          onClick={() =>
-                            campaign.active && handleSend(campaign.id)
-                          }
-                          disabled={
-                            !campaign.active || sendingCampaigns[campaign.id]
-                          }
-                        >
-                          <PaperAirplaneIcon className="h-4 w-4 mr-1" />
-                          {sendingCampaigns[campaign.id]
-                            ? "Sending..."
-                            : campaign.active
-                            ? "Send"
-                            : "Inactive"}
-                        </button>
+                        {/* Send Button with Tooltip */}
+                        <div className="relative group">
+                          <button
+                            className={`px-4 py-1 text-sm rounded-md flex items-center ${
+                              campaign.active
+                                ? "bg-green-500 text-white hover:bg-green-600"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                            onClick={() =>
+                              campaign.active && handleSend(campaign.id)
+                            }
+                            disabled={
+                              !campaign.active || sendingCampaigns[campaign.id]
+                            }
+                          >
+                            <PaperAirplaneIcon className="h-4 w-4 mr-1" />
+                            {sendingCampaigns[campaign.id]
+                              ? "Sending..."
+                              : campaign.active
+                              ? "Send"
+                              : "Send"}
+                          </button>
+                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                            {campaign.active
+                              ? "Send campaign emails"
+                              : "Campaign is inactive"}
+                          </span>
+                        </div>
 
-                        {/* Edit Button */}
-                        <button
-                          className="p-1 border border-blue-300 rounded-md text-blue-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50"
-                          onClick={() => handleEdit(campaign)}
-                          title="Edit"
-                        >
-                          <PencilIcon className="h-5 w-5" />
-                        </button>
+                        {/* Edit Button with Tooltip */}
+                        <div className="relative group">
+                          <button
+                            className="p-1 border border-blue-300 rounded-md text-blue-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50"
+                            onClick={() => handleEdit(campaign)}
+                          >
+                            <PencilIcon className="h-5 w-5" />
+                          </button>
+                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                            Edit
+                          </span>
+                        </div>
 
-                        {/* Delete Button */}
-                        <button
-                          className="p-1 border border-red-500 rounded-md text-red-500 hover:text-red-600 hover:border-red-500 hover:bg-red-50"
-                          onClick={() => {
-                            setCampaignToDelete(campaign.id);
-                            setIsConfirmationDialogOpen(true);
-                          }}
-                          title="Delete"
-                        >
-                          <TrashIcon className="h-5 w-5" />
-                        </button>
+                        {/* Delete Button with Tooltip */}
+                        <div className="relative group">
+                          <button
+                            className="p-1 border border-red-500 rounded-md text-red-500 hover:text-red-600 hover:border-red-500 hover:bg-red-50"
+                            onClick={() => {
+                              setCampaignToDelete(campaign.id);
+                              setIsConfirmationDialogOpen(true);
+                            }}
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                            Delete
+                          </span>
+                        </div>
                       </div>
                     </td>
                   </tr>

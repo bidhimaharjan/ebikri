@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
-const EditCampaignForm = ({ isOpen, onClose, onConfirm }) => {
+const EditCampaignForm = ({ isOpen, onClose, onConfirm, campaign }) => {
   const [campaignName, setCampaignName] = useState('');
   const [discountPercent, setDiscountPercent] = useState('');
   const [promoCode, setPromoCode] = useState('');
@@ -9,28 +9,46 @@ const EditCampaignForm = ({ isOpen, onClose, onConfirm }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
+  // set form fields when campaign prop changes
+  useEffect(() => {
+    if (campaign) {
+      setCampaignName(campaign.campaignName);
+      setDiscountPercent(campaign.discountPercent);
+      setPromoCode(campaign.promoCode);
+      setRecipientType(campaign.recipients);
+      setStartDate(campaign.startDate.split('T')[0]);
+      setEndDate(campaign.endDate.split('T')[0]);
+    }
+  }, [campaign]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('/api/marketing', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        campaignName,
-        discountPercent,
-        promoCode,
-        recipientType,
-        startDate,
-        endDate,
-      }),
-    });
+    try {
+      const response = await fetch(`/api/marketing/${campaign.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          campaignName,
+          discountPercent: parseFloat(discountPercent),
+          promoCode,
+          recipients: recipientType,
+          startDate,
+          endDate,
+        }),
+      });
 
-    if (response.ok) {
-      toast.success('Campaign created successfully!');
-      onClose();
-      onConfirm();
-    } else {
-      toast.error('Error creating campaign');
+      if (response.ok) {
+        toast.success('Campaign updated successfully!');
+        onClose();
+        onConfirm();
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Error updating campaign');
+      }
+    } catch (error) {
+      console.error('Error updating campaign:', error);
+      toast.error('Failed to update campaign');
     }
   };
 
@@ -44,7 +62,7 @@ const EditCampaignForm = ({ isOpen, onClose, onConfirm }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-8 rounded-lg shadow-lg w-[450px]">
-        <h2 className="text-lg font-semibold mb-4">Create Campaign</h2>
+        <h2 className="text-lg font-semibold mb-4">Edit Campaign</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium">Campaign Name *</label>
@@ -61,6 +79,9 @@ const EditCampaignForm = ({ isOpen, onClose, onConfirm }) => {
             <label className="block text-sm font-medium">Discount % *</label>
             <input
               type="number"
+              min="0"
+              max="100"
+              step="0.01"
               className="w-full p-2 mt-1 border rounded"
               value={discountPercent}
               onChange={(e) => setDiscountPercent(e.target.value)}
