@@ -16,7 +16,7 @@ const BusinessName = ({ userId }) => {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
 
-          // ff a business name exists in the response, update the state
+          // if a business name exists in the response, update the state
           const data = await response.json();
           if (data.name) {
             setBusinessName(data.name);
