@@ -36,7 +36,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
       <div
         className={`${
           isNavbarOpen ? 'translate-x-0' : '-translate-x-full'
-        } fixed z-50 inset-y-0 left-0 w-64 bg-blue-500 text-white transform transition-transform md:relative md:translate-x-0 h-full`}
+        } fixed z-50 inset-y-0 left-0 w-64 bg-purple-500 text-white transform transition-transform md:relative md:translate-x-0 h-full`}
       >
         <div className="flex items-center justify-between px-6 py-6">
           <h2 className="text-xl font-bold">Logo</h2>
@@ -50,7 +50,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             <li>
               <Link
                 href="/dashboard"
-                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive('/dashboard') ? '!border-l-4 !border-white-400 font-bold' : ''
                 }`}
               >
@@ -62,7 +62,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             <li>
               <Link 
                 href="/inventory" 
-                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive('/inventory') ? '!border-l-4 !border-white-400 font-bold' : ''
                 }`}
               >
@@ -74,7 +74,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             <li>
               <Link 
                 href="/orders" 
-                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive('/orders') ? '!border-l-4 !border-white-400 font-bold' : ''
                 }`}
               >
@@ -86,7 +86,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             <li>
               <Link 
                 href="/customers"
-                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive('/customers') ? '!border-l-4 !border-white-400 font-bold' : ''
                 }`}
               >
@@ -98,7 +98,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             <li>
               <Link 
                 href="/sales"
-                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive('/sales') ? '!border-l-4 !border-white-400 font-bold' : ''
                 }`}
               >
@@ -110,7 +110,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             <li>
               <Link 
                 href="/marketing"
-                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive('/marketing') ? '!border-l-4 !border-white-400 font-bold' : ''
                 }`}
               >
@@ -122,7 +122,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             <li>
               <Link 
                 href="/settings"
-                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-blue-500 transition-transform hover:font-bold flex items-center gap-3 ${
+                className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive('/settings') ? '!border-l-4 !border-white-400 font-bold' : ''
                 }`}
               >
@@ -137,7 +137,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
         <div className="mt-auto">
           <button
             onClick={handleLogout}
-            className="block w-full text-lg text-white hover:border-l-4 border-blue-500 transition-transform hover:font-bold flex items-center gap-3 px-6 py-6"
+            className="block w-full text-lg text-white hover:border-l-4 border-purple-500 transition-transform hover:font-bold flex items-center gap-3 px-6 py-6"
           >
             <ArrowLeftIcon className="h-5 w-5" />
             <span>Logout</span>

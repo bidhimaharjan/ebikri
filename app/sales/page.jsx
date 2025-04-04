@@ -169,22 +169,22 @@ const SalesLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <button className="flex items-center px-4 py-2 bg-white text-blue-500 font-bold border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
+        <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
             <UserCircleIcon className="h-5 w-5 mr-2" />
             <BusinessName userId={session.user.id} />
           </button>
         </div>
 
         {/* Sales Analytics Title */}
-        <h1 className="text-xl font-semibold text-gray-700 mt-2 mb-4">Sales Analytics</h1>
+        <h1 className="text-xl font-semibold text-gray-800 mt-2 mb-4">Sales Analytics</h1>
 
         {/* View Mode Toggle */}
         <div className="flex space-x-4 mt-2 mb-4">
           <button
             className={`px-6 py-3 font-semibold rounded-lg transition-all duration-300 ${
               viewMode === "monthly"
-                ? "bg-blue-500 text-white shadow-lg hover:bg-blue-600"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-purple-500 text-white shadow-lg hover:bg-purple-400"
+                : "bg-gray-100 text-gray-800 hover:bg-gray-200"
             }`}
             onClick={() => setViewMode("monthly")}
           >
@@ -193,8 +193,8 @@ const SalesLayout = () => {
           <button
             className={`px-6 py-3 font-semibold rounded-lg transition-all duration-300 ${
               viewMode === "yearly"
-                ? "bg-blue-500 text-white shadow-lg hover:bg-blue-600"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-purple-500 text-white shadow-lg hover:bg-purple-400"
+                : "bg-gray-100 text-gray-800 hover:bg-gray-200"
             }`}
             onClick={() => setViewMode("yearly")}
           >
@@ -205,14 +205,14 @@ const SalesLayout = () => {
         {/* Sales Summary */}
         <div className="grid grid-cols-3 gap-6 mt-4">
           <div className="p-6 bg-white rounded-lg shadow-md text-center">
-            <p className="text-gray-700 text-lg font-bold mb-2">
+            <p className="text-gray-800 text-lg font-bold mb-2">
               {viewMode === "monthly" ? "Monthly Revenue" : "Yearly Revenue"}
             </p>
             <p className="text-2xl font-bold text-green-500">Rs. {totalRevenue.toFixed(2)}</p>
           </div>
 
           <div className="p-6 bg-white rounded-lg shadow-md text-center">
-            <p className="text-gray-700 text-lg font-bold mb-2">
+            <p className="text-gray-800 text-lg font-bold mb-2">
               {viewMode === "monthly" ? "Monthly Sales" : "Yearly Sales"}
             </p>
             <p className="text-2xl font-bold text-blue-400">{totalSales} Items</p>
@@ -220,7 +220,7 @@ const SalesLayout = () => {
           
           {/* Sales Growth Card */}
           <div className="p-6 bg-white rounded-lg shadow-md text-center">
-            <p className="text-gray-700 text-lg font-bold mb-2">
+            <p className="text-gray-800 text-lg font-bold mb-2">
               {viewMode === "monthly" ? "Monthly Sales Growth" : "Yearly Sales Growth"}
             </p>
             <p className="text-2xl font-bold text-orange-500">
@@ -233,7 +233,7 @@ const SalesLayout = () => {
         <div className="mt-6 flex space-x-6">
           {/* Sales Trend Chart */}
           <div className="flex-1 p-6 bg-white rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
               {viewMode === "monthly" ? "Monthly Sales Trend" : "Yearly Sales Trend"}
             </h2>
             {/* Legend for Chart */}
@@ -262,7 +262,7 @@ const SalesLayout = () => {
 
           {/* Top 3 Most Sold Products */}
           <div className="w-1/3 p-6 bg-white rounded-xl shadow-md">
-          <h2 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
             <TrophyIcon className="h-6 w-6 text-yellow-500 mr-2" />
             {viewMode === "monthly" ? "Top 3 Products for This Month" : "Top 3 Products for This Year"}
           </h2>

@@ -92,7 +92,7 @@ const PaymentDetails = ({ orderId, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h2 className="text-lg font-semibold mb-4">Payment Details</h2>
+        <h2 className="text-lg text-gray-800 font-semibold mb-4">Payment Details</h2>
         <div className="space-y-4">
           {/* Payment ID */}
           <div className="flex justify-between">
@@ -162,7 +162,7 @@ const PaymentDetails = ({ orderId, onClose }) => {
                 </select>
                 <button
                   onClick={() => handleStatusChange(selectedStatus)}
-                  className="flex-1 px-4 py-2 bg-blue-500 text-sm text-white rounded-md hover:bg-blue-600"
+                  className="flex-1 px-4 py-2 bg-purple-500 text-sm text-white rounded-md hover:bg-purple-400"
                 >
                   Update Status
                 </button>

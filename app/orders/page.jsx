@@ -139,7 +139,7 @@ const OrdersLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <button className="flex items-center px-4 py-2 bg-white text-blue-500 font-bold border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
+        <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
             <UserCircleIcon className="h-5 w-5 mr-2" />
             <BusinessName userId={session.user.id} />
           </button>
@@ -147,7 +147,7 @@ const OrdersLayout = () => {
 
         {/* Orders and Payments Title */}
         <div className="relative mb-4">
-          <h1 className="text-xl font-semibold text-gray-700 mt-2">
+          <h1 className="text-xl font-semibold text-gray-800 mt-2">
             Orders and Payments
           </h1>
         </div>
@@ -155,10 +155,10 @@ const OrdersLayout = () => {
         <div className="flex justify-between items-center mb-4">
           {/* New Order Button */}
           <button
-            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-blue-600"
+            className="h-10 px-4 py-2 bg-purple-500 text-white text-sm rounded-md flex items-center hover:bg-purple-400"
             onClick={() => setIsAddOrderFormOpen(true)}
           >
-            <PlusIcon className="h-5 w-5 mr-1" /> New Order
+            <PlusIcon className="h-4 w-4 mr-1" /> New Order
           </button>
 
           {/* Search Bar */}
@@ -167,7 +167,7 @@ const OrdersLayout = () => {
               <input
                 type="text"
                 placeholder="Search an order..."
-                className="w-full h-10 px-4 pl-10 py-2 text-sm border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-10 px-4 pl-10 py-2 text-sm border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -180,7 +180,7 @@ const OrdersLayout = () => {
         <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-blue-500 text-white text-center">
+              <tr className="text-gray-800 text-lg text-center border-b">
                 <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2">Customer Details</th>
                 <th className="px-4 py-2">Order Details</th>
@@ -256,7 +256,7 @@ const OrdersLayout = () => {
                     <td className="px-4 py-2 text-center">
                       {new Date(item.orderDate).toLocaleDateString()}
                     </td>
-                    
+
                     <td className="px-4 py-2">
                       <div className="flex justify-center items-center space-x-2 h-full">
                         {/* Payments Button */}

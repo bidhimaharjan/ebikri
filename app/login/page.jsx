@@ -69,7 +69,7 @@ export default function LoginPage() {
           <div className="flex items-center gap-3">
             <p className="text-base">Don't have an account?</p>
             <Link href="/signup">
-              <Button className="flex items-center gap-4 rounded-xl bg-red-500 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-red-400">
+              <Button className="flex items-center gap-4 rounded-xl bg-purple-500 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-purple-400">
                 <span>Register</span> <ArrowRightIcon className="w-4" />
               </Button>
             </Link>

@@ -196,11 +196,11 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       >
         {/* Left Section - Form */}
         <div className={`w-full ${qrCodeUrl ? "pr-6" : ""} overflow-y-auto`}>
-          <h2 className="text-lg font-semibold mb-4">New Order</h2>
+          <h2 className="text-lg text-gray-800 font-semibold mb-4">New Order</h2>
 
           <form onSubmit={handleSubmit}>
             {/* Order Details */}
-            <div className="border bg-gray-100 rounded-lg p-4 mb-4">
+            <div className="border bg-gray-100 rounded-lg p-4 mb-4 text-gray-800">
               <h3 className="text-md font-semibold mb-2 flex items-center">
               <ShoppingCartIcon className="h-4 w-4 mr-1" />
                 Order Details
@@ -341,7 +341,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
             </div>
 
             {/* Customer Details */}
-            <div className="border bg-gray-100 rounded-lg p-4 mb-4">
+            <div className="border bg-gray-100 rounded-lg p-4 mb-4 text-gray-800">
               <h3 className="text-md font-semibold mb-2 flex items-center">
                 <UserIcon className="h-4 w-4 mr-1" />
                 Customer Details
@@ -462,7 +462,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   <button
                     type="button"
                     onClick={handleConfirm}
-                    className="px-4 py-2 bg-blue-500 text-sm text-white rounded-md hover:bg-blue-600"
+                    className="px-4 py-2 bg-purple-500 text-sm text-white rounded-md hover:bg-purple-400"
                   >
                     Confirm (Offline)
                   </button>

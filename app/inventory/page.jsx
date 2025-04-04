@@ -7,6 +7,8 @@ import {
   UserCircleIcon,
   MagnifyingGlassIcon,
   PlusIcon,
+  PencilIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import AddProductForm from "@/components/inventory/add-product-form";
 import EditProductForm from "@/components/inventory/edit-product-form";
@@ -26,7 +28,7 @@ const InventoryLayout = () => {
   const [searchQuery, setSearchQuery] = useState(""); // state for search query
   const { data: session, status } = useSession();
   const [inventory, setInventory] = useState([]);
-  const rowsPerPage = 10; // pagination setup
+  const rowsPerPage = 9; // pagination setup
 
   // fetch inventory data
   const fetchInventory = async () => {
@@ -105,7 +107,7 @@ const InventoryLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <button className="flex items-center px-4 py-2 bg-white text-blue-500 font-bold border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
+          <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
             <UserCircleIcon className="h-5 w-5 mr-2" />
             <BusinessName userId={session.user.id} />
           </button>
@@ -113,7 +115,7 @@ const InventoryLayout = () => {
 
         {/* Inventory Title */}
         <div className="relative mb-4">
-          <h1 className="text-xl font-semibold text-gray-700 mt-2">
+          <h1 className="text-xl font-semibold text-gray-800 mt-2">
             Inventory
           </h1>
         </div>
@@ -121,10 +123,10 @@ const InventoryLayout = () => {
         <div className="flex justify-between items-center mb-4">
           {/* Add Product Button */}
           <button
-            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-blue-600"
+            className="h-10 px-4 py-2 bg-purple-500 text-white text-sm font-medium rounded-md flex items-center hover:bg-purple-400"
             onClick={() => setIsAddFormOpen(true)}
           >
-            <PlusIcon className="h-5 w-5 mr-1" /> Add
+            <PlusIcon className="h-4 w-4 mr-1" /> Add
           </button>
           {/* Search Bar */}
           <div className="flex-1 flex justify-center">
@@ -132,7 +134,7 @@ const InventoryLayout = () => {
               <input
                 type="text"
                 placeholder="Search a product..."
-                className="w-full h-10 px-4 pl-10 py-2 text-sm border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-10 px-4 pl-10 py-2 text-sm border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)} // update search query
               />
@@ -145,11 +147,11 @@ const InventoryLayout = () => {
         <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-blue-500 text-white text-left">
+              <tr className="text-gray-800 text-left text-lg border-b">
                 <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2">Product Name</th>
-                <th className="px-4 py-2">Stock Availability</th>
-                <th className="px-4 py-2">Unit Price</th>
+                <th className="px-4 py-2 text-center">Stock Availability</th>
+                <th className="px-4 py-2 text-center">Unit Price</th>
                 <th className="px-4 py-2 text-center">Actions</th>
               </tr>
             </thead>
@@ -163,27 +165,37 @@ const InventoryLayout = () => {
                   <tr key={index} className="border-b">
                     <td className="px-4 py-2">{item.id}</td>
                     <td className="px-4 py-2">{item.productName}</td>
-                    <td className="px-4 py-2">{item.stockAvailability}</td>
-                    <td className="px-4 py-2">{item.unitPrice}</td>
+                    <td className="px-4 py-2 text-center">{item.stockAvailability}</td>
+                    <td className="px-4 py-2 text-center">{item.unitPrice}</td>
                     <td className="px-4 py-2 flex justify-center space-x-2">
                       {/* Edit Product Button */}
-                      <button
-                        className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-300"
-                        onClick={() => handleEdit(item)}
-                      >
-                        Edit
-                      </button>
+                      <div className="relative group">
+                        <button
+                          className="p-1 border border-blue-300 rounded-md text-blue-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50"
+                          onClick={() => handleEdit(item)}
+                        >
+                          <PencilIcon className="h-5 w-5" />
+                        </button>
+                        <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                          Edit
+                        </span>
+                      </div>
 
                       {/* Delete Product Button */}
-                      <button
-                        className="px-4 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
-                        onClick={() => {
-                          setProductToDelete(item.id); // set the product ID to delete
-                          setIsConfirmationDialogOpen(true); // open the confirmation dialog
-                        }}
-                      >
-                        Delete
-                      </button>
+                      <div className="relative group">
+                        <button
+                          className="p-1 border border-red-500 rounded-md text-red-500 hover:text-red-600 hover:border-red-500 hover:bg-red-50"
+                          onClick={() => {
+                            setProductToDelete(item.id); // set the product ID to delete
+                            setIsConfirmationDialogOpen(true); // open the confirmation dialog
+                          }}
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                        <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                          Delete
+                        </span>
+                      </div>
                     </td>
                   </tr>
                 ))}

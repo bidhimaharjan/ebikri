@@ -23,7 +23,7 @@ const MarketingLayout = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: session, status } = useSession();
   const [campaigns, setCampaigns] = useState([]);
-  const rowsPerPage = 10;
+  const rowsPerPage = 9;
 
   // fetch marketing campaigns data
   const fetchCampaigns = async () => {
@@ -168,7 +168,7 @@ const MarketingLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <button className="flex items-center px-4 py-2 bg-white text-blue-500 font-bold border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
+        <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
             <UserCircleIcon className="h-5 w-5 mr-2" />
             <BusinessName userId={session.user.id} />
           </button>
@@ -176,7 +176,7 @@ const MarketingLayout = () => {
 
         {/* Marketing Title */}
         <div className="relative mb-4">
-          <h1 className="text-xl font-semibold text-gray-700 mt-2">
+          <h1 className="text-xl font-semibold text-gray-800 mt-2">
             Marketing Tools
           </h1>
         </div>
@@ -184,10 +184,10 @@ const MarketingLayout = () => {
         <div className="flex justify-between items-center mb-4">
           {/* Create Campaign Button */}
           <button
-            className="h-10 px-4 py-2 bg-blue-500 text-white text-sm rounded-md flex items-center hover:bg-blue-600"
+            className="h-10 px-4 py-2 bg-purple-500 text-white text-sm rounded-md flex items-center hover:bg-purple-400"
             onClick={() => setIsAddFormOpen(true)}
           >
-            <PlusIcon className="h-5 w-5 mr-1" /> Create
+            <PlusIcon className="h-4 w-4 mr-1" /> Create
           </button>
 
           {/* Search Bar */}
@@ -196,7 +196,7 @@ const MarketingLayout = () => {
               <input
                 type="text"
                 placeholder="Search campaigns..."
-                className="w-full h-10 px-4 pl-10 py-2 text-sm border-blue-500 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-10 px-4 pl-10 py-2 text-sm border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -209,13 +209,12 @@ const MarketingLayout = () => {
         <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-blue-500 text-white text-center">
+              <tr className="text-gray-800 text-center border-b">
                 <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2 w-[190px]">Campaign Name</th>
                 <th className="px-4 py-2">Discount %</th>
                 <th className="px-4 py-2">Promo Code</th>
-                <th className="px-4 py-2">Start Date</th>
-                <th className="px-4 py-2">End Date</th>
+                <th className="px-4 py-2">Duration</th>
                 <th className="px-4 py-2">Recipients</th>
                 <th className="px-4 py-2">Status</th>
                 <th className="px-4 py-2">Actions</th>
@@ -238,10 +237,7 @@ const MarketingLayout = () => {
                       {campaign.promoCode}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {formatDate(campaign.startDate)}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {formatDate(campaign.endDate)}
+                      {formatDate(campaign.startDate)} - {formatDate(campaign.endDate)}
                     </td>
                     <td className="px-4 py-2 text-center">
                       {campaign.recipients === "all"

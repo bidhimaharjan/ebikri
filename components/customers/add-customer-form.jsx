@@ -34,13 +34,13 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h2 className="text-lg font-semibold mb-4">Add Customer</h2>
+        <h2 className="text-lg text-gray-800 font-semibold mb-4">Add Customer</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <label className="block text-sm font-medium">Name *</label>
             <input
               type="text"
-              className="w-full p-2 mt-1 border-gray-200 border rounded bg-gray-200"
+              className="w-full p-2 mt-1 text-sm border-gray-300 border rounded"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -51,7 +51,7 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
             <label className="block text-sm font-medium">Phone Number *</label>
             <input
               type="number"
-              className="w-full p-2 mt-1 border-gray-200 rounded bg-gray-200"
+              className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
@@ -62,7 +62,7 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
             <label className="block text-sm font-medium">Email *</label>
             <input
               type="email"
-              className="w-full p-2 mt-1 border-gray-200 border rounded bg-gray-200"
+              className="w-full p-2 mt-1 text-sm border-gray-300 border rounded"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -72,7 +72,7 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
           <div className="flex justify-between">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-400"
             >
               Add Customer
             </button>

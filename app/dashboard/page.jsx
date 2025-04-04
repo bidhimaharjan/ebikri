@@ -119,8 +119,8 @@ const DashboardLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button and Hello Text */}
         <div className="flex justify-between mb-2">
-          <span className="text-lg font-semibold text-gray-700">Hello, {userName}! Hope you have a great sales day!</span>
-          <button className="flex items-center px-4 py-2 bg-white text-blue-500 font-bold border border-blue-500 rounded-full hover:bg-blue-500 hover:text-white">
+          <span className="text-lg font-semibold text-gray-800">Hello, {userName}! Hope you have a great sales day!</span>
+          <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
             <UserCircleIcon className="h-5 w-5 mr-2" />
             <BusinessName userId={session.user.id} />
           </button>
@@ -128,7 +128,7 @@ const DashboardLayout = () => {
 
         {/* Dashboard Title */}
         <div className="relative mb-4">
-          <h1 className="text-xl font-semibold text-gray-700 mt-2">Dashboard</h1>
+          <h1 className="text-xl font-semibold text-gray-800 mt-2">Dashboard</h1>
         </div>
 
         {/* Revenue, Orders, and Customers Cards */}
@@ -159,7 +159,7 @@ const DashboardLayout = () => {
         <div className="mt-8 flex space-x-6">
           {/* Monthly Sales Trend Chart */}
           <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Monthly Sales Trend</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Monthly Sales Trend</h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={monthlyTrends}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -174,7 +174,7 @@ const DashboardLayout = () => {
 
           {/* Top 3 Products of the Month Card */}
           <div className="w-1/3 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <TrophyIcon className="h-6 w-6 text-yellow-500 mr-2" />
               Top 3 Products of the Month
             </h2>

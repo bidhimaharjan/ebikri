@@ -75,7 +75,7 @@ export default function SignupPage() {
 
   return (
     <main className="flex min-h-screen flex-col p-6 bg-gray-50">
-        {/* <div className="flex h-20 shrink-0 items-end rounded-lg bg-red-500 p-4 md:h-20">
+        {/* <div className="flex h-20 shrink-0 items-end rounded-lg bg-purple-500 p-4 md:h-20">
         <EbikriLogo />
         </div> */}
 
@@ -92,7 +92,7 @@ export default function SignupPage() {
                 <div className="flex items-center gap-3">
                     <p className="text-base">Already have an account?</p>
                     <Link href="/login">
-                        <Button className="flex items-center gap-4 rounded-xl bg-red-500 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-red-400">
+                        <Button className="flex items-center gap-4 rounded-xl bg-purple-500 px-4 py-2 text-base font-medium text-white transition-colors hover:bg-purple-400">
                             <span>Log in</span> <ArrowRightIcon className="w-4" />
                         </Button>
                     </Link>

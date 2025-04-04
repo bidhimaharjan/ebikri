@@ -11,10 +11,10 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
   return (
     <form onSubmit={onSubmit} className="space-y-3">
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4">
-        <h1 className={`${lusitana.className} mb-3 text-2xl font-bold text-red-500`}>Register Your Business</h1>
+        <h1 className={`${lusitana.className} mb-3 text-2xl font-bold text-purple-500`}>Register Your Business</h1>
         
         {/* Step 1: User Details */}
-        <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-4">Step 1: User Details</h3>
+        <h3 className="text-lg font-semibold text-purple-500 mt-6 mb-4">Step 1: User Details</h3>
         <div className="w-full flex gap-4">
           {/* Name Field */}
           <div className="flex-1">
@@ -119,7 +119,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         </div>
         
         {/* Step 2: Business Details */}
-        <h3 className="mt-10 text-lg font-semibold text-gray-900 mb-4">Step 2: Business Details</h3>
+        <h3 className="mt-10 text-lg font-semibold text-purple-500 mb-4">Step 2: Business Details</h3>
         <div className="w-full flex gap-4">
           {/* Business Name Field */}
           <div className="flex-1">
@@ -183,7 +183,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
         {/* Submit Button */}
         <div className="flex justify-center items-center h-full">
-          <Button type="submit" className="flex items-center gap-4 rounded-xl bg-red-500 px-4 py-2 mt-8 text-base font-medium text-white transition-colors hover:bg-red-400">
+          <Button type="submit" className="flex items-center gap-4 rounded-xl bg-purple-500 px-4 py-2 mt-8 text-base font-medium text-white transition-colors hover:bg-purple-400">
             <span>Sign up</span> <ArrowRightIcon className="w-4" />
           </Button>
         </div>
