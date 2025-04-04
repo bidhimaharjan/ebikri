@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { QRCodeSVG } from "qrcode.react";
-import { PlusIcon, 
+import {
+  PlusIcon,
   ShoppingCartIcon,
-  UserIcon, 
-  XMarkIcon 
+  UserIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
@@ -19,7 +20,10 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [promoCode, setPromoCode] = useState("");
   const [showCustomerDetails, setShowCustomerDetails] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState(null); // state to store the QR Code URL
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const [totalAmount, setTotalAmount] = useState(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
 
   // fetch products and customers when the form is opened
   useEffect(() => {
@@ -89,6 +93,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   // handle form submission for "Confirm (Offline)"
   const handleConfirm = async (e) => {
     e.preventDefault();
+    setIsConfirmed(true);
     await handleSubmit("Other");
   };
 
@@ -96,7 +101,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const handleSubmit = async (paymentMethod) => {
     try {
       // ensure that quantity is always set (default to 1 if not provided
-      const updatedProducts = products.map(product => ({
+      const updatedProducts = products.map((product) => ({
         ...product,
         quantity: product.quantity || 1, // default to 1 if quantity is not set
       }));
@@ -144,6 +149,8 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
 
       const orderData = await response.json();
       setTotalAmount(orderData.order.totalAmount);
+      setDiscountAmount(orderData.order.discountAmount || 0);
+      setDiscountPercent(orderData.order.discountPercent || 0);
 
       if (paymentMethod === "Khalti") {
         // use the Khalti payment URL from the order creation response
@@ -188,7 +195,9 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50`}>
+    <div
+      className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50`}
+    >
       <div
         className={`bg-white p-8 rounded-lg shadow-lg transition-all duration-300 ${
           qrCodeUrl ? "w-[900px]" : "w-[700px]"
@@ -196,13 +205,15 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       >
         {/* Left Section - Form */}
         <div className={`w-full ${qrCodeUrl ? "pr-6" : ""} overflow-y-auto`}>
-          <h2 className="text-lg text-gray-800 font-semibold mb-4">New Order</h2>
+          <h2 className="text-lg text-gray-800 font-semibold mb-4">
+            New Order
+          </h2>
 
           <form onSubmit={handleSubmit}>
             {/* Order Details */}
             <div className="border bg-gray-100 rounded-lg p-4 mb-4 text-gray-800">
               <h3 className="text-md font-semibold mb-2 flex items-center">
-              <ShoppingCartIcon className="h-4 w-4 mr-1" />
+                <ShoppingCartIcon className="h-4 w-4 mr-1" />
                 Order Details
               </h3>
 
@@ -284,7 +295,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                             }
                           }}
                         />
-                        
+
                         {/* Increment Button */}
                         <button
                           type="button"
@@ -386,7 +397,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
               <div className="flex justify-center my-4">
                 <button
                   type="button"
-                  className="px-4 py-2 border border-blue-400 text-blue-500 rounded-md text-sm font-semibold hover:bg-blue-100"
+                  className="px-4 py-2 border border-blue-300 text-blue-500 rounded-md text-sm font-medium hover:bg-blue-100"
                   onClick={() => setShowCustomerDetails(!showCustomerDetails)}
                 >
                   Enter Customer Details Manually
@@ -419,7 +430,9 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium">Phone Number *</label>
+                    <label className="block text-sm font-medium">
+                      Phone Number *
+                    </label>
                     <input
                       type="text"
                       className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
@@ -450,22 +463,43 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
 
                 <div className="w-2/3 flex items-start justify-end gap-4 pt-6">
                   {/* Generate QR Code Button */}
-                  <button
-                    type="button"
-                    onClick={handleGenerateQRCode}
-                    className="px-4 py-2 bg-green-500 text-sm text-white rounded-md hover:bg-green-600"
-                  >
-                    Generate QR Code
-                  </button>
+                  {/* Show total amount if  Confirm is clicked, otherwise show QR button */}
+                  {isConfirmed ? (
+                    <div className="flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-md">
+                      <p className="text-md font-semibold text-gray-800">
+                        Total: Rs. {totalAmount}
+                      </p>
+                      {discountAmount > 0 && (
+                        <>
+                          <div className="h-6 w-px bg-gray-300"></div>
+                          <p className="text-sm text-gray-800">
+                            Discount: Rs. {discountAmount} ({discountPercent}%)
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    !qrCodeUrl && (
+                      <button
+                        type="button"
+                        onClick={handleGenerateQRCode}
+                        className="px-4 py-2 bg-green-500 text-sm text-white rounded-md hover:bg-green-600"
+                      >
+                        Generate QR Code
+                      </button>
+                    )
+                  )}
 
-                  {/* Confirm (Offline) Button */}
-                  <button
-                    type="button"
-                    onClick={handleConfirm}
-                    className="px-4 py-2 bg-purple-500 text-sm text-white rounded-md hover:bg-purple-400"
-                  >
-                    Confirm (Offline)
-                  </button>
+                  {/* Offline Button - Hidden when QR is shown or Confirm is clicked */}
+                  {!qrCodeUrl && !isConfirmed && (
+                    <button
+                      type="button"
+                      onClick={handleConfirm}
+                      className="w-full sm:w-auto px-4 py-2 bg-purple-500 text-sm text-white rounded-md hover:bg-purple-400"
+                    >
+                      Confirm (Offline)
+                    </button>
+                  )}
 
                   {/* Done Button */}
                   <button
@@ -492,11 +526,22 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                 <QRCodeSVG value={qrCodeUrl} size={200} />
               </div>
               {totalAmount && (
-                <p className="mt-3 text-lg text-center font-semibold text-gray-800">
-                  Total: Rs. {totalAmount}
-                </p>
+                <div className="mt-3 text-center">
+                  {/* Show discount information if discount is applied */}
+                  <p className="text-lg font-semibold text-gray-800">
+                    Total: Rs. {totalAmount}
+                  </p>
+                  {discountAmount > 0 && (
+                    <>
+                      <div className="border-t border-gray-300 my-2"></div>
+                      <p className="text-sm font-semibold text-gray-800">
+                        Discount: Rs. {discountAmount} ({discountPercent}%)
+                      </p>
+                    </>
+                  )}
+                </div>
               )}
-              <p className="mt-2 text-sm text-gray-800 text-center">
+              <p className="mt-6 text-sm text-gray-800 text-center">
                 Scan this QR code to complete the payment.
               </p>
               <p className="mt-10 text-sm text-gray-800 text-center">
