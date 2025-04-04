@@ -63,7 +63,7 @@ const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
             <label className="block text-sm font-medium">Product Name *</label>
             <input
               type="text"
-              className="w-full p-2 mt-1 text-sm border-gray-300 border rounded"
+              className="w-full p-2 mt-1 text-sm border-gray-400 border rounded"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
               required
@@ -74,7 +74,7 @@ const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
             <label className="block text-sm font-medium">Stock (pcs) *</label>
             <input
               type="number"
-              className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
+              className="w-full p-2 mt-1 text-sm border-gray-400 rounded"
               value={stock}
               onChange={(e) => setStock(e.target.value)}
               required
@@ -85,7 +85,7 @@ const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
             <label className="block text-sm font-medium">Unit Price (NPR) *</label>
             <input
               type="number"
-              className="w-full p-2 mt-1 text-sm border-gray-300 border rounded"
+              className="w-full p-2 mt-1 text-sm border-gray-400 border rounded"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               required

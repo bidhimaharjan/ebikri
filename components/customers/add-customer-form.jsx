@@ -40,7 +40,7 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
             <label className="block text-sm font-medium">Name *</label>
             <input
               type="text"
-              className="w-full p-2 mt-1 text-sm border-gray-300 border rounded"
+              className="w-full p-2 mt-1 text-sm border border-gray-400 rounded"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -51,7 +51,7 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
             <label className="block text-sm font-medium">Phone Number *</label>
             <input
               type="number"
-              className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
+              className="w-full p-2 mt-1 text-sm border border-gray-400 rounded"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
@@ -62,7 +62,7 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
             <label className="block text-sm font-medium">Email *</label>
             <input
               type="email"
-              className="w-full p-2 mt-1 text-sm border-gray-300 border rounded"
+              className="w-full p-2 mt-1 text-sm border border-gray-400 rounded"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

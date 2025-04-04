@@ -178,7 +178,7 @@ const DashboardLayout = () => {
               <TrophyIcon className="h-6 w-6 text-yellow-500 mr-2" />
               Top 3 Products of the Month
             </h2>
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-4 text-center">
               {topProducts.map((product) => (
                 <div key={product.productId} className="p-4 bg-gray-50 rounded-lg shadow-sm">
                   <p className="text-blue-400 text-lg font-bold">{product.productName} (ID{product.productId})</p>
