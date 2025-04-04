@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { QRCodeSVG } from "qrcode.react";
-import {
-  PlusIcon,
-  UserIcon,
+import { PlusIcon, 
+  ShoppingCartIcon,
+  UserIcon, 
+  XMarkIcon 
 } from "@heroicons/react/24/outline";
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
@@ -15,6 +16,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [deliveryLocation, setDeliveryLocation] = useState("");
+  const [promoCode, setPromoCode] = useState("");
   const [showCustomerDetails, setShowCustomerDetails] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState(null); // state to store the QR Code URL
   const [totalAmount, setTotalAmount] = useState(null);
@@ -84,83 +86,95 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
     await handleSubmit("Khalti");
   };
 
-  // handle form submission for "Confirm"
+  // handle form submission for "Confirm (Offline)"
   const handleConfirm = async (e) => {
     e.preventDefault();
     await handleSubmit("Other");
   };
 
-   // handle form submission
-   const handleSubmit = async (paymentMethod) => {
+  // handle form submission
+  const handleSubmit = async (paymentMethod) => {
     try {
+      // ensure that quantity is always set (default to 1 if not provided
+      const updatedProducts = products.map(product => ({
+        ...product,
+        quantity: product.quantity || 1, // default to 1 if quantity is not set
+      }));
+
       // validate product selection
-      if (products.length === 0 || products.some(p => !p.productId || !p.quantity || p.quantity <= 0)) {
+      if (
+        updatedProducts.length === 0 ||
+        updatedProducts.some((p) => !p.productId || p.quantity <= 0)
+      ) {
         toast.error("Please select a valid product and quantity.");
         return;
       }
-  
+
       // validate customer details
       if (!customer && (!name || !email || !phoneNumber)) {
         toast.error("Please select a customer or enter customer details.");
         return;
       }
-  
+
       // validate delivery location
       if (!deliveryLocation.trim()) {
         toast.error("Please enter a delivery location.");
         return;
       }
-  
+
       // proceed with order creation
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          products,
+          products: updatedProducts,
           customer,
           name,
           email,
           phoneNumber,
           deliveryLocation,
           paymentMethod,
+          promoCode: promoCode.trim() || null, // send trimmed promo code or null
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to create order");
       }
-  
+
       const orderData = await response.json();
       setTotalAmount(orderData.order.totalAmount);
-  
+
       if (paymentMethod === "Khalti") {
         // use the Khalti payment URL from the order creation response
         const paymentUrl = orderData.payment_url;
-  
+
         if (!paymentUrl) {
           throw new Error("Khalti payment URL not found");
         }
-  
+
         // set the QR code URL
         setQrCodeUrl(paymentUrl);
         toast.success("Order created successfully! Scan the QR code to pay.");
         onConfirm();
       } else {
-        toast.success("Order created successfully! Please change the payment status after payment is completed");
+        toast.success(
+          "Order created successfully! Please change the payment status after payment is completed"
+        );
       }
     } catch (error) {
       console.error("Error creating order:", error);
       toast.error("Failed to create order");
       onConfirm();
     }
-  }; 
+  };
 
   const addProductField = () => {
     setProducts([...products, { productId: "", quantity: "" }]);
   };
 
   const removeProductField = (index) => {
-    if (index === 0) return; // prevent removing the first product field
+    if (products.length <= 1) return; // prevent removing the last product field
     const updatedProducts = products.filter((_, i) => i !== index);
     setProducts(updatedProducts);
   };
@@ -173,212 +187,335 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
 
   if (!isOpen) return null;
 
-return (
-  <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50`}>
-  <div className={`bg-white p-8 rounded-lg shadow-lg transition-all duration-300 ${qrCodeUrl ? "w-[900px]" : "w-[700px]"} flex flex-col md:flex-row max-h-[90vh] overflow-hidden`}>
-    {/* Left Section - Form */}
-    <div className={`w-full ${qrCodeUrl ? "pr-6" : ""} overflow-y-auto`}>
-      <h2 className="text-lg font-semibold mb-4">New Order</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Order Details */}
-        <h3 className="text-md font-semibold mb-2">Order Details</h3>
-        {products.map((product, index) => (
-          <div key={index} className="flex gap-4 mb-4 items-center relative">
-            <div className="w-1/2">
-              <label className="block text-sm font-medium">Product ID *</label>
-              <select
-                className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200 select-truncate"
-                value={product.productId}
-                onChange={(e) =>
-                  updateProductField(index, "productId", e.target.value)
-                }
-                required
-              >
-                <option value="">Select a product</option>
-                {availableProducts.map((prod) => (
-                  <option key={prod.id} value={prod.id}>
-                    ID{prod.id} {prod.productName} (Stock: {prod.stockAvailability}, Price: {prod.unitPrice})
-                  </option>
-                ))}
-              </select>
+  return (
+    <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50`}>
+      <div
+        className={`bg-white p-8 rounded-lg shadow-lg transition-all duration-300 ${
+          qrCodeUrl ? "w-[900px]" : "w-[700px]"
+        } flex flex-col md:flex-row max-h-[90vh] overflow-hidden`}
+      >
+        {/* Left Section - Form */}
+        <div className={`w-full ${qrCodeUrl ? "pr-6" : ""} overflow-y-auto`}>
+          <h2 className="text-lg font-semibold mb-4">New Order</h2>
+
+          <form onSubmit={handleSubmit}>
+            {/* Order Details */}
+            <div className="border bg-gray-100 rounded-lg p-4 mb-4">
+              <h3 className="text-md font-semibold mb-2 flex items-center">
+              <ShoppingCartIcon className="h-4 w-4 mr-1" />
+                Order Details
+              </h3>
+
+              {products.map((product, index) => (
+                <div
+                  key={index}
+                  className="flex gap-4 mb-4 items-center relative"
+                >
+                  {/* Product selection */}
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium">
+                      Product ID *
+                    </label>
+                    <select
+                      className="w-full p-2 mt-1 text-sm border border-gray-300 rounded select-truncate"
+                      value={product.productId}
+                      onChange={(e) =>
+                        updateProductField(index, "productId", e.target.value)
+                      }
+                      required
+                    >
+                      <option value="">Select a product</option>
+                      {availableProducts.map((prod) => (
+                        <option key={prod.id} value={prod.id}>
+                          ID{prod.id} {prod.productName} (Stock:{" "}
+                          {prod.stockAvailability}, Price: {prod.unitPrice})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Quantity Input */}
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium mb-1">
+                      Quantity *
+                    </label>
+
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center border border-gray-300 rounded overflow-hidden h-10 flex-1">
+                        {/* Decrement Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newQty = Math.max(
+                              1,
+                              parseInt(product.quantity || 1) - 1
+                            );
+                            updateProductField(index, "quantity", newQty);
+                          }}
+                          className="px-3 py-2 text-gray-600 hover:text-black text-lg font-bold bg-gray-100 hover:bg-gray-200"
+                        >
+                          −
+                        </button>
+
+                        {/* Quantity Input Field */}
+                        <input
+                          type="number"
+                          className="w-full text-center p-2 text-sm border-0 focus:ring-0 outline-none"
+                          value={product.quantity || 1} // default to 1
+                          onChange={(e) => {
+                            const newQty = Math.max(
+                              1,
+                              parseInt(e.target.value) || 1
+                            );
+                            updateProductField(index, "quantity", newQty);
+                          }}
+                          min={1}
+                          required
+                          onFocus={(e) => {
+                            // clear the input when focused
+                            if (e.target.value !== "") {
+                              e.target.value = "";
+                            }
+                          }}
+                          onBlur={(e) => {
+                            // reset the input to 1 if left blank
+                            if (e.target.value === "") {
+                              updateProductField(index, "quantity", 1);
+                            }
+                          }}
+                        />
+                        
+                        {/* Increment Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newQty = parseInt(product.quantity || 1) + 1;
+                            updateProductField(index, "quantity", newQty);
+                          }}
+                          className="px-3 py-2 text-gray-600 hover:text-black text-lg font-bold bg-gray-100 hover:bg-gray-200"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Add Button */}
+                      <div className="flex items-center gap-1">
+                        {index === products.length - 1 && (
+                          <div className="relative group">
+                            <button
+                              type="button"
+                              onClick={addProductField}
+                              className="p-1 text-blue-500 hover:text-blue-600 rounded-full hover:bg-blue-100 border border-blue-300 flex items-center justify-center w-6 h-6"
+                            >
+                              <PlusIcon className="w-4 h-4" />
+                            </button>
+                            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-700 text-white text-xs rounded py-1 px-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              Add another
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Remove Button */}
+                        <div className="relative group">
+                          <button
+                            type="button"
+                            onClick={() => removeProductField(index)}
+                            disabled={products.length <= 1 && index === 0} // Disable the button for the first product if there's only one product
+                            className={`p-1 rounded-full border flex items-center justify-center w-6 h-6 ${
+                              products.length <= 1 && index === 0
+                                ? "text-gray-400 border-gray-300 cursor-not-allowed opacity-50"
+                                : "text-red-500 hover:text-red-600 hover:bg-red-100 border-red-300"
+                            }`}
+                          >
+                            <XMarkIcon className="w-4 h-4" />
+                          </button>
+                          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-700 text-white text-xs rounded py-1 px-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            Remove
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="w-1/2 relative">
-              <label className="block text-sm font-medium">Quantity *</label>
-              <input
-                type="number"
-                className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200 pr-8"
-                value={product.quantity}
-                onChange={(e) =>
-                  updateProductField(index, "quantity", e.target.value)
-                }
-                required
-              />
-              {index > 0 && (
+
+            {/* Customer Details */}
+            <div className="border bg-gray-100 rounded-lg p-4 mb-4">
+              <h3 className="text-md font-semibold mb-2 flex items-center">
+                <UserIcon className="h-4 w-4 mr-1" />
+                Customer Details
+              </h3>
+
+              {/* Customer selection */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium">
+                    Choose a Customer
+                  </label>
+                  <select
+                    className="w-full p-2 mt-1 text-sm border-gray-300 border rounded select-truncate"
+                    value={customer}
+                    onChange={handleCustomerChange}
+                  >
+                    <option value="">Select a customer</option>
+                    {customers.map((cust) => (
+                      <option key={cust.id} value={cust.id}>
+                        ID{cust.id} {cust.name} ({cust.phoneNumber})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Delivery Location */}
+                <div>
+                  <label className="block text-sm font-medium">
+                    Delivery Location *
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full p-2 mt-1 text-sm border-gray-300 rounded select-truncate"
+                    value={deliveryLocation}
+                    onChange={(e) => setDeliveryLocation(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Toggle Button for Manual Customer Entry */}
+              <div className="flex justify-center my-4">
                 <button
                   type="button"
-                  onClick={() => removeProductField(index)}
-                  className="absolute right-2 top-3 transform -translate-y-1/2 text-red-500 font-semibold hover:text-red-600 text-sm"
+                  className="px-4 py-2 border border-blue-400 text-blue-500 rounded-md text-sm font-semibold hover:bg-blue-100"
+                  onClick={() => setShowCustomerDetails(!showCustomerDetails)}
                 >
-                  ✕
+                  Enter Customer Details Manually
                 </button>
+              </div>
+
+              {/* Manual Customer Entry Fields */}
+              {showCustomerDetails && (
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium">Name *</label>
+                    <input
+                      type="text"
+                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium">Email *</label>
+                    <input
+                      type="email"
+                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium">Phone Number *</label>
+                    <input
+                      type="text"
+                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
               )}
             </div>
-          </div>
-        ))}
 
-          <div className="flex justify-center my-2">
-            <button
-              type="button"
-              onClick={addProductField}
-              className="px-4 py-2 text-sm bg-blue-500 border-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
-            >
-              <PlusIcon className="w-4 h-4 mr-1" />
-              Add Another Product
-            </button>
-          </div>
+            {/* Promo Code and Submit Buttons */}
+            <div className="border bg-gray-100 rounded-lg p-4">
+              <div className="flex items-start gap-4">
+                {/* Promo Code Field */}
+                <div className="w-1/3">
+                  <label className="block text-sm font-medium mb-1">
+                    Promo Code (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full p-2 text-sm border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                  />
+                </div>
 
-        {/* Customer Details */}
-        <h3 className="text-md font-semibold mt-4 mb-2">Customer Details</h3>
+                <div className="w-2/3 flex items-start justify-end gap-4 pt-6">
+                  {/* Generate QR Code Button */}
+                  <button
+                    type="button"
+                    onClick={handleGenerateQRCode}
+                    className="px-4 py-2 bg-green-500 text-sm text-white rounded-md hover:bg-green-600"
+                  >
+                    Generate QR Code
+                  </button>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium">Choose a Customer</label>
-            <select
-              className="w-full p-2 mt-1 border-gray-300 border rounded bg-gray-200 select-truncate"
-              value={customer}
-              onChange={handleCustomerChange}
-            >
-              <option value="">Select a customer</option>
-              {customers.map((cust) => (
-                <option key={cust.id} value={cust.id}>
-                  ID{cust.id} {cust.name} ({cust.phoneNumber})
-                </option>
-              ))}
-            </select>
-          </div>
+                  {/* Confirm (Offline) Button */}
+                  <button
+                    type="button"
+                    onClick={handleConfirm}
+                    className="px-4 py-2 bg-blue-500 text-sm text-white rounded-md hover:bg-blue-600"
+                  >
+                    Confirm (Offline)
+                  </button>
 
-          <div>
-            <label className="block text-sm font-medium">Delivery Location *</label>
-            <input
-              type="text"
-              className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200 select-truncate"
-              value={deliveryLocation}
-              onChange={(e) => setDeliveryLocation(e.target.value)}
-              required
-            />
-          </div>
+                  {/* Done Button */}
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-gray-200 text-sm text-gray-700 rounded-md hover:bg-gray-400"
+                    onClick={onClose}
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
 
-        <p className="text-center my-2 font-semibold">OR</p>
-
-        {/* Toggle Button for Manual Customer Entry */}
-        <div className="flex justify-center my-2">
-          <button
-            type="button"
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm flex items-center"
-            onClick={() => setShowCustomerDetails(!showCustomerDetails)}
-          >
-            <UserIcon className="h-4 w-4 mr-1" />
-            Enter Customer Details
-          </button>
-        </div>
-
-        {/* Manual Customer Entry Fields (Conditional Rendering) */}
-        {showCustomerDetails && (
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div>
-              <label className="block text-sm font-medium">Name *</label>
-              <input
-                type="text"
-                className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Email *</label>
-              <input
-                type="email"
-                className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Phone Number *</label>
-              <input
-                type="text"
-                className="w-full p-2 mt-1 border-gray-300 rounded bg-gray-200"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-              />
+        {/* Right Section - QR Code */}
+        {qrCodeUrl && (
+          <div className="border-l border-gray-300 pl-6 flex flex-col items-center">
+            <div className="p-4 w-full">
+              <h3 className="text-md text-center font-semibold mb-3 mt-2">
+                Payment QR Code
+              </h3>
+              <div className="p-4 w-full">
+                <QRCodeSVG value={qrCodeUrl} size={200} />
+              </div>
+              {totalAmount && (
+                <p className="mt-3 text-lg text-center font-semibold text-gray-800">
+                  Total: Rs. {totalAmount}
+                </p>
+              )}
+              <p className="mt-2 text-sm text-gray-800 text-center">
+                Scan this QR code to complete the payment.
+              </p>
+              <p className="mt-10 text-sm text-gray-800 text-center">
+                You can also follow this link for payment:
+              </p>
+              <a
+                href={qrCodeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 text-sm text-blue-400 hover:text-blue-500 underline break-all"
+              >
+                {qrCodeUrl}
+              </a>
             </div>
           </div>
         )}
-
-        {/* Submit Buttons */}
-        <div className="flex justify-center mt-6 gap-4">
-          <button
-            type="button"
-            onClick={handleConfirm}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            Confirm
-          </button>
-
-          <button
-            type="button"
-            onClick={handleGenerateQRCode}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-          >
-            Generate QR Code
-          </button>
-
-          <button
-            type="button"
-            className="px-7 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-400"
-            onClick={onClose}
-          >
-            Done
-          </button>
-        </div>
-      </form>
-    </div>
-
-    {/* Right Section - QR Code (Only visible when QR exists) */}
-    {qrCodeUrl && (
-      <div className="pl-6 border-l border-gray-300 flex flex-col items-center">
-        <h3 className="text-md font-semibold mb-3 mt-2">Payment QR Code</h3>
-        <QRCodeSVG value={qrCodeUrl} size={200} />
-        {totalAmount && (
-          <p className="mt-3 text-lg font-semibold text-gray-800">
-            Total: Rs. {totalAmount}
-          </p>
-        )}
-        <p className="mt-2 text-sm text-gray-800 text-center">
-          Scan this QR code to complete the payment.
-        </p>
-        <p className="mt-10 text-sm text-gray-800 text-center">
-          You can also follow this link for payment:
-        </p>
-        <a
-          href={qrCodeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 text-sm text-blue-400 hover:text-blue-500 underline break-all"
-        >
-          {qrCodeUrl}
-        </a>
       </div>
-    )}
-  </div>
-</div>
-
-);
-
+    </div>
+  );
 };
 
 export default AddOrderForm;

@@ -8,6 +8,8 @@ import {
   MagnifyingGlassIcon,
   PlusIcon,
   CreditCardIcon,
+  PencilIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import AddOrderForm from "@/components/orders/add-order-form";
 import EditOrderForm from "@/components/orders/edit-order-form";
@@ -28,7 +30,8 @@ const OrdersLayout = () => {
   const [selectedOrderId, setSelectedOrderId] = useState(null); // track selected order ID
   const [orderToEdit, setOrderToEdit] = useState(null); // track order to edit
   const [orderToDelete, setOrderToDelete] = useState(null); // track order to delete
-  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false); // confirmation dialog state
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
+    useState(false); // confirmation dialog state
   const rowsPerPage = 3;
 
   // fetch order data
@@ -64,7 +67,7 @@ const OrdersLayout = () => {
     setOrderToEdit(order); // track selected order ID
     setIsEditOrderFormOpen(true);
   };
-  
+
   // handle delete button click
   const handleDeleteClick = (orderId) => {
     setOrderToDelete(orderId); // set the order to delete
@@ -157,6 +160,7 @@ const OrdersLayout = () => {
           >
             <PlusIcon className="h-5 w-5 mr-1" /> New Order
           </button>
+
           {/* Search Bar */}
           <div className="flex-1 flex justify-center">
             <div className="relative w-1/3">
@@ -181,81 +185,117 @@ const OrdersLayout = () => {
                 <th className="px-4 py-2">Customer Details</th>
                 <th className="px-4 py-2">Order Details</th>
                 <th className="px-4 py-2">Total Amount</th>
+                <th className="px-4 py-2">Discount</th>
                 <th className="px-4 py-2">Order Date</th>
                 <th className="px-4 py-2 text-center">Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {filteredOrders
-                .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+                .slice(
+                  (currentPage - 1) * rowsPerPage,
+                  currentPage * rowsPerPage
+                )
                 .map((item, index) => (
-                <tr key={item.id} className="border-b">
-                  <td className="px-4 py-2 text-center">{item.id}</td>
-                  <td className="px-4 py-2">
-                    <div className="space-y-1">
-                      <div>
-                        <strong>Cust. ID:</strong> {item.customer?.id}
+                  <tr key={item.id} className="border-b">
+                    <td className="px-4 py-2 text-center">{item.id}</td>
+
+                    <td className="px-4 py-2">
+                      <div className="space-y-1">
+                        <div>
+                          <strong>Cust. ID:</strong> {item.customer?.id}
+                        </div>
+                        <div>
+                          <strong>Name:</strong> {item.customer?.name}
+                        </div>
+                        <div>
+                          <strong>Email:</strong> {item.customer?.email}
+                        </div>
+                        <div>
+                          <strong>Phone:</strong> {item.customer?.phoneNumber}
+                        </div>
+                        <div>
+                          <strong>Delivery:</strong> {item.deliveryLocation}
+                        </div>
                       </div>
-                      <div>
-                        <strong>Name:</strong> {item.customer?.name}
-                      </div>
-                      <div>
-                        <strong>Email:</strong> {item.customer?.email}
-                      </div>
-                      <div>
-                        <strong>Phone:</strong> {item.customer?.phoneNumber}
-                      </div>
-                      <div>
-                        <strong>Delivery:</strong> {item.deliveryLocation}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2">
-                    <table className="w-full">
-                      <thead>
-                        <tr>
-                          <th>Prod. ID</th>
-                          <th>Quantity</th>
-                          <th>Price</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {item.products.map((product) => (
-                          <tr key={product.productId} className="text-center">
-                            <td>{product.productId}</td>
-                            <td>{product.quantity}</td>
-                            <td>{product.unitPrice}</td>
+                    </td>
+
+                    <td className="px-4 py-2 ">
+                      <table className="w-full">
+                        <thead>
+                          <tr>
+                            <th className="px-2">Prod. ID</th>
+                            <th className="px-2">Quantity</th>
+                            <th className="px-2">Price</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </td>
-                  <td className="px-4 py-2 text-center">{item.totalAmount}</td>
-                  <td className="px-4 py-2 text-center">
-                    {new Date(item.orderDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-2 flex justify-center space-x-2">
-                    <button
-                      className="px-4 py-1 text-sm bg-green-500 text-white rounded-md flex items-center hover:bg-green-600"
-                      onClick={() => handlePayments(item.id)}
-                    >
-                      <CreditCardIcon className="h-4 w-4 mr-1" /> Payments
-                    </button>
-                    <button
-                      className="px-4 py-1 text-sm bg-gray-200 text-black rounded-md hover:bg-gray-300"
-                      onClick={() => handleEdit(item)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="px-4 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
-                      onClick={() => handleDeleteClick(item.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                        </thead>
+                        <tbody>
+                          {item.products.map((product) => (
+                            <tr key={product.productId} className="text-center">
+                              <td>{product.productId}</td>
+                              <td>{product.quantity}</td>
+                              <td>{product.unitPrice}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </td>
+
+                    <td className="px-4 py-2 text-center">{item.totalAmount}</td>
+
+                    <td className="px-4 py-2 text-center">
+                      Rs. {item.discountAmount}
+                      {item.discountAmount > 0 && (
+                        <div className="text-green-600">
+                          ({item.discountPercent}%)
+                        </div>
+                      )}
+                    </td>
+                    
+                    <td className="px-4 py-2 text-center">
+                      {new Date(item.orderDate).toLocaleDateString()}
+                    </td>
+                    
+                    <td className="px-4 py-2">
+                      <div className="flex justify-center items-center space-x-2 h-full">
+                        {/* Payments Button */}
+                        <button
+                          className="px-4 py-1 text-sm bg-green-500 text-white rounded-md flex items-center hover:bg-green-600"
+                          onClick={() => handlePayments(item.id)}
+                        >
+                          <CreditCardIcon className="h-4 w-4 mr-1" /> Payments
+                        </button>
+
+                        {/* Edit Button */}
+                        <div className="relative group">
+                          <button
+                            className="p-1 border border-blue-300 rounded-md text-blue-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50"
+                            onClick={() => handleEdit(item)}
+                          >
+                            <PencilIcon className="h-5 w-5" />
+                          </button>
+                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                            Edit
+                          </span>
+                        </div>
+
+                        {/* Delete Button */}
+                        <div className="relative group">
+                          <button
+                            className="p-1 border border-red-500 rounded-md text-red-500 hover:text-red-600 hover:border-red-500 hover:bg-red-50"
+                            onClick={() => handleDeleteClick(item.id)}
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                            Delete
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

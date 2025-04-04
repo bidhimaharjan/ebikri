@@ -291,7 +291,7 @@ const MarketingLayout = () => {
                           </span>
                         </div>
 
-                        {/* Edit Button with Tooltip */}
+                        {/* Edit Button */}
                         <div className="relative group">
                           <button
                             className="p-1 border border-blue-300 rounded-md text-blue-400 hover:text-blue-500 hover:border-blue-500 hover:bg-blue-50"
@@ -304,7 +304,7 @@ const MarketingLayout = () => {
                           </span>
                         </div>
 
-                        {/* Delete Button with Tooltip */}
+                        {/* Delete Button */}
                         <div className="relative group">
                           <button
                             className="p-1 border border-red-500 rounded-md text-red-500 hover:text-red-600 hover:border-red-500 hover:bg-red-50"

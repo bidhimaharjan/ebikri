@@ -19,5 +19,11 @@ export const orderTable = pgTable("order", {
 
   totalAmount: numeric(10, 2).notNull(),
 
+  discountPercent: numeric(5, 2).default(0),
+
+  discountAmount: numeric(10, 2).default(0),
+
+  promoCode: varchar({ length: 50 }),
+
   orderDate: date("order_date").notNull(),
 });

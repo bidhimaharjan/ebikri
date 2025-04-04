@@ -7,8 +7,9 @@ import { orderProductTable } from "@/src/db/schema/orderproduct";
 import { customerTable } from "@/src/db/schema/customer";
 import { productTable } from "@/src/db/schema/product";
 import { paymentTable } from "@/src/db/schema/payment";
+import { marketingTable } from "@/src/db/schema/marketing";
 import { salesTable } from "@/src/db/schema/sales";
-import { eq, and, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import axios from "axios";
 
 // fetch order data
@@ -78,6 +79,31 @@ export async function GET(request) {
   }
 }
 
+// helper function to validate promo codes
+async function validatePromoCode(promoCode, businessId) {
+  if (!promoCode) return null;
+  
+  try {
+    const [promo] = await db
+      .select()
+      .from(marketingTable)
+      .where(
+        and(
+          eq(marketingTable.promoCode, promoCode),
+          eq(marketingTable.businessId, businessId),
+          sql`${marketingTable.startDate} <= NOW()`,
+          sql`${marketingTable.endDate} >= NOW()`,
+          eq(marketingTable.active, true)
+        )
+      );
+
+    return promo || null;
+  } catch (error) {
+    console.error("Error validating promo code:", error);
+    return null;
+  }
+}
+
 // add new order data
 export async function POST(request) {
   const session = await getServerSession(authOptions);
@@ -98,6 +124,7 @@ export async function POST(request) {
       phoneNumber,
       deliveryLocation,
       paymentMethod,
+      promoCode,
     } = body;
 
     // validate required fields
@@ -179,6 +206,21 @@ export async function POST(request) {
         .where(eq(customerTable.id, customerId));
     }
 
+    // validate and apply promo code if provided
+    let discountAmount = 0;
+    let validatedPromo = null;
+    
+    if (promoCode) {
+      validatedPromo = await validatePromoCode(promoCode, session.user.businessId);
+      
+      if (!validatedPromo) {
+        return new NextResponse(
+          JSON.stringify({ error: "Invalid or expired promo code" }),
+          { status: 400 }
+        );
+      }
+    }
+
     // calculate the total amount for the order and validate product stock
     let totalAmount = 0;
     for (const product of products) {
@@ -213,6 +255,13 @@ export async function POST(request) {
       totalAmount += productData.unitPrice * product.quantity;
     }
 
+    // apply discount if valid promo code exists
+    if (validatedPromo) {
+      discountAmount = totalAmount * (Number(validatedPromo.discountPercent) / 100);
+      discountAmount = Math.min(discountAmount, totalAmount); // ensure discount doesn't exceed total amount
+      totalAmount -= discountAmount;
+    }
+
     // create the order
     const [newOrder] = await db
       .insert(orderTable)
@@ -224,6 +273,9 @@ export async function POST(request) {
         deliveryLocation,
         email,
         totalAmount,
+        discountPercent: validatedPromo ? validatedPromo.discountPercent : 0,
+        discountAmount,
+        promoCode: validatedPromo ? promoCode : null,
         orderDate: new Date(),
       })
       .returning();
@@ -250,15 +302,15 @@ export async function POST(request) {
           stockAvailability: productData.stockAvailability - product.quantity,
         })
         .where(eq(productTable.id, product.productId));
-
+        
       // insert sales data into the sales table
       await db.insert(salesTable).values({
         businessId: session.user.businessId,
         productId: product.productId,
         quantitySold: product.quantity,
-        revenue: productData.unitPrice * product.quantity,
+        revenue: validatedPromo ? (productData.unitPrice * product.quantity) - ((Number(validatedPromo.discountPercent) / 100) * (productData.unitPrice * product.quantity)) : productData.unitPrice * product.quantity,
         saleDate: new Date(),
-        // discountAmount: 0, 
+        discountAmount: discountAmount,
       });
     }
 
@@ -322,7 +374,7 @@ export async function POST(request) {
       );
     }
 
-    // Return success response for non-Khalti payments
+    // return success response for non-Khalti payments
     return new NextResponse(
       JSON.stringify({
         message: "Order created successfully",
