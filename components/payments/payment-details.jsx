@@ -147,9 +147,10 @@ const PaymentDetails = ({ orderId, onClose }) => {
           {/* Manual Status Update (only for "Other" payment method) */}
           {payment.paymentMethod === "Other" && (
             <div className="mt-4">
-              <label className="block text-sm text-center font-medium mb-2">
+              <label className="block text-sm text-center font-semibold mb-2">
                 Update Payment Status
               </label>
+              
               <div className="flex items-center gap-3 w-full">
                 <select
                   value={selectedStatus}
@@ -169,13 +170,12 @@ const PaymentDetails = ({ orderId, onClose }) => {
               </div>
             </div>
           )}
-
-
         </div>
+
         <div className="flex justify-end mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-400"
+            className="px-4 py-2 bg-gray-200 border border-gray-300 text-sm text-gray-700 rounded-md hover:bg-gray-300"
           >
             Close
           </button>

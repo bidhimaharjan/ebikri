@@ -128,13 +128,13 @@ const AddCampaignForm = ({ isOpen, onClose, onConfirm }) => {
           <div className="flex justify-between">
             <button
               type="submit"
-              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-400"
+              className="px-4 py-2 bg-purple-500 text-sm text-white rounded hover:bg-purple-400"
             >
               Create Campaign
             </button>
             <button
               type="button"
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-400"
+              className="px-4 py-2 bg-gray-200 border border-gray-300 text-sm text-gray-700 rounded-md hover:bg-gray-300"
               onClick={onClose}
             >
               Cancel

@@ -334,7 +334,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                             disabled={products.length <= 1 && index === 0} // Disable the button for the first product if there's only one product
                             className={`p-1 rounded-full border flex items-center justify-center w-6 h-6 ${
                               products.length <= 1 && index === 0
-                                ? "text-gray-400 border-gray-300 cursor-not-allowed opacity-50"
+                                ? "text-gray-400 border-gray-300 cursor-not-allowed"
                                 : "text-red-500 hover:text-red-600 hover:bg-red-100 border-red-300"
                             }`}
                           >
@@ -504,7 +504,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   {/* Done Button */}
                   <button
                     type="button"
-                    className="px-4 py-2 bg-gray-200 text-sm text-gray-700 rounded-md hover:bg-gray-400"
+                    className="px-4 py-2 bg-gray-200 border border-gray-300 text-sm text-gray-700 rounded-md hover:bg-gray-300"
                     onClick={onClose}
                   >
                     Done

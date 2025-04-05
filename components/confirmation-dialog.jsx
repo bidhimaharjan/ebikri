@@ -9,7 +9,7 @@ const ConfirmationDialog = ({ isOpen, onClose, onConfirm, message }) => {
         <h2 className="text-lg font-semibold text-gray-700 mt-4">{message}</h2>
         <div className="mt-4 flex justify-end gap-4">
           <button
-            className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-400 mt-6"
+            className="px-4 py-2 bg-purple-500 text-sm text-white rounded-md hover:bg-purple-400 mt-6"
             onClick={() => {
               onConfirm();
               onClose();
@@ -19,7 +19,7 @@ const ConfirmationDialog = ({ isOpen, onClose, onConfirm, message }) => {
           </button>
 
           <button
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-400 mt-6"
+            className="px-4 py-2 bg-gray-200 border border-gray-300 text-sm text-gray-700 rounded-md hover:bg-gray-300 mt-6"
             onClick={onClose}
           >
             Cancel
