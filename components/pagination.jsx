@@ -9,20 +9,28 @@ const Pagination = ({
   rowsPerPage,
   data,
 }) => {
-  // Calculate pagination
+  // calculate the start and end index for the rows to be displayed
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const displayedRows = data.slice(startIndex, endIndex);
 
+  // calculate page number range
+  const maxPageButtons = 10; // max 10 page numbers to show
+  let startPage = Math.max(currentPage - Math.floor(maxPageButtons / 2), 1);
+  let endPage = startPage + maxPageButtons - 1;
+
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(endPage - maxPageButtons + 1, 1);
+  }
+
+  const pageNumbers = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pageNumbers.push(i);
+  }
+
   return (
     <div>
-      {/* Display Paginated Data */}
-      <div>
-        {displayedRows.map((item, index) => (
-          <div key={index}>{/* Render your data here */}</div>
-        ))}
-      </div>
-
       {/* Pagination Controls */}
       <div className="flex justify-end mt-4 space-x-2">
         {/* Previous Button */}
@@ -40,17 +48,17 @@ const Pagination = ({
         </button>
 
         {/* Page Numbers */}
-        {Array.from({ length: totalPages }, (_, index) => (
+        {pageNumbers.map((pageNumber) => (
           <button
-            key={index}
+            key={pageNumber}
             className={`px-4 py-2 rounded-full text-sm font-bold ${
-              currentPage === index + 1
+              currentPage === pageNumber
                 ? "bg-purple-500 text-white"
                 : "text-gray-800"
             }`}
-            onClick={() => onPageChange(index + 1)}
+            onClick={() => onPageChange(pageNumber)}
           >
-            {index + 1}
+            {pageNumber}
           </button>
         ))}
 

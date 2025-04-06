@@ -6,6 +6,7 @@ import {
   ShoppingCartIcon,
   UserIcon,
   XMarkIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
@@ -24,6 +25,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [totalAmount, setTotalAmount] = useState(null);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [orderData, setOrderData] = useState(null);
 
   // fetch products and customers when the form is opened
   useEffect(() => {
@@ -148,6 +150,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       }
 
       const orderData = await response.json();
+      setOrderData(orderData);
       setTotalAmount(orderData.order.totalAmount);
       setDiscountAmount(orderData.order.discountAmount || 0);
       setDiscountPercent(orderData.order.discountPercent || 0);
@@ -196,7 +199,8 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50`}>
+      className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50`}
+    >
       <div
         className={`bg-white p-8 rounded-lg shadow-lg transition-all duration-300 ${
           qrCodeUrl ? "w-[900px]" : "w-[700px]"
@@ -204,7 +208,9 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       >
         {/* Left Section - Form */}
         <div className={`w-full ${qrCodeUrl ? "pr-6" : ""} overflow-y-auto`}>
-          <h2 className="text-lg text-gray-800 font-semibold mb-4">New Order</h2>
+          <h2 className="text-lg text-gray-800 font-semibold mb-4">
+            New Order
+          </h2>
 
           <form onSubmit={handleSubmit}>
             {/* Order Details */}
@@ -215,7 +221,10 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
               </h3>
 
               {products.map((product, index) => (
-                <div key={index} className="flex gap-4 mb-4 items-center relative">
+                <div
+                  key={index}
+                  className="flex gap-4 mb-4 items-center relative"
+                >
                   {/* Product selection */}
                   <div className="w-1/2">
                     <label className="block text-sm font-medium">
@@ -513,12 +522,47 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
         {qrCodeUrl && (
           <div className="border-l border-gray-300 pl-6 flex flex-col items-center">
             <div className="p-4 w-full">
-              <h3 className="text-md text-center font-semibold mb-3 mt-2">
+              <h3 className="text-center font-semibold mb-2">
                 Payment QR Code
               </h3>
+
+              {/* Payment Status Refresh Button */}
+              <div className="flex justify-center">
+                <button
+                  onClick={async () => {
+                    try {
+                      if (!orderData?.order?.id) {
+                        throw new Error("Order information not available");
+                      }
+
+                      const response = await fetch(`/api/payment/${orderData.order.id}`);
+
+                      if (!response.ok) throw new Error("Failed to refresh");
+                      const paymentStatus = await response.json();
+
+                      if (paymentStatus.status === "paid") {
+                        toast.success("Payment completed!");
+                      } else {
+                        toast.info(`Payment status: ${paymentStatus.status}`);
+                      }
+                    } catch (error) {
+                      toast.error(error.message || "Error refreshing payment");
+                      console.error("Refresh error:", error);
+                    }
+                  }}
+                  className="flex items-center gap-1 text-sm text-blue-500 font-semibold hover:text-blue-700"
+                >
+                  <ArrowPathIcon className="h-4 w-4" />
+                  Refresh
+                </button>
+              </div>
+
+              {/* Generated Dynamic QR Code */}
               <div className="p-4 w-full">
                 <QRCodeSVG value={qrCodeUrl} size={200} />
               </div>
+
+              {/* Total Amount and Discount Information */}
               {totalAmount && (
                 <div className="mt-3 text-center">
                   {/* Show discount information if discount is applied */}
@@ -535,9 +579,11 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   )}
                 </div>
               )}
-              <p className="mt-6 text-sm text-gray-800 text-center">
+              <p className="mt-4 text-sm text-gray-800 text-center">
                 Scan this QR code to complete the payment.
               </p>
+
+              {/* Payment Link */}
               <p className="mt-10 text-sm text-gray-800 text-center">
                 You can also follow this link for payment:
               </p>
