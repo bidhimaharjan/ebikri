@@ -10,6 +10,7 @@ import AddCampaignForm from "@/components/marketing/add-campaign-form";
 import EditCampaignForm from "@/components/marketing/edit-campaign-form";
 import ConfirmationDialog from "@/components/confirmation-dialog";
 import { toast } from "react-toastify";
+import Link from 'next/link';
 
 const MarketingLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -168,10 +169,12 @@ const MarketingLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-        <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
-            <UserCircleIcon className="h-5 w-5 mr-2" />
-            <BusinessName userId={session.user.id} />
-          </button>
+          <Link href="/profile">
+            <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
+              <UserCircleIcon className="h-5 w-5 mr-2" />
+              <BusinessName userId={session.user.id} />
+            </button>
+          </Link>
         </div>
 
         {/* Marketing Title */}
@@ -179,6 +182,7 @@ const MarketingLayout = () => {
           <h1 className="text-xl font-semibold text-gray-800 mt-2">
             Marketing Tools
           </h1>
+          <p className="text-gray-600">Create and manage marketing campaigns to boost your sales</p>
         </div>
 
         <div className="flex justify-between items-center mb-4">
@@ -237,7 +241,8 @@ const MarketingLayout = () => {
                       {campaign.promoCode}
                     </td>
                     <td className="px-4 py-2 text-center">
-                      {formatDate(campaign.startDate)} - {formatDate(campaign.endDate)}
+                      {formatDate(campaign.startDate)} -{" "}
+                      {formatDate(campaign.endDate)}
                     </td>
                     <td className="px-4 py-2 text-center">
                       {campaign.recipients === "all"

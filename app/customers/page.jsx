@@ -16,6 +16,7 @@ import ConfirmationDialog from "@/components/confirmation-dialog";
 import { toast } from "react-toastify";
 import BusinessName from "@/components/businessname";
 import Pagination from "@/components/pagination";
+import Link from 'next/link';
 
 const CustomersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -29,7 +30,7 @@ const CustomersLayout = () => {
   const [searchQuery, setSearchQuery] = useState(""); // state for search query
   const { data: session, status } = useSession();
   const [customer, setCustomer] = useState([]);
-  const rowsPerPage = 9; // pagination setup
+  const rowsPerPage = 8; // pagination setup
 
   // fetch customer data
   const fetchCustomer = async () => {
@@ -109,10 +110,12 @@ const CustomersLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
-            <UserCircleIcon className="h-5 w-5 mr-2" />
-            <BusinessName userId={session.user.id} />
-          </button>
+          <Link href="/profile">
+            <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
+              <UserCircleIcon className="h-5 w-5 mr-2" />
+              <BusinessName userId={session.user.id} />
+            </button>
+          </Link>
         </div>
 
         {/* Customers Title */}
@@ -120,6 +123,7 @@ const CustomersLayout = () => {
           <h1 className="text-xl font-semibold text-gray-800 mt-2">
             Customers
           </h1>
+          <p className="text-gray-600">Manage your customer information</p>
         </div>
 
         <div className="flex justify-between items-center mb-4">
@@ -172,7 +176,9 @@ const CustomersLayout = () => {
                     <td className="px-4 py-2">{item.phoneNumber}</td>
                     <td className="px-4 py-2">{item.email}</td>
                     <td className="px-4 py-2 text-center">{item.addedDate}</td>
-                    <td className="px-4 py-2 text-center">{item.totalOrders}</td>
+                    <td className="px-4 py-2 text-center">
+                      {item.totalOrders}
+                    </td>
                     <td className="px-4 py-2 flex justify-center space-x-2">
                       {/* Edit Customer Button */}
                       <div className="relative group">
@@ -187,7 +193,7 @@ const CustomersLayout = () => {
                         </span>
                       </div>
 
-                      {/* Delete Delete Button */}
+                      {/* Delete Customer Button */}
                       <div className="relative group">
                         <button
                           className="p-1 border border-red-500 rounded-md text-red-500 hover:text-red-600 hover:border-red-500 hover:bg-red-50"
@@ -219,7 +225,7 @@ const CustomersLayout = () => {
         />
 
         {/* Footer */}
-        <div className="text-center text-gray-500 text-sm mt-2">
+        <div className="text-center text-gray-500 text-sm mt-6">
           ©2025 eBikri. All Rights Reserved
         </div>
 

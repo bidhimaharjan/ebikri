@@ -16,6 +16,7 @@ import ConfirmationDialog from "@/components/confirmation-dialog";
 import { toast } from "react-toastify";
 import BusinessName from "@/components/businessname";
 import Pagination from "@/components/pagination";
+import Link from 'next/link';
 
 const InventoryLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
@@ -28,7 +29,7 @@ const InventoryLayout = () => {
   const [searchQuery, setSearchQuery] = useState(""); // state for search query
   const { data: session, status } = useSession();
   const [inventory, setInventory] = useState([]);
-  const rowsPerPage = 9; // pagination setup
+  const rowsPerPage = 8; // pagination setup
 
   // fetch inventory data
   const fetchInventory = async () => {
@@ -107,10 +108,12 @@ const InventoryLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
-            <UserCircleIcon className="h-5 w-5 mr-2" />
-            <BusinessName userId={session.user.id} />
-          </button>
+          <Link href="/profile">
+            <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
+              <UserCircleIcon className="h-5 w-5 mr-2" />
+              <BusinessName userId={session.user.id} />
+            </button>
+          </Link>
         </div>
 
         {/* Inventory Title */}
@@ -118,6 +121,7 @@ const InventoryLayout = () => {
           <h1 className="text-xl font-semibold text-gray-800 mt-2">
             Inventory
           </h1>
+          <p className="text-gray-600">Track and manage your inventory and stock-levels</p>
         </div>
 
         <div className="flex justify-between items-center mb-4">
@@ -165,7 +169,9 @@ const InventoryLayout = () => {
                   <tr key={index} className="border-b">
                     <td className="px-4 py-2">{item.id}</td>
                     <td className="px-4 py-2">{item.productName}</td>
-                    <td className="px-4 py-2 text-center">{item.stockAvailability}</td>
+                    <td className="px-4 py-2 text-center">
+                      {item.stockAvailability}
+                    </td>
                     <td className="px-4 py-2 text-center">{item.unitPrice}</td>
                     <td className="px-4 py-2 flex justify-center space-x-2">
                       {/* Edit Product Button */}
@@ -213,7 +219,7 @@ const InventoryLayout = () => {
         />
 
         {/* Footer */}
-        <div className="text-center text-gray-500 text-sm mt-2">
+        <div className="text-center text-gray-500 text-sm mt-6">
           ©2025 eBikri. All Rights Reserved
         </div>
 
