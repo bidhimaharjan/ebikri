@@ -196,8 +196,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50`}
-    >
+      className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50`}>
       <div
         className={`bg-white p-8 rounded-lg shadow-lg transition-all duration-300 ${
           qrCodeUrl ? "w-[900px]" : "w-[700px]"
@@ -205,9 +204,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       >
         {/* Left Section - Form */}
         <div className={`w-full ${qrCodeUrl ? "pr-6" : ""} overflow-y-auto`}>
-          <h2 className="text-lg text-gray-800 font-semibold mb-4">
-            New Order
-          </h2>
+          <h2 className="text-lg text-gray-800 font-semibold mb-4">New Order</h2>
 
           <form onSubmit={handleSubmit}>
             {/* Order Details */}
@@ -218,10 +215,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
               </h3>
 
               {products.map((product, index) => (
-                <div
-                  key={index}
-                  className="flex gap-4 mb-4 items-center relative"
-                >
+                <div key={index} className="flex gap-4 mb-4 items-center relative">
                   {/* Product selection */}
                   <div className="w-1/2">
                     <label className="block text-sm font-medium">
@@ -331,7 +325,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                           <button
                             type="button"
                             onClick={() => removeProductField(index)}
-                            disabled={products.length <= 1 && index === 0} // Disable the button for the first product if there's only one product
+                            disabled={products.length <= 1 && index === 0} // disable the button for the first product if there's only one product
                             className={`p-1 rounded-full border flex items-center justify-center w-6 h-6 ${
                               products.length <= 1 && index === 0
                                 ? "text-gray-400 border-gray-300 cursor-not-allowed"
@@ -411,7 +405,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                     <label className="block text-sm font-medium">Name *</label>
                     <input
                       type="text"
-                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
+                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded select-truncate"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
@@ -422,7 +416,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                     <label className="block text-sm font-medium">Email *</label>
                     <input
                       type="email"
-                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
+                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded select-truncate"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -435,7 +429,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                     </label>
                     <input
                       type="text"
-                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded"
+                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded select-truncate"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                       required
@@ -455,7 +449,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   </label>
                   <input
                     type="text"
-                    className="w-full p-2 text-sm border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 text-sm border border-gray-300 rounded select-truncate"
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value)}
                   />

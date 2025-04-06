@@ -74,6 +74,7 @@ export async function GET(request, { params }) {
         quantity: product.quantity,
       })),
       deliveryLocation: order[0].deliveryLocation,
+      promoCode: order[0].promoCode,
       totalAmount: order[0].totalAmount,
       paymentStatus: paymentStatus,
     };

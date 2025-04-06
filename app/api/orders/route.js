@@ -223,6 +223,8 @@ export async function POST(request) {
 
     // calculate the total amount for the order and validate product stock
     let totalAmount = 0;
+    let totalDiscountAmount = 0;
+    // First step: Validation and Calculation
     for (const product of products) {
       const [productData] = await db
         .select()
@@ -252,16 +254,20 @@ export async function POST(request) {
         );
       }
 
-      totalAmount += productData.unitPrice * product.quantity;
+      const productTotal = productData.unitPrice * product.quantity;
+      totalAmount += productTotal;
+      
+      // calculate discount for this product if promo exists
+      if (validatedPromo) {
+        const productDiscount = productTotal * (Number(validatedPromo.discountPercent) / 100);
+        totalDiscountAmount += productDiscount;
+      }
     }
 
-    // apply discount if valid promo code exists
-    if (validatedPromo) {
-      discountAmount = totalAmount * (Number(validatedPromo.discountPercent) / 100);
-      discountAmount = Math.min(discountAmount, totalAmount); // ensure discount doesn't exceed total amount
-      totalAmount -= discountAmount;
-    }
+    // apply total discount
+    totalAmount -= totalDiscountAmount;
 
+    // Second Step: Actual Order Processing
     // create the order
     const [newOrder] = await db
       .insert(orderTable)
@@ -274,25 +280,34 @@ export async function POST(request) {
         email,
         totalAmount,
         discountPercent: validatedPromo ? validatedPromo.discountPercent : 0,
-        discountAmount,
+        discountAmount: totalDiscountAmount,
         promoCode: validatedPromo ? promoCode : null,
         orderDate: new Date(),
       })
       .returning();
 
-    // add order products and deduct stock
+    // add order products, deduct stock, and record sales
     for (const product of products) {
       const [productData] = await db
         .select()
         .from(productTable)
         .where(eq(productTable.id, product.productId));
 
+      const productTotal = productData.unitPrice * product.quantity;
+      let productDiscount = 0;
+
+      if (validatedPromo) {
+        productDiscount =
+          productTotal * (Number(validatedPromo.discountPercent) / 100);
+      }
+
+      // add order product
       await db.insert(orderProductTable).values({
         orderId: newOrder.id,
         productId: product.productId,
         quantity: product.quantity,
         unitPrice: productData.unitPrice,
-        amount: productData.unitPrice * product.quantity,
+        amount: productTotal - productDiscount,
       });
 
       // deduct the stock from the product table
@@ -308,9 +323,9 @@ export async function POST(request) {
         businessId: session.user.businessId,
         productId: product.productId,
         quantitySold: product.quantity,
-        revenue: validatedPromo ? (productData.unitPrice * product.quantity) - ((Number(validatedPromo.discountPercent) / 100) * (productData.unitPrice * product.quantity)) : productData.unitPrice * product.quantity,
+        revenue: productTotal - productDiscount,      
         saleDate: new Date(),
-        discountAmount: discountAmount,
+        discountAmount: productDiscount,
       });
     }
 

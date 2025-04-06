@@ -5,6 +5,7 @@ import {
   PlusIcon,
   ShoppingCartIcon,
   UserIcon,
+  XMarkIcon
 } from "@heroicons/react/24/outline";
 
 const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
@@ -15,6 +16,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [deliveryLocation, setDeliveryLocation] = useState("");
+  const [promoCode, setPromoCode] = useState("");
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
   const [totalAmount, setTotalAmount] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState("");
@@ -45,7 +47,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
           console.log("Fetching order details for ID:", order.id);
           const response = await fetch(`/api/orders/${order.id}`);
           if (!response.ok) throw new Error("Failed to fetch order details");
-          
+
           const data = await response.json();
           // update the state with the fetched order details
           setProducts(data.products);
@@ -54,13 +56,14 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
           setEmail(data.customer.email);
           setPhoneNumber(data.customer.phoneNumber);
           setDeliveryLocation(data.deliveryLocation);
+          setPromoCode(data.promoCode);
           setTotalAmount(data.totalAmount);
           setPaymentStatus(data.paymentStatus);
         } catch (error) {
           console.error("Error fetching order details:", error);
         }
       };
-  
+
       fetchOrderDetails();
     }
   }, [isOpen, order]);
@@ -70,12 +73,23 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
     try {
       // check if payment status is pending or failed
       if (paymentStatus !== "pending" && paymentStatus !== "failed") {
-        toast.error("Order can only be modified when payment status is pending or failed.");
+        toast.error(
+          "Order can only be modified when payment status is pending or failed."
+        );
         return;
       }
 
+      // ensure that quantity is always set (default to 1 if not provided
+      const updatedProducts = products.map((product) => ({
+        ...product,
+        quantity: product.quantity || 1, // default to 1 if quantity is not set
+      }));
+
       // validate product selection
-      if (products.length === 0 || products.some(p => !p.productId || !p.quantity || p.quantity <= 0)) {
+      if (
+        products.length === 0 ||
+        products.some((p) => !p.productId || !p.quantity || p.quantity <= 0)
+      ) {
         toast.error("Please select a valid product and quantity.");
         return;
       }
@@ -98,7 +112,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
       });
 
       if (response.ok) {
-        const data = await response.json();  // Parse the JSON response body
+        const data = await response.json(); // Parse the JSON response body
         toast.success(data.message);
       } else {
         toast.error("Failed to update order");
@@ -131,7 +145,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   };
 
   const removeProductField = (index) => {
-    if (index === 0) return; // prevent removing the first product field
+    if (products.length <= 1) return; // prevent removing the last product field
     const updatedProducts = products.filter((_, i) => i !== index);
     setProducts(updatedProducts);
   };
@@ -145,7 +159,9 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   // if payment status is "paid," show a toast error and close the form
   useEffect(() => {
     if (isOpen && paymentStatus === "paid") {
-      toast.error("This order cannot be modified because payment is already completed.");
+      toast.error(
+        "This order cannot be modified because payment is already completed."
+      );
       onClose();
     }
   }, [isOpen, paymentStatus, onClose]);
@@ -157,122 +173,231 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-8 rounded-lg shadow-lg w-[700px] max-h-[90vh] overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-4">Modify Order</h2>
+        {/* Left Section - Form */}
+        <h2 className="text-lg text-gray-800 font-semibold mb-4">
+          Modify Order
+        </h2>
+
         <form onSubmit={handleSubmit}>
           {/* Order Details */}
-          <h3 className="text-md font-semibold mt-6 mb-2 flex items-center">
-            <ShoppingCartIcon className="h-5 w-5 mr-1" />
-            Order Details
-          </h3>
-          {products.map((product, index) => (
-            <div key={index} className="flex gap-4 mb-4 items-center">
-              <div className="w-1/2">
-                <label className="block text-sm font-medium">Product ID *</label>
-                <select
-                  className="w-full p-2 mt-1 border-gray-200 border rounded bg-gray-200"
-                  value={product.productId}
-                  onChange={(e) => updateProductField(index, "productId", e.target.value)}
-                  required
-                >
-                  <option value="">Select a product</option>
-                  {availableProducts.map((prod) => (
-                    <option key={prod.id} value={prod.id}>
-                      ID{prod.id} {prod.productName} (Stock: {prod.stockAvailability}, Price: {prod.unitPrice})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-1/2 relative">
-                <label className="block text-sm font-medium">Quantity *</label>
-                <input
-                  type="number"
-                  className="w-full p-2 mt-1 border-gray-200 rounded bg-gray-200"
-                  value={product.quantity}
-                  onChange={(e) => updateProductField(index, "quantity", e.target.value)}
-                  required
-                />
-                {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => removeProductField(index)}
-                    className="absolute right-2 top-3 transform -translate-y-1/2 text-red-500 font-semibold hover:text-red-600 text-sm"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+          <div className="border bg-gray-100 rounded-lg p-4 mb-4 text-gray-800">
+            <h3 className="text-md font-semibold mb-2 flex items-center">
+              <ShoppingCartIcon className="h-4 w-4 mr-1" />
+              Order Details
+            </h3>
 
-          <div className="flex justify-center my-2">
-            <button
-              type="button"
-              onClick={addProductField}
-              className="px-4 py-2 text-sm bg-blue-500 border-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center"
-            >
-              <PlusIcon className="w-4 h-4 mr-1" />
-              Add Another Product
-            </button>
-          </div>
+            {products.map((product, index) => (
+              <div key={index} className="flex gap-4 mb-4 items-center">
+                {/* Product selection */}
+                <div className="w-1/2">
+                  <label className="block text-sm font-medium">
+                    Product ID *
+                  </label>
+                  <select
+                    className="w-full p-2 mt-1 text-sm border border-gray-300 rounded select-truncate"
+                    value={product.productId}
+                    onChange={(e) =>
+                      updateProductField(index, "productId", e.target.value)
+                    }
+                    required
+                  >
+                    <option value="">Select a product</option>
+                    {availableProducts.map((prod) => (
+                      <option key={prod.id} value={prod.id}>
+                        ID{prod.id} {prod.productName} (Stock:{" "}
+                        {prod.stockAvailability}, Price: {prod.unitPrice})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Quantity Input */}
+                <div className="w-1/2">
+                  <label className="block text-sm font-medium mb-1">
+                    Quantity *
+                  </label>
+                 
+                  <div className="flex items-center gap-2">
+                      <div className="flex items-center border border-gray-300 rounded overflow-hidden h-10 flex-1">
+                        {/* Decrement Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newQty = Math.max(
+                              1,
+                              parseInt(product.quantity || 1) - 1
+                            );
+                            updateProductField(index, "quantity", newQty);
+                          }}
+                          className="px-3 py-2 text-gray-600 hover:text-black text-lg font-bold bg-gray-100 hover:bg-gray-200"
+                        >
+                          −
+                        </button>
+
+                        {/* Quantity Input Field */}
+                        <input
+                          type="number"
+                          className="w-full text-center p-2 text-sm border-0 focus:ring-0 outline-none"
+                          value={product.quantity || 1} // default to 1
+                          onChange={(e) => {
+                            const newQty = Math.max(
+                              1,
+                              parseInt(e.target.value) || 1
+                            );
+                            updateProductField(index, "quantity", newQty);
+                          }}
+                          min={1}
+                          required
+                          onFocus={(e) => {
+                            // clear the input when focused
+                            if (e.target.value !== "") {
+                              e.target.value = "";
+                            }
+                          }}
+                          onBlur={(e) => {
+                            // reset the input to 1 if left blank
+                            if (e.target.value === "") {
+                              updateProductField(index, "quantity", 1);
+                            }
+                          }}
+                        />
+
+                        {/* Increment Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newQty = parseInt(product.quantity || 1) + 1;
+                            updateProductField(index, "quantity", newQty);
+                          }}
+                          className="px-3 py-2 text-gray-600 hover:text-black text-lg font-bold bg-gray-100 hover:bg-gray-200"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Add Button */}
+                      <div className="flex items-center gap-1">
+                        {index === products.length - 1 && (
+                          <div className="relative group">
+                            <button
+                              type="button"
+                              onClick={addProductField}
+                              className="p-1 text-blue-500 hover:text-blue-600 rounded-full hover:bg-blue-100 border border-blue-300 flex items-center justify-center w-6 h-6"
+                            >
+                              <PlusIcon className="w-4 h-4" />
+                            </button>
+                            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-700 text-white text-xs rounded py-1 px-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              Add another
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Remove Button */}
+                        <div className="relative group">
+                          <button
+                            type="button"
+                            onClick={() => removeProductField(index)}
+                            disabled={products.length <= 1 && index === 0} // disable the button for the first product if there's only one product
+                            className={`p-1 rounded-full border flex items-center justify-center w-6 h-6 ${
+                              products.length <= 1 && index === 0
+                                ? "text-gray-400 border-gray-300 cursor-not-allowed"
+                                : "text-red-500 hover:text-red-600 hover:bg-red-100 border-red-300"
+                            }`}
+                          >
+                            <XMarkIcon className="w-4 h-4" />
+                          </button>
+                          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-gray-700 text-white text-xs rounded py-1 px-2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            Remove
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
           {/* Customer Details (for display only) */}
-          <h3 className="text-md font-semibold mt-6 mb-2 flex items-center">
-            <UserIcon className="h-5 w-5 mr-1" />
-            Customer Details
-          </h3>
+          <div className="border bg-gray-100 rounded-lg p-4 mb-4 text-gray-800">
+            <h3 className="text-md font-semibold mb-2 flex items-center">
+              <UserIcon className="h-4 w-4 mr-1" />
+              Customer Details
+            </h3>
 
-          <div className="space-y-2">
-            <div>
-              <span className="font-semibold">Name:</span> {name}
-            </div>
-            <div>
-              <span className="font-semibold">Phone Number:</span> {phoneNumber}
-            </div>
-            <div>
-              <span className="font-semibold">Email:</span> {email}
+            <div className="space-y-2 text-sm mb-1">
+              <div>
+                <span className="font-semibold">Name:</span> {name}
+              </div>
+              <div>
+                <span className="font-semibold">Phone Number:</span> {phoneNumber}
+              </div>
+              <div>
+                <span className="font-semibold">Email:</span> {email}
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-4 mb-4 mr-4 items-center">
-            <div className="w-1/2">
-              <label className="mt-6 block font-semibold">Change Delivery Location *</label>
-              <input
-                type="text"
-                className="w-full p-2 mt-1 border-gray-200 rounded bg-gray-200"
-                value={deliveryLocation}
-                onChange={(e) => setDeliveryLocation(e.target.value)}
-                required
-              />
-            </div>
-          </div>
+          {/* Delivery Location, Promo Code, Submit Buttons */}
+          <div className="border bg-gray-100 rounded-lg p-4 text-gray-800">
+            {/* Delivery Location Field */}
+            <div className="flex gap-4 mb-4 mr-4 items-center">
+              <div className="w-1/2">
+                <label className="block text-sm font-medium">
+                  Change Delivery Location *
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-2 mt-1 text-sm border border-gray-300 rounded select-truncate"
+                  value={deliveryLocation}
+                  onChange={(e) => setDeliveryLocation(e.target.value)}
+                  required
+                />
+              </div>
 
-          {/* Submit Buttons */}
-          <div className="flex justify-center mt-6 gap-4">
-            <button
-              type="button"
-              onClick={() => handleSubmit("Other")}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-            >
-              Confirm
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSubmit("Khalti")}
-              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-            >
-              Generate QR Code
-            </button>
-            <button
-              type="button"
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-400"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
+              {/* Promo Code Field */}
+              <div className="w-1/2">
+                <label className="block text-sm font-medium">
+                  Promo Code (Optional)
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-2 mt-1 text-sm border border-gray-300 rounded select-truncate"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Submit Buttons */}
+            <div className="flex justify-center mt-6 gap-4">
+              <button
+                type="button"
+                onClick={() => handleSubmit("Khalti")}
+                className="px-4 py-2 bg-green-500 text-white text-sm rounded-md hover:bg-green-600"
+              >
+                Generate QR Code
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSubmit("Other")}
+                className="px-4 py-2 bg-purple-500 text-sm text-white rounded-md hover:bg-purple-400"
+              >
+                Confirm (Offline)
+              </button>
+
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-200 border border-gray-300 text-sm text-gray-700 rounded-md hover:bg-gray-300"
+                onClick={onClose}
+              >
+                Done
+              </button>
+            </div>
           </div>
         </form>
 
-        {/* QR Code Section */}
+        {/* Right Section - QR Code */}
         {qrCodeUrl && (
           <div className="mt-6 border-t border-gray-200 pt-6">
             <h3 className="text-md font-semibold mb-3">Payment QR Code</h3>
