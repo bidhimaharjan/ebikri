@@ -184,7 +184,7 @@ const OrdersLayout = () => {
         <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="text-gray-800 text-lg text-center border-b">
+              <tr className="text-gray-800 text-center border-b">
                 <th className="px-4 py-2">ID</th>
                 <th className="px-4 py-2">Customer Details</th>
                 <th className="px-4 py-2">Order Details</th>
@@ -202,7 +202,7 @@ const OrdersLayout = () => {
                   currentPage * rowsPerPage
                 )
                 .map((item, index) => (
-                  <tr key={item.id} className="border-b">
+                  <tr key={item.id} className="border-b text-sm">
                     <td className="px-4 py-2 text-center">{item.id}</td>
 
                     <td className="px-4 py-2">
@@ -316,7 +316,7 @@ const OrdersLayout = () => {
         />
 
         {/* Footer */}
-        <div className="text-center text-gray-500 text-sm mt-2">
+        <div className="text-center text-gray-500 text-sm mt-6">
           ©2025 eBikri. All Rights Reserved
         </div>
 

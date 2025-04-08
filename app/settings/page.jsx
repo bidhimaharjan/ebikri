@@ -131,15 +131,20 @@ const SettingsLayout = () => {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to update personal info");
+        throw new Error(data.error || "Failed to update personal information");
       }
 
-      toast.success("Personal information updated successfully");
-      setEditPersonal(false);
+      if (data.message === "No changes made. Please make some changes.") {
+        toast.info(data.message);
+      } else {
+        toast.success("Personal information updated successfully");
+        setEditPersonal(false);
+      }
     } catch (error) {
-      toast.error(error.message || "Failed to update personal information");
-      console.error("Error updating personal info:", error);
+      toast.error(error.message);
     }
   };
 
@@ -153,15 +158,20 @@ const SettingsLayout = () => {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to update business info");
+        throw new Error(data.error || "Failed to update business information");
       }
 
-      toast.success("Business information updated successfully");
-      setEditBusiness(false);
+      if (data.message === "No changes made. Please make some changes.") {
+        toast.info(data.message);
+      } else {
+        toast.success("Business information updated successfully");
+        setEditBusiness(false);
+      }
     } catch (error) {
-      toast.error(error.message || "Failed to update business information");
-      console.error("Error updating business info:", error);
+      toast.error(error.message);
     }
   };
 
@@ -183,20 +193,26 @@ const SettingsLayout = () => {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to change password");
+        throw new Error(data.error || "Failed to change password");;
       }
 
-      toast.success("Password changed successfully");
-      setPasswordInfo({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-      setEditPassword(false);
+      if (data.message === "No changes made. Please make some changes.") {
+        toast.info(data.message);
+      } else {
+        toast.success("Password changed successfully");
+        setPasswordInfo({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setEditPassword(false);
+      }
+      
     } catch (error) {
-      toast.error(error.message || "Failed to change password");
-      console.error("Error changing password:", error);
+      toast.error(error.message);
     }
   };
 
@@ -403,7 +419,7 @@ const SettingsLayout = () => {
                   />
                 ) : (
                   <p className="p-2 bg-gray-50 rounded-md">
-                    {userData.businessInfo.businessType || "N/A"}
+                    {userData.businessInfo.businessName || "N/A"}
                   </p>
                 )}
               </div>
