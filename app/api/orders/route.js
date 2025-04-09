@@ -321,6 +321,7 @@ export async function POST(request) {
       // insert sales data into the sales table
       await db.insert(salesTable).values({
         businessId: session.user.businessId,
+        orderId: newOrder.id,
         productId: product.productId,
         quantitySold: product.quantity,
         revenue: productTotal - productDiscount,      

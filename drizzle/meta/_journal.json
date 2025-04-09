@@ -120,6 +120,20 @@
       "when": 1743781637363,
       "tag": "0016_first_vulture",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1744210833566,
+      "tag": "0017_brave_bloodscream",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1744210921308,
+      "tag": "0018_dear_mister_sinister",
+      "breakpoints": true
     }
   ]
 }

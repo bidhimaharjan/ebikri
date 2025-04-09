@@ -71,74 +71,111 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   // handle form submission
   const handleSubmit = async (paymentMethod) => {
     try {
-      // check if payment status is pending or failed
-      if (paymentStatus !== "pending" && paymentStatus !== "failed") {
-        toast.error(
-          "Order can only be modified when payment status is pending or failed."
-        );
-        return;
-      }
-
-      // ensure that quantity is always set (default to 1 if not provided
-      const updatedProducts = products.map((product) => ({
-        ...product,
-        quantity: product.quantity || 1, // default to 1 if quantity is not set
-      }));
-
-      // validate product selection
-      if (
-        products.length === 0 ||
-        products.some((p) => !p.productId || !p.quantity || p.quantity <= 0)
-      ) {
-        toast.error("Please select a valid product and quantity.");
-        return;
-      }
-
-      // validate delivery location
+      // Validate required fields
       if (!deliveryLocation.trim()) {
         toast.error("Please enter a delivery location.");
         return;
       }
-
-      // proceed with order update
+  
+      // Prepare the request body
+      const requestBody = {
+        products: products.map(p => ({
+          productId: p.productId,
+          quantity: p.quantity || 1
+        })),
+        name,
+        email,
+        phoneNumber,
+        deliveryLocation,
+        paymentMethod,
+        promoCode,
+        customer: customer // pass the customer ID if exists
+      };
+  
       const response = await fetch(`/api/orders/${order.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          products: products,
-          deliveryLocation: deliveryLocation,
-          // paymentMethod
-        }),
+        body: JSON.stringify(requestBody)
       });
-
-      if (response.ok) {
-        const data = await response.json(); // Parse the JSON response body
-        toast.success(data.message);
-      } else {
-        toast.error("Failed to update order");
-        throw new Error("Failed to update order");
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update order");
       }
-
-      // const updatedOrderData = await response.json();
-      // setTotalAmount(updatedOrderData.order.totalAmount);
-
-      // if (paymentMethod === "Khalti") {
-      //   const paymentUrl = updatedOrderData.payment_url;
-      //   if (!paymentUrl) throw new Error("Khalti payment URL not found");
-      //   setQrCodeUrl(paymentUrl);
-      //   toast.success("Order updated successfully! Scan the QR code to pay.");
-      // } else {
-      //   toast.success("Order updated successfully! Please change the payment status after payment is completed");
-      // }
-
-      // onClose();
-      onConfirm();
+  
+      const data = await response.json();
+      
+      if (paymentMethod === "Khalti" && data.payment_url) {
+        setQrCodeUrl(data.payment_url);
+        toast.success("Order updated! Scan QR to pay.");
+      } else {
+        toast.success("Order updated successfully!");
+        onConfirm();
+        onClose();
+      }
     } catch (error) {
       console.error("Error updating order:", error);
-      toast.error("Failed to update order");
-      onConfirm();
+      toast.error(error.message || "Failed to update order");
     }
   };
+  // const handleSubmit = async (paymentMethod) => {
+  //   try {
+  //     // check if payment status is pending or failed
+  //     if (paymentStatus !== "pending" && paymentStatus !== "failed") {
+  //       toast.error(
+  //         "Order can only be modified when payment status is pending or failed."
+  //       );
+  //       return;
+  //     }
+
+  //     // ensure that quantity is always set (default to 1 if not provided
+  //     const updatedProducts = products.map((product) => ({
+  //       ...product,
+  //       quantity: product.quantity || 1, // default to 1 if quantity is not set
+  //     }));
+
+  //     // validate product selection
+  //     if (
+  //       products.length === 0 ||
+  //       products.some((p) => !p.productId || !p.quantity || p.quantity <= 0)
+  //     ) {
+  //       toast.error("Please select a valid product and quantity.");
+  //       return;
+  //     }
+
+  //     // validate delivery location
+  //     if (!deliveryLocation.trim()) {
+  //       toast.error("Please enter a delivery location.");
+  //       return;
+  //     }
+
+  //     // proceed with order update
+  //     const response = await fetch(`/api/orders/${order.id}`, {
+  //       method: "PUT",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         products: products,
+  //         deliveryLocation: deliveryLocation,
+  //         // paymentMethod
+  //       }),
+  //     });
+
+  //     if (response.ok) {
+  //       const data = await response.json(); // Parse the JSON response body
+  //       toast.success(data.message);
+  //     } else {
+  //       toast.error("Failed to update order");
+  //       throw new Error("Failed to update order");
+  //     }
+
+  //     // onClose();
+  //     onConfirm();
+  //   } catch (error) {
+  //     console.error("Error updating order:", error);
+  //     toast.error("Failed to update order");
+  //     onConfirm();
+  //   }
+  // };
 
   const addProductField = () => {
     setProducts([...products, { productId: "", quantity: "" }]);

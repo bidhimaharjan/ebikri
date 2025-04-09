@@ -1,0 +1,2 @@
+ALTER TABLE "sales" ADD COLUMN "salesId" integer NOT NULL;--> statement-breakpoint
+ALTER TABLE "sales" ADD CONSTRAINT "sales_salesId_sales_id_fk" FOREIGN KEY ("salesId") REFERENCES "public"."sales"("id") ON DELETE cascade ON UPDATE no action;
