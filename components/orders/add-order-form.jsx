@@ -10,7 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
-  const [products, setProducts] = useState([{ productId: "", quantity: "" }]);
+  const [products, setProducts] = useState([{ productId: "", quantity: 1 }]);
   const [availableProducts, setAvailableProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [customer, setCustomer] = useState("");
@@ -22,10 +22,12 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [showCustomerDetails, setShowCustomerDetails] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState(null); // state to store the QR Code URL
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [totalAmount, setTotalAmount] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountPercent, setDiscountPercent] = useState(0);
   const [orderData, setOrderData] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState("pending");
 
   // fetch products and customers when the form is opened
   useEffect(() => {
@@ -166,7 +168,6 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
         // set the QR code URL
         setQrCodeUrl(paymentUrl);
         toast.success("Order created successfully! Scan the QR code to pay.");
-        onConfirm();
       } else {
         toast.success(
           "Order created successfully! Please change the payment status after payment is completed"
@@ -176,6 +177,39 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       console.error("Error creating order:", error);
       toast.error("Failed to create order");
       onConfirm();
+    }
+  };
+
+  // handle payment status refresh button click
+  const handleRefreshPayment = async () => {
+    setIsRefreshing(true);
+    try {
+      if (!orderData?.order?.id) {
+        throw new Error("Order information not available");
+      }
+
+      // fetch the latest order details which includes payment status
+      const response = await fetch(`/api/orders/${orderData.order.id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch order status");
+      }
+
+      const updatedOrderData = await response.json();
+      // update the payment status in state
+      setPaymentStatus(updatedOrderData.paymentStatus);
+      
+      if (updatedOrderData.paymentStatus === "paid") {
+        toast.success("Payment completed!");
+        // close the form since payment is complete
+        onClose();
+      } else {
+        toast.info(`Current payment status: ${updatedOrderData.paymentStatus}`);
+      }
+    } catch (error) {
+      console.error("Refresh error:", error);
+      toast.error(error.message || "Error refreshing payment status");
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -529,31 +563,18 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
               {/* Payment Status Refresh Button */}
               <div className="flex justify-center">
                 <button
-                  onClick={async () => {
-                    try {
-                      if (!orderData?.order?.id) {
-                        throw new Error("Order information not available");
-                      }
-
-                      const response = await fetch(`/api/payment/${orderData.order.id}`);
-
-                      if (!response.ok) throw new Error("Failed to refresh");
-                      const paymentStatus = await response.json();
-
-                      if (paymentStatus.status === "paid") {
-                        toast.success("Payment completed!");
-                      } else {
-                        toast.info(`Payment status: ${paymentStatus.status}`);
-                      }
-                    } catch (error) {
-                      toast.error(error.message || "Error refreshing payment");
-                      console.error("Refresh error:", error);
-                    }
-                  }}
-                  className="flex items-center gap-1 text-sm text-blue-500 font-semibold hover:text-blue-700"
+                  onClick={handleRefreshPayment}
+                  disabled={isRefreshing}
+                  className={`flex items-center gap-1 text-sm font-semibold ${
+                    isRefreshing ? 'text-gray-500' : 'text-blue-500 hover:text-blue-700'
+                  }`}
                 >
-                  <ArrowPathIcon className="h-4 w-4" />
-                  Refresh
+                  {isRefreshing ? (
+                    <ArrowPathIcon className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ArrowPathIcon className="h-4 w-4" />
+                  )}
+                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
                 </button>
               </div>
 

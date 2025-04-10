@@ -64,7 +64,6 @@ const OrdersLayout = () => {
 
   // handle edit button click
   const handleEdit = (order) => {
-    console.log("Order to edit:", order); // Add this line
     setOrderToEdit(order); // track selected order ID
     setIsEditOrderFormOpen(true);
   };
@@ -82,16 +81,19 @@ const OrdersLayout = () => {
         method: "DELETE",
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to delete order");
+        // handle paid orders error with a toast
+        toast.error(data.message || data.error || "Failed to delete order");
+        return;
       }
 
-      const data = await response.json();
       toast.success(data.message); // show success message
       fetchOrders(); // refresh the orders list
     } catch (error) {
       console.error("Error deleting order:", error);
-      toast.error("Failed to delete order");
+      toast.error(error.message || "Failed to delete order");
     } finally {
       setIsConfirmationDialogOpen(false); // close the confirmation dialog
       setOrderToDelete(null); // reset the order to delete
