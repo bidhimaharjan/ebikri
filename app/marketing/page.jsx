@@ -148,15 +148,18 @@ const MarketingLayout = () => {
   };
 
   if (status === "loading") {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   if (!session) {
     return (
-      <p>
-        You are not authenticated. Please log in to access the marketing
-        campaigns.
-      </p>
+      <div className="flex h-screen items-center justify-center">
+        <p>You are not authenticated. Please log in to access the marketing campaigns.</p>
+      </div>
     );
   }
 

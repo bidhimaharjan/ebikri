@@ -101,11 +101,19 @@ const DashboardLayout = () => {
   };
 
   if (status === 'loading') {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   if (!session) {
-    return <p>You are not authenticated. Please log in to access the dashboard.</p>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>You are not authenticated. Please log in to access the dashboard.</p>;
+      </div>
+    );
   }
 
   // get the user's name from the session, default to "User" if not found

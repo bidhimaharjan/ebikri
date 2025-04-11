@@ -124,12 +124,18 @@ const OrdersLayout = () => {
   const totalPages = Math.ceil(filteredOrders.length / rowsPerPage);
 
   if (status === "loading") {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   if (!session) {
     return (
-      <p>You are not authenticated. Please log in to access the inventory.</p>
+      <div className="flex h-screen items-center justify-center">
+        <p>You are not authenticated. Please log in to access the inventory.</p>
+      </div>
     );
   }
 
