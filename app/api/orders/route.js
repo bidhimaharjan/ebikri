@@ -17,9 +17,7 @@ export async function GET(request) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -68,14 +66,13 @@ export async function GET(request) {
       })
     );
 
-    return new NextResponse(JSON.stringify(populatedOrders), {
-      status: 200,
-    });
+    return NextResponse.json(populatedOrders, { status: 200 });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-    });
+    return NextResponse.json(
+      { error: "Internal server error" }), 
+      { status: 500,
+    };
   }
 }
 
@@ -109,9 +106,7 @@ export async function POST(request) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -136,11 +131,9 @@ export async function POST(request) {
       !email ||
       !phoneNumber
     ) {
-      return new NextResponse(
-        JSON.stringify({ error: "Missing required fields" }),
-        {
-          status: 400,
-        }
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
       );
     }
 
@@ -181,17 +174,15 @@ export async function POST(request) {
         } catch (error) {
           if (error.code === "23505") {
             // handle duplicate email error
-            return new NextResponse(
-              JSON.stringify({
-                error: "Customer with this email already exists",
-              }),
+            return NextResponse.json(
+              { error: "Customer with this email already exists" },
               { status: 400 }
             );
           } else {
             console.error("Error creating customer:", error);
-            return new NextResponse(
-              JSON.stringify({ error: "Internal server error" }),
-              { status: 500 }
+            return NextResponse.json(
+              { error: "Internal server error" },
+              { status: 400 }
             );
           }
         }
@@ -207,18 +198,16 @@ export async function POST(request) {
     }
 
     // validate and apply promo code if provided
-    let discountAmount = 0;
     let validatedPromo = null;
     
     if (promoCode) {
       validatedPromo = await validatePromoCode(promoCode, session.user.businessId);
       
       if (!validatedPromo) {
-        return new NextResponse(
-          JSON.stringify({ 
-            error: "Invalid or expired promo code",
-            promoCode: promoCode
-          }),
+        return NextResponse.json({ 
+          error: "Invalid or expired promo code",
+          promoCode: promoCode,
+        },
           { status: 400 }
         );
       }
@@ -227,6 +216,7 @@ export async function POST(request) {
     // calculate the total amount for the order and validate product stock
     let totalAmount = 0;
     let totalDiscountAmount = 0;
+
     // First step: Validation and Calculation
     for (const product of products) {
       const [productData] = await db
@@ -235,28 +225,22 @@ export async function POST(request) {
         .where(eq(productTable.id, product.productId));
 
       if (!productData) {
-        return new NextResponse(
-          JSON.stringify({
-            error: `Product with ID ${product.productId} not found`,
-            productId: product.productId,
-          }),
-          {
-            status: 404,
-          }
+        return NextResponse.json({ 
+          error: `Product with ID ${product.productId} not found`,
+          productId: product.productId,
+        },
+          { status: 404 }
         );
       }
 
       // check if there is enough stock
       if (productData.stockAvailability < product.quantity) {
-        return new NextResponse(
-          JSON.stringify({
+        return NextResponse.json({
             error: `Insufficient stock for product ${product.productId}`,
             productId: product.productId,
             availableStock: productData.stockAvailability
-          }),
-          {
-            status: 400,
-          }
+          },
+          { status: 400 }
         );
       }
 
@@ -324,7 +308,7 @@ export async function POST(request) {
         })
         .where(eq(productTable.id, product.productId));
         
-      // insert sales data into the sales table
+      // insert sales record into the sales table
       await db.insert(salesTable).values({
         businessId: session.user.businessId,
         orderId: newOrder.id,
@@ -385,15 +369,13 @@ export async function POST(request) {
         console.log("Khalti Payment URL:", khaltiResponse.data.payment_url);
 
         // return the Khalti payment URL to the client
-        return new NextResponse(
-          JSON.stringify({
+        return NextResponse.json(
+          {
             message: "Order created successfully",
             order: newOrder,
             payment_url: khaltiResponse.data.payment_url,
-          }),
-          {
-            status: 201,
-          }
+          },
+          { status: 201 }
         );
       } catch (error) {
         console.error("Khalti payment initiation failed:", error);
@@ -408,33 +390,30 @@ export async function POST(request) {
           .where(eq(paymentTable.id, newPayment.id));
 
         // return success response for non-Khalti payments
-        return new NextResponse(
-          JSON.stringify({
+        return NextResponse.json({
             message: "Order created successfully",
             order: newOrder,
             khaltiFailed: true,
             error: "Khalti payment initiation failed",
             details: error.response?.data?.message || "Payment service unavailable"
-          }),
+          },
           { status: 201 } // still return 201 since order was created with offline payment
         );
       }
     }
   
     // return success response for non-Khalti payments
-    return new NextResponse(
-      JSON.stringify({
+    return NextResponse.json({
         message: "Order created successfully",
         order: newOrder,
-      }),
-      {
-        status: 201,
-      }
+      },
+      { status: 201,}
     );
   } catch (error) {
     console.error("Error creating order:", error);
-    return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-    });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 }
+    );
   }
 }

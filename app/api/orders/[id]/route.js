@@ -127,6 +127,7 @@ export async function PUT(request, { params }) {
 
   try {
     const orderId = id;
+    const body = await request.json();
     const {
       products,
       name,
@@ -135,7 +136,7 @@ export async function PUT(request, { params }) {
       deliveryLocation,
       paymentMethod,
       promoCode,
-    } = await request.json();
+    } = body;
 
     console.log("Updating Order with ID:", orderId);
 
@@ -171,14 +172,15 @@ export async function PUT(request, { params }) {
 
     // validate and apply promo code if provided
     let validatedPromo = null;
-    let discountAmount = 0;
     
     if (promoCode) {
       validatedPromo = await validatePromoCode(promoCode, session.user.businessId);
       
       if (!validatedPromo) {
-        return NextResponse.json(
-          { error: "Invalid or expired promo code" },
+        return NextResponse.json({ 
+          error: "Invalid or expired promo code",
+          promoCode: promoCode,
+        },
           { status: 400 }
         );
       }
@@ -189,6 +191,7 @@ export async function PUT(request, { params }) {
     let totalDiscountAmount = 0;
     const productDetails = [];
 
+    // First step: Validation and Calculation
     for (const product of products) {
       const [productData] = await db
         .select()
@@ -196,15 +199,29 @@ export async function PUT(request, { params }) {
         .where(eq(productTable.id, product.productId));
 
       if (!productData) {
-        return NextResponse.json(
-          { error: `Product with ID ${product.productId} not found` },
+        return NextResponse.json({ 
+          error: `Product with ID ${product.productId} not found`,
+          productId: product.productId,
+        },
           { status: 404 }
+        );
+      }
+
+      // check if there is enough stock
+      if (productData.stockAvailability < product.quantity) {
+        return NextResponse.json({
+            error: `Insufficient stock for product ${product.productId}`,
+            productId: product.productId,
+            availableStock: productData.stockAvailability
+          },
+          { status: 400 }
         );
       }
 
       const productTotal = productData.unitPrice * product.quantity;
       let productDiscount = 0;
 
+      // calculate discount for this product if promo exists
       if (validatedPromo) {
         productDiscount = productTotal * (Number(validatedPromo.discountPercent) / 100);
         totalDiscountAmount += productDiscount;
@@ -222,6 +239,7 @@ export async function PUT(request, { params }) {
     // apply total discount
     totalAmount -= totalDiscountAmount;
 
+    // Second Step: Actual Order Processing
     // start transaction
     const result = await db.transaction(async (tx) => {
       // restore stock from existing order products
@@ -231,22 +249,6 @@ export async function PUT(request, { params }) {
             stockAvailability: sql`${productTable.stockAvailability} + ${existingProduct.quantity}`
           })
           .where(eq(productTable.id, existingProduct.productId));
-      }
-
-      // verify stock for new quantities
-      for (const product of productDetails) {
-        const quantity = Number(product.quantity);
-        if (isNaN(quantity)) {
-          throw new Error(`Invalid quantity for product ${product.productId}`);
-        }
-
-        const [productData] = await tx.select()
-          .from(productTable)
-          .where(eq(productTable.id, product.productId));
-
-        if (productData.stockAvailability < product.quantity) {
-          throw new Error(`Insufficient stock for product ${product.productId}`);
-        }
       }
 
       // delete existing order products
@@ -284,14 +286,14 @@ export async function PUT(request, { params }) {
           amount: product.amount,
         });
 
-        // update product stock
+         // deduct the stock from the product table
         await tx.update(productTable)
         .set({
           stockAvailability: sql`${productTable.stockAvailability} - ${product.quantity}`
         })
         .where(eq(productTable.id, product.productId));
 
-        // add sales record
+        // insert sales record into the sales table
         await tx.insert(salesTable).values({
           businessId: session.user.businessId,
           orderId: orderId,
@@ -346,43 +348,55 @@ export async function PUT(request, { params }) {
         await db
           .update(paymentTable)
           .set({
-            pidx: khaltiResponse.data.pidx,
-            status: "pending",
+            pidx: khaltiResponse.data.pidx, // payment ID from Khalti
           })
           .where(eq(paymentTable.orderId, orderId));
 
-        return NextResponse.json({
-          message: "Order updated successfully",
-          orderId,
-          payment_url: khaltiResponse.data.payment_url,
-          totalAmount,
-          discountAmount: totalDiscountAmount,
-          discountPercent: validatedPromo ? validatedPromo.discountPercent : 0
-        });
+        console.log("Khalti Payment URL:", khaltiResponse.data.payment_url);
 
+        // return the Khalti payment URL to the client
+        return NextResponse.json(
+          {
+            message: "Order updated successfully",
+            orderId,
+            payment_url: khaltiResponse.data.payment_url,
+            totalAmount,
+            discountAmount: totalDiscountAmount,
+            discountPercent: validatedPromo
+              ? validatedPromo.discountPercent
+              : 0,
+          },
+          { status: 201 }
+        );
       } catch (error) {
         console.error("Khalti payment initiation failed:", error);
-        await db.update(paymentTable)
-          .set({
-            status: "failed",
-            paymentDetails: JSON.stringify({
-              error: error.message,
-              response: error.response?.data,
-            }),
-          })
-          .where(eq(paymentTable.orderId, orderId));
 
+        // update payment method to "Other" since Khalti failed
+        await db
+        .update(paymentTable)
+        .set({
+          paymentMethod: "Other",
+          error_message: "Khalti payment initiation failed"
+        })
+        .where(eq(paymentTable.orderId, orderId));
+
+        // return success response for non-Khalti payments
         return NextResponse.json({
-          message: "Order updated but payment initiation failed",
-          orderId,
-          warning: "Payment gateway unavailable. Please try again later.",
-          totalAmount,
-          discountAmount: totalDiscountAmount,
-          discountPercent: validatedPromo ? validatedPromo.discountPercent : 0
-        }, { status: 200 });
+            message: "Order updated successfully",
+            orderId,
+            totalAmount,
+            discountAmount: totalDiscountAmount,
+            discountPercent: validatedPromo ? validatedPromo.discountPercent : 0,
+            khaltiFailed: true,
+            error: "Khalti payment initiation failed",
+            details: error.response?.data?.message || "Payment service unavailable"
+          }, 
+          { status: 201 } // still return 201 since order was created with offline payment
+        );
       }
     }
 
+    // return success response for non-Khalti payments
     return NextResponse.json({
       message: "Order updated successfully",
       orderId,

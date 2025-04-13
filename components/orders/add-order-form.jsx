@@ -97,7 +97,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   // handle form submission for "Confirm (Offline)"
   const handleConfirm = async (e) => {
     e.preventDefault();
-    setIsConfirmed(true);
+    setIsConfirmed(false);
     await handleSubmit("Other");
   };
 
@@ -148,7 +148,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       });
 
       const orderData = await response.json();
-
+      // handle response errors
       if (!response.ok) {
         if (orderData.error) {
           // for insufficient stock errors
@@ -197,11 +197,12 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
           toast.error("Khalti payment URL not found");
           return;
         }
-
-        // set the QR code URL
-        setQrCodeUrl(paymentUrl);
+        
+        setQrCodeUrl(paymentUrl); // set the QR code URL
         toast.success("Order created successfully! Scan the QR code to pay.");
       } else {
+        // Offline payment
+        setIsConfirmed(true);
         toast.success(
           "Order created successfully! Please change the payment status after payment is completed."
         );
@@ -583,24 +584,28 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
               </div>
             </div>
 
-            {qrCodeUrl && (
+            {/* Payment Notice */}
+            {/* Show payment notice for Khalti payment */}
+            {qrCodeUrl && !orderData?.khaltiFailed && (
               <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
                 <p className="font-semibold">Payment Notice:</p>
                 <p>Khalti payment initiated. Please scan the QR code or follow the link to complete the payment.</p>
               </div>
             )}
 
-            {isConfirmed && (
+            {/* Show payment notice for offline payment */}
+            {isConfirmed && !orderData?.khaltiFailed && (
               <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
                 <p className="font-semibold">Payment Notice:</p>
                 <p>Offline payment initiated. Please change the payment status after payment is completed.</p>
               </div>
             )}
 
+            {/* Show payment notice for Khalti failure */}
             {orderData?.khaltiFailed && (
               <div className="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 text-sm">
                 <p className="font-semibold">Payment Notice:</p>
-                <p>Khalti payment failed. Please proceed with offline payment.</p>
+                <p>Khalti payment initiation failed. Please proceed with offline payment.</p>
               </div>
             )}         
           </form>

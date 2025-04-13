@@ -81,13 +81,28 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   // handle form submission for "Confirm (Offline)"
   const handleConfirm = async (e) => {
     e.preventDefault();
-    setIsConfirmed(true);
+    setIsConfirmed(false);
     await handleSubmit("Other");
   };
 
   // handle form submission
   const handleSubmit = async (paymentMethod) => {
-    try {      
+    try {    
+      // ensure that quantity is always set (default to 1 if not provided
+      const updatedProducts = products.map((product) => ({
+        ...product,
+        quantity: product.quantity || 1, // default to 1 if quantity is not set
+      }));
+
+      // validate product selection
+      if (
+        updatedProducts.length === 0 ||
+        updatedProducts.some((p) => !p.productId || p.quantity <= 0)
+      ) {
+        toast.error("Please select a valid product and quantity.");
+        return;
+      }
+
       // validate required fields
       if (!deliveryLocation.trim()) {
         toast.error("Please enter a delivery location.");
@@ -109,36 +124,74 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
         customer,
       };
 
+      // proceed with order creation
       const response = await fetch(`/api/orders/${order.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
       });
 
+      const data = await response.json();
+      // handle response errors
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update order");
+        if (data.error) {
+          // for insufficient stock errors
+          if (data.availableStock !== undefined) {
+            toast.error(
+              `Only ${data.availableStock} items available for product ID ${data.productId || 'unknown'}`
+            );
+            return;
+          }
+
+          // for invalid promo code errors
+          if (data.promoCode) {
+            toast.error(`${data.promoCode} is an invalid promo code`);
+            return;
+          }
+
+          // for other errors
+          toast.error(data.error || "Failed to update order");
+          return;
+        }
       }
 
-      const data = await response.json();
       setOrderData(data);
       setTotalAmount(data.totalAmount);
       setDiscountAmount(data.discountAmount || 0);
       setDiscountPercent(data.discountPercent || 0);
 
-      const paymentUrl = data.payment_url;
-      if (paymentMethod === "Khalti") {
+      if (paymentMethod === "Khalti" && data.khaltiFailed) {
+        // Khalti failed but order was created
+        toast.warning(
+          "Khalti payment initiation failed, proceeding with offline payment"
+        );
+        
+        // show order details without QR code
+        setQrCodeUrl(null);
+        setIsConfirmed(true); // show as confirmed offline order
+        
+        // update local state to reflect offline payment
+        setPaymentStatus("pending");
+      }
+      else if (paymentMethod === "Khalti") {
+        // Khalti success case
+        const paymentUrl = data?.payment_url;
+
         if (!paymentUrl) {
-          throw new Error("Khalti payment URL not found");
+          toast.error("Khalti payment URL not found");
+          return;
         }
-        setQrCodeUrl(paymentUrl);
+        
+        setQrCodeUrl(paymentUrl); // set the QR code URL
         toast.success("Order updated successfully! Scan the QR code to pay.");
       } else {
-        toast.success(
-          "Order updated successfully! Please change the payment status after payment is completed"
-        );
+        // Offline payment
         setIsConfirmed(true);
+        toast.success(
+          "Order updated successfully! Please change the payment status after payment is completed."
+        );
       }
+      onConfirm();
     } catch (error) {
       console.error("Error updating order:", error);
       toast.error(error.message || "Failed to update order");
@@ -204,8 +257,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
     }
   }, [isOpen, paymentStatus, onClose]);
 
-  // if payment status is "paid," do not render the form
-  if (!isOpen || paymentStatus === "paid") return null;
+  if (!isOpen) return null;
 
   // render the form if payment status is not "completed"
   return (
@@ -463,6 +515,31 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
                 </button>
               </div>
             </div>
+
+            {/* Payment Notice */}
+            {/* Show payment notice for Khalti payment */}
+            {qrCodeUrl && !orderData?.khaltiFailed && (
+              <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
+                <p className="font-semibold">Payment Notice:</p>
+                <p>Khalti payment initiated. Please scan the QR code or follow the link to complete the payment.</p>
+              </div>
+            )}
+
+            {/* Show payment notice for offline payment */}
+            {isConfirmed && !orderData?.khaltiFailed && (
+              <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
+                <p className="font-semibold">Payment Notice:</p>
+                <p>Offline payment initiated. Please change the payment status after payment is completed.</p>
+              </div>
+            )}
+
+            {/* Show payment notice for Khalti failure */}
+            {orderData?.khaltiFailed && (
+              <div className="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 text-sm">
+                <p className="font-semibold">Payment Notice:</p>
+                <p>Khalti payment initiation failed. Please proceed with offline payment.</p>
+              </div>
+            )} 
           </form>
         </div>
 
