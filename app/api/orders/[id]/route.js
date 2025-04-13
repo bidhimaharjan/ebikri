@@ -349,6 +349,7 @@ export async function PUT(request, { params }) {
           .update(paymentTable)
           .set({
             pidx: khaltiResponse.data.pidx, // payment ID from Khalti
+            paymentLink: khaltiResponse.data.payment_url, // Khalti payment link
           })
           .where(eq(paymentTable.orderId, orderId));
 

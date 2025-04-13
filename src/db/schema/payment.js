@@ -21,4 +21,6 @@ export const paymentTable = pgTable("payment", {
   paymentMethod: varchar({ length: 50 }).notNull(), // payment method (e.g., "Khalti")
 
   paymentDetails: text(), // additional payment details (e.g., raw response from Khalti)
+
+  paymentLink: varchar({ length: 500 }), // Khalti payment link
 });

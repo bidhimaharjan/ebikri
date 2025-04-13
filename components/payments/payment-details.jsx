@@ -144,6 +144,21 @@ const PaymentDetails = ({ orderId, onClose }) => {
             </div>
           )}
 
+          {/* Payment Link (if available) */}
+          {payment.paymentLink && (
+            <div className="flex justify-between">
+              <span className="text-sm font-medium">Payment Link:</span>
+              <a
+                href={payment.paymentLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 underline hover:text-blue-800"
+              >
+                View Payment
+              </a>
+            </div>
+          )}
+
           {/* Manual Status Update (only for "Other" payment method) */}
           {payment.paymentMethod === "Other" && (
             <div className="mt-4">
