@@ -91,7 +91,7 @@ const CustomersLayout = () => {
   // calculate total pages
   const totalPages = Math.ceil(filteredCustomer.length / rowsPerPage);
 
-  if (status === "loading" || isLoading) {
+  if (status === "loading") {
     return (
       <div className="flex h-screen items-center justify-center">
         <p>Loading...</p>

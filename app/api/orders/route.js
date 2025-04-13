@@ -215,7 +215,10 @@ export async function POST(request) {
       
       if (!validatedPromo) {
         return new NextResponse(
-          JSON.stringify({ error: "Invalid or expired promo code" }),
+          JSON.stringify({ 
+            error: "Invalid or expired promo code",
+            promoCode: promoCode
+          }),
           { status: 400 }
         );
       }
@@ -235,6 +238,7 @@ export async function POST(request) {
         return new NextResponse(
           JSON.stringify({
             error: `Product with ID ${product.productId} not found`,
+            productId: product.productId,
           }),
           {
             status: 404,
@@ -247,6 +251,8 @@ export async function POST(request) {
         return new NextResponse(
           JSON.stringify({
             error: `Insufficient stock for product ${product.productId}`,
+            productId: product.productId,
+            availableStock: productData.stockAvailability
           }),
           {
             status: 400,
@@ -345,51 +351,76 @@ export async function POST(request) {
 
     // if payment method is Khalti, initiate Khalti payment
     if (paymentMethod === "Khalti") {
-      const khaltiResponse = await axios.post(
-        "https://dev.khalti.com/api/v2/epayment/initiate/",
-        {
-          return_url: "http://localhost:3000/api/payment/callback",
-          website_url: "http://localhost:3000",
-          amount: totalAmount * 100, // amount in paisa
-          purchase_order_id: newOrder.id, // use the order ID as the purchase order ID
-          purchase_order_name: `Order #${newOrder.id}`,
-          customer_info: {
-            name: name,
-            email: email,
-            phone: phoneNumber,
+      try {
+        const khaltiResponse = await axios.post(
+          "https://dev.khalti.com/api/v2/epayment/initiate/",
+          {
+            return_url: "http://localhost:3000/api/payment/callback",
+            website_url: "http://localhost:3000",
+            amount: totalAmount * 100, // amount in paisa
+            purchase_order_id: newOrder.id, // use the order ID as the purchase order ID
+            purchase_order_name: `Order #${newOrder.id}`,
+            customer_info: {
+              name: name,
+              email: email,
+              phone: phoneNumber,
+            },
           },
-        },
-        {
-          headers: {
-            Authorization: `Key ${process.env.KHALTI_SECRET_KEY}`,
-          },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Key ${process.env.KHALTI_SECRET_KEY}`,
+            },
+            timeout: 5000
+          }
+        );
 
-      // update payment record with Khalti details
-      await db
-        .update(paymentTable)
-        .set({
-          pidx: khaltiResponse.data.pidx, // payment ID from Khalti
-        })
-        .where(eq(paymentTable.id, newPayment.id));
+        // update payment record with Khalti details
+        await db
+          .update(paymentTable)
+          .set({
+            pidx: khaltiResponse.data.pidx, // payment ID from Khalti
+          })
+          .where(eq(paymentTable.id, newPayment.id));
 
-      // console.log("Khalti Payment Initiation Response:", khaltiResponse.data);
-      console.log("Khalti Payment URL:", khaltiResponse.data.payment_url);
+        console.log("Khalti Payment URL:", khaltiResponse.data.payment_url);
 
-      // return the Khalti payment URL to the client
-      return new NextResponse(
-        JSON.stringify({
-          message: "Order created successfully",
-          order: newOrder,
-          payment_url: khaltiResponse.data.payment_url,
-        }),
-        {
-          status: 201,
-        }
-      );
+        // return the Khalti payment URL to the client
+        return new NextResponse(
+          JSON.stringify({
+            message: "Order created successfully",
+            order: newOrder,
+            payment_url: khaltiResponse.data.payment_url,
+          }),
+          {
+            status: 201,
+          }
+        );
+      } catch (error) {
+        console.error("Khalti payment initiation failed:", error);
+      
+        // update payment method to "Other" since Khalti failed
+        await db
+          .update(paymentTable)
+          .set({
+            paymentMethod: "Other",
+            error_message: "Khalti payment initiation failed"
+          })
+          .where(eq(paymentTable.id, newPayment.id));
+
+        // return success response for non-Khalti payments
+        return new NextResponse(
+          JSON.stringify({
+            message: "Order created successfully",
+            order: newOrder,
+            khaltiFailed: true,
+            error: "Khalti payment initiation failed",
+            details: error.response?.data?.message || "Payment service unavailable"
+          }),
+          { status: 201 } // still return 201 since order was created with offline payment
+        );
+      }
     }
-
+  
     // return success response for non-Khalti payments
     return new NextResponse(
       JSON.stringify({

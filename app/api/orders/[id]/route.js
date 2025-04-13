@@ -423,6 +423,8 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
+    const customerId = order.customerId;
+
     // first check payment status
     const [payment] = await db
       .select()
@@ -469,6 +471,14 @@ export async function DELETE(request, { params }) {
 
       // delete associated order products
       await tx.delete(orderProductTable).where(eq(orderProductTable.orderId, orderId));
+
+      // decrement totalOrders count for the customer
+      await tx.update(customerTable)
+      .set({
+        totalOrders: sql`${customerTable.totalOrders} - 1`
+      })
+      .where(eq(customerTable.id, customerId));
+
 
       // delete the order
       await tx.delete(orderTable).where(eq(orderTable.id, orderId));

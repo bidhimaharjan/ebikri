@@ -37,7 +37,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
           // fetch products
           const productsResponse = await fetch("/api/inventory");
           if (!productsResponse.ok) {
-            throw new Error("Failed to fetch products");
+            toast.error("Failed to fetch products");
           }
           const productsData = await productsResponse.json();
           // sort products by ascending ID
@@ -47,7 +47,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
           // fetch customers
           const customersResponse = await fetch("/api/customers");
           if (!customersResponse.ok) {
-            throw new Error("Failed to fetch customers");
+            toast.error("Failed to fetch customers");
           }
 
           const customersData = await customersResponse.json();
@@ -147,22 +147,55 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create order");
-      }
-
       const orderData = await response.json();
-      setOrderData(orderData);
-      setTotalAmount(orderData.order.totalAmount);
-      setDiscountAmount(orderData.order.discountAmount || 0);
-      setDiscountPercent(orderData.order.discountPercent || 0);
 
-      if (paymentMethod === "Khalti") {
-        // use the Khalti payment URL from the order creation response
-        const paymentUrl = orderData.payment_url;
+      if (!response.ok) {
+        if (orderData.error) {
+          // for insufficient stock errors
+          if (orderData.availableStock !== undefined) {
+            toast.error(
+              `Only ${orderData.availableStock} items available for product ID ${orderData.productId || 'unknown'}`
+            );
+            return;
+          }
+
+          // for invalid promo code errors
+          if (orderData.promoCode) {
+            toast.error(`${orderData.promoCode} is an invalid promo code`);
+            return;
+          }
+
+          // for other errors
+          toast.error(orderData.error || "Failed to create order");
+          return;
+        }
+      }
+      
+      setOrderData(orderData);
+      setTotalAmount(orderData?.order?.totalAmount ?? 0);
+      setDiscountAmount(orderData?.order?.discountAmount ?? 0);
+      setDiscountPercent(orderData?.order?.discountPercent ?? 0);
+
+      if (paymentMethod === "Khalti" && orderData.khaltiFailed) {
+        // Khalti failed but order was created
+        toast.warning(
+          "Khalti payment initiation failed, proceeding with offline payment"
+        );
+        
+        // show order details without QR code
+        setQrCodeUrl(null);
+        setIsConfirmed(true); // show as confirmed offline order
+        
+        // update local state to reflect offline payment
+        setPaymentStatus("pending");
+      }
+      else if (paymentMethod === "Khalti") {
+        // Khalti success case
+        const paymentUrl = orderData?.payment_url;
 
         if (!paymentUrl) {
-          throw new Error("Khalti payment URL not found");
+          toast.error("Khalti payment URL not found");
+          return;
         }
 
         // set the QR code URL
@@ -170,13 +203,13 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
         toast.success("Order created successfully! Scan the QR code to pay.");
       } else {
         toast.success(
-          "Order created successfully! Please change the payment status after payment is completed"
+          "Order created successfully! Please change the payment status after payment is completed."
         );
       }
+      onConfirm();
     } catch (error) {
       console.error("Error creating order:", error);
-      toast.error("Failed to create order");
-      onConfirm();
+      toast.error(error.message || "Failed to create order");
     }
   };
 
@@ -185,13 +218,13 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
     setIsRefreshing(true);
     try {
       if (!orderData?.order?.id) {
-        throw new Error("Order information not available");
+        toast.error("Order information not available");
       }
 
       // fetch the latest order details which includes payment status
       const response = await fetch(`/api/orders/${orderData.order.id}`);
       if (!response.ok) {
-        throw new Error("Failed to fetch order status");
+        toast.errorr("Failed to fetch order status");
       }
 
       const updatedOrderData = await response.json();
@@ -549,6 +582,27 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                 </div>
               </div>
             </div>
+
+            {qrCodeUrl && (
+              <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
+                <p className="font-semibold">Payment Notice:</p>
+                <p>Khalti payment initiated. Please scan the QR code or follow the link to complete the payment.</p>
+              </div>
+            )}
+
+            {isConfirmed && (
+              <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
+                <p className="font-semibold">Payment Notice:</p>
+                <p>Offline payment initiated. Please change the payment status after payment is completed.</p>
+              </div>
+            )}
+
+            {orderData?.khaltiFailed && (
+              <div className="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 text-sm">
+                <p className="font-semibold">Payment Notice:</p>
+                <p>Khalti payment failed. Please proceed with offline payment.</p>
+              </div>
+            )}         
           </form>
         </div>
 
