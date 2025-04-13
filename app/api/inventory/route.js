@@ -10,9 +10,10 @@ export async function GET(request) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-    });
+    return NextResponse.json(
+      { error: "Unauthorized" }, 
+      { status: 401 }
+    );
   }
 
   try {
@@ -22,16 +23,14 @@ export async function GET(request) {
       .from(productTable)
       .where(eq(productTable.businessId, session.user.businessId));
 
-    // console.log(inventory);
-    return new NextResponse(JSON.stringify(inventory), {
-      status: 200,
-    });
-  } catch (error) {
-    console.error('Error fetching inventory:', error);
-    return new NextResponse(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-    });
-  }
+      return NextResponse.json(inventory, { status: 200 });
+    } catch (error) {
+      console.error('Error fetching inventory:', error);
+      return NextResponse.json(
+        { error: 'Internal server error' }, 
+        { status: 500 }
+      );
+    }
 }
 
 // add new product data

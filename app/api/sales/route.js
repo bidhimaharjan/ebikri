@@ -11,9 +11,10 @@ export async function GET(request) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   try {
@@ -29,15 +30,12 @@ export async function GET(request) {
     .where(eq(salesTable.businessId, session.user.businessId));
 
     // return the sales data as JSON
-    return new NextResponse(JSON.stringify(sales), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json(sales, { status: 200 });
   } catch (error) {
     console.error("Error fetching sales data:", error);
-    return new NextResponse(
-      JSON.stringify({ error: "Error fetching sales data" }),
-      { status: 500 }
-    );
+    return NextResponse.json(
+      { error: "Error fetching sales data" },
+      { status: 500 });
+
   }
 }

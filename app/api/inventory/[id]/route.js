@@ -10,9 +10,10 @@ export async function PUT(request, { params }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-    });
+    return NextResponse.json(
+      { error: "Unauthorized" }, 
+      { status: 401 }
+    );
   }
 
   try {
@@ -24,9 +25,10 @@ export async function PUT(request, { params }) {
 
     // validate input fields
     if (!productName || !stockAvailability || !unitPrice) {
-      return new NextResponse(JSON.stringify({ message: 'Missing required fields' }), {
-        status: 400,
-      });
+      return NextResponse.json(
+        { message: 'Missing required fields' }, 
+        { status: 400 }
+      );
     }
 
     const [updatedProduct] = await db
@@ -39,14 +41,16 @@ export async function PUT(request, { params }) {
       .where(eq(productTable.id, id))
       .returning();
 
-    return new NextResponse(JSON.stringify({ message: 'Product updated successfully', product: updatedProduct }), {
-      status: 200,
-    });
+      return NextResponse.json(
+        { message: 'Product updated successfully', product: updatedProduct },
+        { status: 200 }
+      );      
   } catch (error) {
     console.error('Error updating product:', error);
-    return new NextResponse(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-    });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );    
   }
 }
 
@@ -56,9 +60,10 @@ export async function DELETE(request, { params }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-    });
+    return NextResponse.json(
+      { error: "Unauthorized" }, 
+      { status: 401 }
+    );
   }
 
   try {
@@ -69,13 +74,17 @@ export async function DELETE(request, { params }) {
       .delete(productTable)
       .where(eq(productTable.id, id));
 
-    return new NextResponse(JSON.stringify({ message: 'Product deleted successfully' }), {
-      status: 200,
-    });
+      return NextResponse.json(
+        { message: 'Product deleted successfully' },
+        { status: 200 }
+      );
+      
   } catch (error) {
     console.error('Error deleting product:', error);
-    return new NextResponse(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-    });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+    
   }
 }

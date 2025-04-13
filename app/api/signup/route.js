@@ -14,7 +14,10 @@ export async function POST(req) {
 
     // validate required fields
     if (!name || !phoneNumber || !email || !password || !businessName || !businessType) {
-      return new NextResponse(JSON.stringify({ error: 'Fields with * are required' }), { status: 400 });
+      return NextResponse.json(
+        { error: 'Fields with * are required' },
+        { status: 400 }
+      );      
     }
 
     // check if user already exists
@@ -24,7 +27,10 @@ export async function POST(req) {
       .where(eq(usersTable.email, email))
 
     if (existingUser.length > 0) {
-      return new NextResponse(JSON.stringify({ error: 'User already exists. Try with a new email.' }), { status: 400 });
+      return NextResponse.json(
+        { error: 'User already exists. Try with a new email.' },
+        { status: 400 }
+      );      
     }
 
     // hash password
@@ -49,13 +55,22 @@ export async function POST(req) {
       });
     } else {
       console.error("Failed to create user, userId is missing.");
-      return new NextResponse(JSON.stringify({ error: 'Failed to register user' }), { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to register user' },
+        { status: 500 }
+      );      
     }
 
-    return new NextResponse(JSON.stringify({ message: 'User and business registered successfully' }), { status: 201 });
+    return NextResponse.json(
+      { message: 'User and business registered successfully' },
+      { status: 201 }
+    );    
   } catch (error) {
     // log the error for debugging
     console.error('Error registering user:', error);
-    return new NextResponse(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );    
   }
 }

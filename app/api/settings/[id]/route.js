@@ -12,9 +12,10 @@ export async function GET(request, { params }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   try {
@@ -22,9 +23,7 @@ export async function GET(request, { params }) {
 
     // verify user can only access their own data
     if (id !== session.user.id) {
-      return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-        status: 403,
-      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // fetch user data
@@ -34,9 +33,7 @@ export async function GET(request, { params }) {
       .where(eq(usersTable.id, id));
 
     if (!user) {
-      return new NextResponse(JSON.stringify({ error: "User not found" }), {
-        status: 404,
-      });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // fetch business data
@@ -48,23 +45,21 @@ export async function GET(request, { params }) {
     // remove sensitive fields before sending response
     const { password, ...safeUserData } = user;
 
-    return new NextResponse(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         user: safeUserData,
         business: business || null,
-      }),
-      {
-        status: 200,
-      }
+      },
+      { status: 200 }
     );
+    
   } catch (error) {
     console.error("Error fetching user settings:", error);
-    return new NextResponse(
-      JSON.stringify({ error: "Internal server error" }),
-      {
-        status: 500,
-      }
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
     );
+    
   }
 }
 
@@ -73,9 +68,7 @@ export async function PUT(request, { params }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-    });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -83,9 +76,7 @@ export async function PUT(request, { params }) {
 
     // verify user can only access their own data
     if (id !== session.user.id) {
-      return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-        status: 403,
-      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -175,7 +166,6 @@ export async function PUT(request, { params }) {
           throw new Error("New password cannot be the same as current password");
         }
 
-
         // hash the new password
         const hashedPassword = await hash(passwordInfo.newPassword, 10);
         await tx
@@ -190,19 +180,19 @@ export async function PUT(request, { params }) {
     });
 
     if (!changesMade) {
-      return new NextResponse(
-        JSON.stringify({ message: "No changes made. Please make some changes." }),
+      return NextResponse.json(
+        { message: "No changes made. Please make some changes." },
         { status: 200 }
-      );
+      );      
     }
 
-    return new NextResponse(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         message: "Settings updated successfully",
         ...results,
-      }),
+      },
       { status: 200 }
-    );
+    );    
   } catch (error) {
     console.error("Error updating user settings:", error);
     return NextResponse.json(

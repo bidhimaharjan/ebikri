@@ -10,9 +10,10 @@ export async function GET(request) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-    });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   try {
@@ -23,18 +24,17 @@ export async function GET(request) {
 
     console.log("Marketing Data from API:", campaigns);
 
-    return new NextResponse(JSON.stringify(campaigns), {
-      status: 200,
-    });
+    return NextResponse.json(campaigns, { status: 200 });
   } catch (error) {
     console.error('Error fetching campaigns:', error);
-    return new NextResponse(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-    });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
-// Create a new marketing campaign
+// create a new marketing campaign
 export async function POST(request) {
   const session = await getServerSession(authOptions);
 
