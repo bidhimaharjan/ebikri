@@ -68,7 +68,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         <div className="w-full flex gap-4">
           {/* Name Field */}
           <div className="flex-1">
-            <label className="mb-3 block text-base font-medium text-gray-900" htmlFor="name">
+            <label className="mb-3 block font-medium text-gray-900" htmlFor="name">
               Name *
             </label>
             <input
@@ -89,7 +89,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
           {/* Phone Number Field */}
           <div className="flex-1">
-            <label className="mb-3 block text-base font-medium text-gray-900" htmlFor="phoneNumber">
+            <label className="mb-3 block font-medium text-gray-900" htmlFor="phoneNumber">
               Phone Number *
             </label>
             <input
@@ -111,7 +111,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
         {/* Email Field */}
         <div>
-          <label className="mb-3 mt-5 block text-base font-medium text-gray-900" htmlFor="email">
+          <label className="mb-3 mt-5 block font-medium text-gray-900" htmlFor="email">
             Email *
           </label>
           <input
@@ -136,7 +136,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         {/* Password Fields */}
         <div className="w-full flex gap-4">
           <div className="flex-1">
-            <label className="mb-3 mt-5 block text-base font-medium text-gray-900" htmlFor="password">
+            <label className="mb-3 mt-5 block font-medium text-gray-900" htmlFor="password">
               Password *
             </label>
             <div className="relative">
@@ -194,7 +194,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
           
           {/* Confirm Password Field */}
           <div className="flex-1">
-            <label className="mb-3 mt-5 block text-base font-medium text-gray-900" htmlFor="confirmPassword">
+            <label className="mb-3 mt-5 block font-medium text-gray-900" htmlFor="confirmPassword">
               Confirm Password *
             </label>
             <div className="relative">
@@ -234,7 +234,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         <div className="w-full flex gap-4">
           {/* Business Name Field */}
           <div className="flex-1">
-            <label className="mb-3 block text-base font-medium text-gray-900" htmlFor="businessName">
+            <label className="mb-3 block font-medium text-gray-900" htmlFor="businessName">
               Business Name *
             </label>
             <input
@@ -255,7 +255,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
           {/* Business Type Field */}
           <div className="flex-1">
-            <label className="mb-3 block text-base font-medium text-gray-900" htmlFor="businessType">
+            <label className="mb-3 block font-medium text-gray-900" htmlFor="businessType">
               Business Type *
             </label>
             <select
@@ -284,7 +284,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         {/* Business Email Field */}
         <div className="w-full flex gap-4">
           <div className="flex-1">
-            <label className="mt-5 mb-3 block text-base font-medium text-gray-900" htmlFor="businessEmail">
+            <label className="mt-5 mb-3 block font-medium text-gray-900" htmlFor="businessEmail">
               Business Email
             </label>
             <input
@@ -307,7 +307,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
           {/* PAN Number Field */}
           <div className="flex-1">
-            <label className="mt-5 mb-3 block text-base font-medium text-gray-900" htmlFor="panNumber">
+            <label className="mt-5 mb-3 block font-medium text-gray-900" htmlFor="panNumber">
               PAN Number
             </label>
             <input
@@ -318,7 +318,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
               value={formData.panNumber}
               onChange={onChange}
               onBlur={handleBlur}
-              placeholder="Enter PAN (e.g., ABCDE1234F)"
+              placeholder="Enter 9-digit PAN number"
               maxLength="10"
             />
             {getFieldError('panNumber') && (

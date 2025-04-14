@@ -4,21 +4,10 @@ import { usersTable } from '@/src/db/schema/users';
 import { businessTable } from '@/src/db/schema/business';
 import { hash } from 'bcrypt';
 import { eq } from 'drizzle-orm';
-import { validateServerSignup } from '@/app/validation/signup';
 
 export async function POST(req) {
   try {
-    const data = await req.json();   
-    // validate using server validation
-    const errors = validateServerSignup(data);
-  
-    if (Object.keys(errors).length > 0) {
-      // return the first error message
-      return NextResponse.json(
-        { error: Object.values(errors)[0] },
-        { status: 400 }
-      );
-    }
+    const data = await req.json();
 
     // check if user already exists
     const existingUser = await db

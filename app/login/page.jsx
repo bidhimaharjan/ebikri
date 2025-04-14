@@ -8,13 +8,15 @@ import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
+import { validateLoginForm } from '@/app/validation/login';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [error, setError] = useState(null); // for handling login errors
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [touchedFields, setTouchedFields] = useState({});
   const router = useRouter(); // initialize the router
 
   const handleChange = (e) => {
@@ -22,9 +24,23 @@ export default function LoginPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouchedFields(prev => ({ ...prev, [name]: true }));
+    const errors = validateLoginForm({ [name]: formData[name] });
+    setFieldErrors(prev => ({ ...prev, [name]: errors[name] }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // reset error state
+
+    // validate form before submission
+    const errors = validateLoginForm(formData);
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      toast.error(Object.values(errors)[0]);
+      return;
+    }
 
     const response = await signIn('credentials', {
       redirect: false, // handle the redirect manually
@@ -33,7 +49,6 @@ export default function LoginPage() {
     });
 
     if (response?.error) {
-      setError(response.error); // set error message if login fails
       toast.error(response.error || 'Login failed!');
     } else {
       toast.success('Welcome to eBikri');
@@ -47,12 +62,23 @@ export default function LoginPage() {
     }
   };
 
+  const getFieldError = (name) => {
+    return touchedFields[name] ? fieldErrors[name] : '';
+  };
+
   return (
     <main className="flex min-h-screen flex-col bg-gray-50 p-6">
       <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
         {/* Left Section */}
         <div className="flex flex-col justify-center gap-6 px-6 py-10 md:w-1/2 md:px-20">
-          <LoginForm formData={formData} onChange={handleChange} onSubmit={handleSubmit} />
+        <LoginForm 
+            formData={formData} 
+            onChange={handleChange} 
+            onSubmit={handleSubmit}
+            onBlur={handleBlur}
+            fieldErrors={fieldErrors}
+            getFieldError={getFieldError}
+          />
         </div>
 
         {/* Vertical line */}

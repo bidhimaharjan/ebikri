@@ -61,6 +61,9 @@ export const validateSignupForm = (formData) => {
       if (formData.password.length < 8) {
         errors.password = "Password must be at least 8 characters";
       }
+      if (formData.password.length > 100) {
+        errors.password = "Password is too long";
+      }
       if (!/[A-Z]/.test(formData.password)) {
         errors.password = errors.password
           ? `${errors.password}. Must contain uppercase letter`
@@ -129,21 +132,11 @@ export const validateSignupForm = (formData) => {
       errors.panNumber = "PAN number must be exactly 9 digits";
     }
   }
-  
-  return errors;
-};
-
-export const validateServerSignup = (data) => {
-  const errors = validateSignupForm(data);
-
-  // server-only validations
-  if (data.password && data.password.length > 255) {
-    errors.password = "Password cannot exceed 255 characters";
-  }
 
   return errors;
 };
 
+// Password strength validation
 export const getPasswordStrength = (password) => {
   if (!password) return 0;
   let strength = 0;
