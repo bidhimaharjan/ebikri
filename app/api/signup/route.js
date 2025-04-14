@@ -4,27 +4,27 @@ import { usersTable } from '@/src/db/schema/users';
 import { businessTable } from '@/src/db/schema/business';
 import { hash } from 'bcrypt';
 import { eq } from 'drizzle-orm';
+import { validateServerSignup } from '@/app/validation/signup';
 
 export async function POST(req) {
   try {
-    const { name, phoneNumber, email, password, businessName, businessType, businessEmail,  panNumber } = await req.json();
-    
-    // log the received data for debugging
-    console.log('Received data:', { name, phoneNumber, email, password, businessName, businessType, businessEmail,  panNumber });
-
-    // validate required fields
-    if (!name || !phoneNumber || !email || !password || !businessName || !businessType) {
+    const data = await req.json();   
+    // validate using server validation
+    const errors = validateServerSignup(data);
+  
+    if (Object.keys(errors).length > 0) {
+      // return the first error message
       return NextResponse.json(
-        { error: 'Fields with * are required' },
+        { error: Object.values(errors)[0] },
         { status: 400 }
-      );      
+      );
     }
 
     // check if user already exists
     const existingUser = await db
       .select()
       .from(usersTable)
-      .where(eq(usersTable.email, email))
+      .where(eq(usersTable.email, data.email))
 
     if (existingUser.length > 0) {
       return NextResponse.json(
@@ -33,14 +33,27 @@ export async function POST(req) {
       );      
     }
 
+    // check for existing phone number
+    const existingPhone = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.phoneNumber, data.phoneNumber));
+
+    if (existingPhone.length > 0) {
+      return NextResponse.json(
+        { error: 'Phone number already registered' },
+        { status: 400 }
+      );
+    }
+
     // hash password
-    const hashedPassword = await hash(password, 10);
+    const hashedPassword = await hash(data.password, 10);
 
     // insert new user and get the inserted ID using .returning
     const [newUser] = await db.insert(usersTable).values({
-      name,
-      phoneNumber,
-      email,
+      name: data.name,
+      phoneNumber: data.phoneNumber,
+      email: data.email,
       password: hashedPassword,
     }).returning();
 
@@ -48,10 +61,10 @@ export async function POST(req) {
     if (newUser && newUser.id) {
       await db.insert(businessTable).values({
         userId: newUser.id,
-        businessName,
-        businessType,
-        businessEmail,
-        panNumber
+        businessName: data.businessName,
+        businessType: data.businessType,
+        businessEmail: data.businessEmail,
+        panNumber: data.panNumber
       });
     } else {
       console.error("Failed to create user, userId is missing.");
