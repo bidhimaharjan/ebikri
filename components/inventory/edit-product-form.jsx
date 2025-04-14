@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { validateProductForm } from '@/app/validation/product';
+import { validateProductForm, validateProductEdit } from '@/app/validation/product';
 
 const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
   const [formData, setFormData] = useState({
@@ -18,6 +18,7 @@ const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
         stockAvailability: product.stockAvailability,
         unitPrice: product.unitPrice
       });
+      setErrors({});
     }
   }, [product]);
 
@@ -34,10 +35,14 @@ const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
     e.preventDefault();
 
     // validate form
-    const validationErrors = validateProductForm(formData);
+    const validationErrors = validateProductEdit(formData, product);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      toast.error('Please fix the errors in the form');
+      if (validationErrors.noChanges) {
+        toast.info(validationErrors.noChanges);
+        return;
+      }
+      toast.error('Please fix the form errors');
       return;
     }
   
@@ -56,7 +61,6 @@ const EditProductForm = ({ isOpen, onClose, onConfirm, product }) => {
         toast.success('Product updated successfully!');
         onClose();
         onConfirm();
-        setErrors({});
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || 'Error updating product');

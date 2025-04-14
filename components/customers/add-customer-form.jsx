@@ -1,31 +1,62 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { validateCustomerForm } from '@/app/validation/customer';
 
 const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
-  const [name, setName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    phoneNumber: '',
+    email: ''
+  });
+  const [errors, setErrors] = useState({})
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // clear error when user types
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('/api/customers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        phoneNumber,
-        email,
-      }),
-    });
+    // validate form
+    const validationErrors = validateCustomerForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.error("Please fix the form errors");
+      return;
+    }
 
-    if (response.ok) {
-      toast.success('Customer added successfully!');
-      onClose();
-      onConfirm();
-    } else {
-      toast.error('Error adding customer');
-      onConfirm();
+    try {
+      const response = await fetch("/api/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          phoneNumber: formData.phoneNumber,
+          email: formData.email.trim(),
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Customer added successfully!");
+        setFormData({ name: '', phoneNumber: '', email: '' });
+        setErrors({});
+        onClose();
+        onConfirm();
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Error adding customer");
+      }
+    } catch (error) {
+      console.error("Error adding customer:", error);
+      toast.error("Error adding customer");
     }
   };
 
@@ -36,39 +67,59 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <h2 className="text-lg text-gray-800 font-semibold mb-4">Add Customer</h2>
         <form onSubmit={handleSubmit}>
+          {/* Customer Name Field */}
           <div className="mb-6">
             <label className="block text-sm font-medium">Name *</label>
             <input
               type="text"
-              className="w-full p-2 mt-1 text-sm border border-gray-400 rounded"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
+              name="name"
+              className={`w-full p-2 mt-1 text-sm border rounded ${
+                errors.name ? 'border-red-500' : 'border-gray-400'
+              }`}
+              value={formData.name}
+              onChange={handleChange}
             />
+            {errors.name && (
+              <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+            )}
           </div>
 
+          {/* Phone Number Field */}
           <div className="mb-6">
             <label className="block text-sm font-medium">Phone Number *</label>
             <input
               type="number"
-              className="w-full p-2 mt-1 text-sm border border-gray-400 rounded"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
+              name="phoneNumber"
+              className={`w-full p-2 mt-1 text-sm border rounded ${
+                errors.phoneNumber ? 'border-red-500' : 'border-gray-400'
+              }`}
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              maxLength="10"
             />
+            {errors.phoneNumber && (
+              <p className="mt-1 text-xs text-red-500">{errors.phoneNumber}</p>
+            )}
           </div>
 
+          {/* Email Field */}
           <div className="mb-6">
             <label className="block text-sm font-medium">Email *</label>
             <input
               type="email"
-              className="w-full p-2 mt-1 text-sm border border-gray-400 rounded"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              name="email"
+              className={`w-full p-2 mt-1 text-sm border rounded ${
+                errors.email ? 'border-red-500' : 'border-gray-400'
+              }`}
+              value={formData.email}
+              onChange={handleChange}
             />
+            {errors.email && (
+              <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+            )}
           </div>
 
+          {/* Submit and Cancel Buttons */}
           <div className="flex justify-between">
             <button
               type="submit"

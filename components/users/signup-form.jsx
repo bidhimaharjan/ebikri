@@ -80,7 +80,6 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
               onChange={onChange}
               onBlur={handleBlur}
               placeholder="Enter your full name"
-              required
             />
             {getFieldError('name') && (
               <p className="mt-1 text-xs text-red-500">{getFieldError('name')}</p>
@@ -101,7 +100,6 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
               onChange={onChange}
               onBlur={handleBlur}
               placeholder="Enter 10-digit phone number"
-              required
             />
             {getFieldError('phoneNumber') && (
               <p className="mt-1 text-xs text-red-500">{getFieldError('phoneNumber')}</p>
@@ -126,7 +124,6 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
             }}
             onBlur={handleBlur}
             placeholder="Enter your email address"
-            required
           />
           {getFieldError('email') && (
             <p className="mt-1 text-xs text-red-500">{getFieldError('email')}</p>
@@ -149,7 +146,6 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
                 onChange={onChange}
                 onBlur={handleBlur}
                 placeholder="Enter your password"
-                required
               />
               <button
                 type="button"
@@ -207,7 +203,6 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
                 onChange={onChange}
                 onBlur={handleBlur}
                 placeholder="Confirm your password"
-                required
               />
               <button
                 type="button"
@@ -246,7 +241,6 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
               onChange={onChange}
               onBlur={handleBlur}
               placeholder="Enter your business name"
-              required
             />
             {getFieldError('businessName') && (
               <p className="mt-1 text-xs text-red-500">{getFieldError('businessName')}</p>
@@ -265,7 +259,6 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
               value={formData.businessType}
               onChange={onChange}
               onBlur={handleBlur}
-              required
             >
               <option value="">Select business type</option>
               <option value="Retail">Retail</option>
@@ -319,7 +312,6 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
               onChange={onChange}
               onBlur={handleBlur}
               placeholder="Enter 9-digit PAN number"
-              maxLength="10"
             />
             {getFieldError('panNumber') && (
               <p className="mt-1 text-xs text-red-500">{getFieldError('panNumber')}</p>

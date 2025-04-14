@@ -17,7 +17,7 @@ export async function PUT(request, { params }) {
   }
 
   try {
-    const id = params.id;
+    const { id } = await params;
     console.log("Updating Customer with ID:", id);
 
     const body = await request.json();
@@ -67,7 +67,7 @@ export async function DELETE(request, { params }) {
   }
 
   try {
-    const id = params.id;
+    const { id } = await params;
     console.log("Deleting Customer with ID:", id);
 
     await db

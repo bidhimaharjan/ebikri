@@ -57,3 +57,19 @@ export const validateProductForm = (formData) => {
 
   return errors;
 };
+
+export const validateProductEdit = (formData, originalProduct) => {
+  const errors = validateProductForm(formData); // first validate the form data
+  
+  // additional checks for edit functionality
+  const hasChanges = 
+    formData.productName !== originalProduct.productName ||
+    Number(formData.stockAvailability) !== Number(originalProduct.stockAvailability) ||
+    parseFloat(formData.unitPrice) !== parseFloat(originalProduct.unitPrice);
+
+  if (!hasChanges) {
+    errors.noChanges = 'No changes were made to the product';
+  }
+
+  return errors;
+};
