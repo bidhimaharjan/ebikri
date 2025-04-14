@@ -1,31 +1,63 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { validateProductForm } from '@/app/validation/product';
 
 const AddProductForm = ({ isOpen, onClose, onConfirm }) => {
-  const [productName, setProductName] = useState('');
-  const [stock, setStock] = useState('');
-  const [price, setPrice] = useState('');
+  const [formData, setFormData] = useState({
+    productName: '',
+    stockAvailability: '',
+    unitPrice: ''
+  });
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // clear error when user types
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('/api/inventory', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        productName,
-        stockAvailability: stock,
-        unitPrice: price,
-      }),
-    });
+    // validate form
+    const validationErrors = validateProductForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.error("Please fix the errors in the form");
+      return;
+    }
 
-    if (response.ok) {
-      toast.success('Product added successfully!');
-      onClose();
-      onConfirm();
-    } else {
-      toast.error('Error adding product');
-      onConfirm();
+    try {
+      const response = await fetch("/api/inventory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productName: formData.productName.trim(),
+          stockAvailability: parseInt(formData.stockAvailability),
+          unitPrice: parseFloat(formData.unitPrice),
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Product added successfully!");
+        onClose();
+        onConfirm();
+        setFormData({
+          productName: "",
+          stockAvailability: "",
+          unitPrice: "",
+        });
+        setErrors({});
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Error adding product');
+      }
+    } catch (error) {
+      console.error("Error adding product:", error);
+      toast.error("Error adding product");
     }
   };
 
@@ -36,39 +68,58 @@ const AddProductForm = ({ isOpen, onClose, onConfirm }) => {
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <h2 className="text-lg text-gray-800 font-semibold mb-4">Add Product</h2>
         <form onSubmit={handleSubmit}>
+          {/* Product Name Field */}
           <div className="mb-6">
             <label className="block text-sm font-medium">Product Name *</label>
             <input
               type="text"
-              className="w-full p-2 mt-1 text-sm border border-gray-400 rounded"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              required
+              name="productName"
+              className={`w-full p-2 mt-1 text-sm border rounded ${
+                errors.productName ? 'border-red-500' : 'border-gray-400'
+              }`}
+              value={formData.productName}
+              onChange={handleChange}  
             />
+            {errors.productName && (
+              <p className="mt-1 text-xs text-red-500">{errors.productName}</p>
+            )}
           </div>
 
+          {/* Stock Availability Field */}
           <div className="mb-6">
             <label className="block text-sm font-medium">Stock (pcs) *</label>
             <input
               type="number"
-              className="w-full p-2 mt-1 text-sm border border-gray-400 rounded"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              required
+              name="stockAvailability"
+              className={`w-full p-2 mt-1 text-sm border rounded ${
+                errors.stockAvailability ? 'border-red-500' : 'border-gray-400'
+              }`}
+              value={formData.stockAvailability}
+              onChange={handleChange}             
             />
+            {errors.stockAvailability && (
+              <p className="mt-1 text-xs text-red-500">{errors.stockAvailability}</p>
+            )}
           </div>
 
+          {/* Unit Price Field */}
           <div className="mb-6">
             <label className="block text-sm font-medium">Unit Price (NPR) *</label>
             <input
               type="number"
-              className="w-full p-2 mt-1 text-sm border border-gray-400 rounded"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
+              name="unitPrice"
+              className={`w-full p-2 mt-1 text-sm border rounded ${
+                errors.unitPrice ? 'border-red-500' : 'border-gray-400'
+              }`}
+              value={formData.unitPrice}
+              onChange={handleChange}              
             />
+            {errors.unitPrice && (
+              <p className="mt-1 text-xs text-red-500">{errors.unitPrice}</p>
+            )}
           </div>
 
+          {/* Submit and Cancel Buttons */}
           <div className="flex justify-between">
             <button
               type="submit"

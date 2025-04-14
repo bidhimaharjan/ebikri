@@ -17,8 +17,7 @@ export async function PUT(request, { params }) {
   }
 
   try {
-    const id = params.id;
-    console.log("Updating Product with ID:", id);
+    const { id } = await params;
 
     const body = await request.json();
     const { productName, stockAvailability, unitPrice } = body;
@@ -67,8 +66,7 @@ export async function DELETE(request, { params }) {
   }
 
   try {
-    const id = params.id;
-    console.log("Deleting Product with ID:", id);
+    const { id } = await params;
 
     await db
       .delete(productTable)
