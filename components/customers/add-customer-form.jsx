@@ -88,7 +88,7 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
           <div className="mb-6">
             <label className="block text-sm font-medium">Phone Number *</label>
             <input
-              type="number"
+              type="tel"
               name="phoneNumber"
               className={`w-full p-2 mt-1 text-sm border rounded ${
                 errors.phoneNumber ? 'border-red-500' : 'border-gray-400'
