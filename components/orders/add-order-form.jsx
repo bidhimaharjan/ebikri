@@ -8,6 +8,8 @@ import {
   XMarkIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import { validateOrderForm } from "@/app/validation/order";
+import { validateCustomerForm } from "@/app/validation/customer";
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [products, setProducts] = useState([{ productId: "", quantity: 1 }]);
@@ -28,6 +30,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [orderData, setOrderData] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState("pending");
+  const [errors, setErrors] = useState({});
 
   // fetch products and customers when the form is opened
   useEffect(() => {
@@ -104,6 +107,48 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   // handle form submission
   const handleSubmit = async (paymentMethod) => {
     try {
+      // first check if customer is selected or manual details are provided
+      if (!customer && !showCustomerDetails) {
+        toast.error("Please select a customer or enter customer details.");
+        return;
+      }
+
+      // if manual details are shown, validate customer details
+      if (showCustomerDetails && (!name || !email || !phoneNumber)) {
+        toast.error("Please fill all customer details or select a customer.");
+        return;
+      }
+
+      // prepare form data for validation
+      const formData = {
+        products,
+        name,
+        phoneNumber,
+        email,
+        deliveryLocation,
+      };
+
+      // validate the form
+      const validationErrors = validateOrderForm(formData);
+      
+      // check if customer is selected or manual details are provided
+      if (!customer && showCustomerDetails) {
+        // validate the customer details
+        const customerValidation = validateCustomerForm({ name, phoneNumber, email });
+        if (Object.keys(customerValidation).length > 0) {
+          setErrors({ ...validationErrors, ...customerValidation });
+          return;
+        }
+      }
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        return;
+      }
+
+      // clear any previous errors
+      setErrors({});
+
       // ensure that quantity is always set (default to 1 if not provided
       const updatedProducts = products.map((product) => ({
         ...product,
@@ -116,12 +161,6 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
         updatedProducts.some((p) => !p.productId || p.quantity <= 0)
       ) {
         toast.error("Please select a valid product and quantity.");
-        return;
-      }
-
-      // validate customer details
-      if (!customer && (!name || !email || !phoneNumber)) {
-        toast.error("Please select a customer or enter customer details.");
         return;
       }
 
@@ -283,7 +322,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
           <form onSubmit={handleSubmit}>
             {/* Order Details */}
             <div className="border bg-gray-100 rounded-lg p-4 mb-4 text-gray-800">
-              <h3 className="text-md font-semibold mb-2 flex items-center">
+              <h3 className="text-base font-semibold mb-2 flex items-center">
                 <ShoppingCartIcon className="h-4 w-4 mr-1" />
                 Order Details
               </h3>
@@ -424,7 +463,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
 
             {/* Customer Details */}
             <div className="border bg-gray-100 rounded-lg p-4 mb-4 text-gray-800">
-              <h3 className="text-md font-semibold mb-2 flex items-center">
+              <h3 className="text-base font-semibold mb-2 flex items-center">
                 <UserIcon className="h-4 w-4 mr-1" />
                 Customer Details
               </h3>
@@ -456,11 +495,23 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   </label>
                   <input
                     type="text"
-                    className="w-full p-2 mt-1 text-sm border-gray-300 rounded select-truncate"
+                    name="deliveryLocation" 
+                    className={`w-full p-2 mt-1 text-sm border ${
+                      errors.deliveryLocation ? 'border-red-500' : 'border-gray-300'
+                    } rounded`}
                     value={deliveryLocation}
-                    onChange={(e) => setDeliveryLocation(e.target.value)}
+                    onChange={(e) => {
+                      setDeliveryLocation(e.target.value);
+                      // Clear error when user types
+                      if (errors.deliveryLocation) {
+                        setErrors({ ...errors, deliveryLocation: undefined });
+                      }
+                    }}
                     required
                   />
+                  {errors.deliveryLocation && (
+                    <p className="mt-1 text-xs text-red-500">{errors.deliveryLocation}</p>
+                  )}
                 </div>
               </div>
 
@@ -482,35 +533,57 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                     <label className="block text-sm font-medium">Name *</label>
                     <input
                       type="text"
-                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded select-truncate"
+                      name="name"
+                      className={`w-full p-2 mt-1 text-sm border ${
+                        errors.name ? 'border-red-500' : 'border-gray-300'
+                      } rounded`}
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        if (errors.name) setErrors({ ...errors, name: undefined });
+                      }}
                     />
+                    {errors.name && (
+                      <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                    )}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium">Email *</label>
                     <input
                       type="email"
-                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded select-truncate"
+                      name="email"
+                      className={`w-full p-2 mt-1 text-sm border ${
+                        errors.email ? 'border-red-500' : 'border-gray-300'
+                      } rounded`}
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (errors.email) setErrors({ ...errors, email: undefined });
+                      }}
                     />
+                    {errors.email && (
+                      <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium">
-                      Phone Number *
-                    </label>
+                    <label className="block text-xs font-medium">Phone Number *</label>
                     <input
-                      type="text"
-                      className="w-full p-2 mt-1 text-sm border-gray-300 rounded select-truncate"
+                      type="tel"
+                      name="phoneNumber"
+                      className={`w-full p-2 mt-1 text-sm border ${
+                        errors.phoneNumber ? 'borde r-red-500' : 'border-gray-300'
+                      } rounded`}
                       value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      required
+                      onChange={(e) => {
+                        setPhoneNumber(e.target.value);
+                        if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
+                      }}
                     />
+                    {errors.phoneNumber && (
+                      <p className="mt-1 text-xs text-red-500">{errors.phoneNumber}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -537,7 +610,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   {/* Show total amount if  Confirm is clicked, otherwise show QR button */}
                   {isConfirmed ? (
                     <div className="flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-md">
-                      <p className="text-md font-semibold text-gray-800">
+                      <p className="text-base font-semibold text-gray-800">
                         Total: Rs. {totalAmount}
                       </p>
                       {discountAmount > 0 && (

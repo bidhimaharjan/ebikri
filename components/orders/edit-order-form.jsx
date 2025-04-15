@@ -8,6 +8,7 @@ import {
   XMarkIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import { validateOrderEdit } from "@/app/validation/order";
 
 const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   const [products, setProducts] = useState([{ productId: "", quantity: 1 }]);
@@ -26,6 +27,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   const [paymentStatus, setPaymentStatus] = useState("pending");
   const [orderData, setOrderData] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // fetch available products when the form is opened
   useEffect(() => {
@@ -87,7 +89,35 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
 
   // handle form submission
   const handleSubmit = async (paymentMethod) => {
-    try {    
+    try {
+      // prepare form data for validation
+      const formData = {
+        products,
+        name,
+        phoneNumber,
+        email,
+        deliveryLocation,
+      };
+
+      // validate the form
+      const validationErrors = validateOrderEdit(formData, order);
+      
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        if (validationErrors.noChanges) {
+          toast.error(validationErrors.noChanges);
+        }
+        const firstError = Object.keys(validationErrors)[0];
+        const element = document.querySelector(`[name="${firstError}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
+      // clear any previous errors
+      setErrors({});
+
       // ensure that quantity is always set (default to 1 if not provided
       const updatedProducts = products.map((product) => ({
         ...product,
@@ -276,7 +306,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
           <form onSubmit={handleSubmit}>
             {/* Order Details */}
             <div className="border bg-gray-100 rounded-lg p-4 mb-4 text-gray-800">
-              <h3 className="text-md font-semibold mb-2 flex items-center">
+              <h3 className="text-base font-semibold mb-2 flex items-center">
                 <ShoppingCartIcon className="h-4 w-4 mr-1" />
                 Order Details
               </h3>
@@ -414,7 +444,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
 
             {/* Customer Details (for display only) */}
             <div className="border bg-gray-100 rounded-lg p-4 mb-4 text-gray-800">
-              <h3 className="text-md font-semibold mb-2 flex items-center">
+              <h3 className="text-base font-semibold mb-2 flex items-center">
                 <UserIcon className="h-4 w-4 mr-1" />
                 Customer Details
               </h3>
@@ -443,11 +473,21 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
                   </label>
                   <input
                     type="text"
-                    className="w-full p-2 mt-1 text-sm border border-gray-300 rounded select-truncate"
+                    name="deliveryLocation"
+                    className={`w-full p-2 mt-1 text-sm border ${
+                      errors.deliveryLocation ? 'border-red-500' : 'border-gray-300'
+                    } rounded`}
                     value={deliveryLocation || ""}
-                    onChange={(e) => setDeliveryLocation(e.target.value)}
-                    required
+                    onChange={(e) => {
+                      setDeliveryLocation(e.target.value);
+                      if (errors.deliveryLocation) {
+                        setErrors({ ...errors, deliveryLocation: undefined });
+                      }
+                    }}
                   />
+                  {errors.deliveryLocation && (
+                    <p className="mt-1 text-xs text-red-500">{errors.deliveryLocation}</p>
+                  )}
                 </div>
 
                 {/* Promo Code Field */}
@@ -470,7 +510,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
                 {/* Show total amount if  Confirm is clicked, otherwise show QR button */}
                 {isConfirmed ? (
                     <div className="flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-md">
-                      <p className="text-md font-semibold text-gray-800">
+                      <p className="text-base font-semibold text-gray-800">
                         Total: Rs. {totalAmount}
                       </p>
                       {discountAmount > 0 && (
