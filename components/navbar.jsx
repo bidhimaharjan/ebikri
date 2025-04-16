@@ -4,6 +4,7 @@ import { Bars3Icon, HomeIcon, CubeIcon, ShoppingCartIcon, UserIcon, ChartBarIcon
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import ConfirmationDialog from './confirmation-dialog'
+import Image from 'next/image';
 
 const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -27,7 +28,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
       {/* Navbar Overlay */}
       <div
         className={`${
-          isNavbarOpen ? 'block' : 'hidden'
+          isNavbarOpen ? "block" : "hidden"
         } fixed inset-0 bg-gray-800 bg-opacity-50 z-50 md:hidden`}
         onClick={() => setIsNavbarOpen(false)}
       ></div>
@@ -35,23 +36,34 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
       {/* Navbar */}
       <div
         className={`${
-          isNavbarOpen ? 'translate-x-0' : '-translate-x-full'
+          isNavbarOpen ? "translate-x-0" : "-translate-x-full"
         } fixed z-50 inset-y-0 left-0 w-64 bg-purple-500 text-white transform transition-transform md:relative md:translate-x-0 h-full`}
       >
-        <div className="flex items-center justify-between px-6 py-6">
-          <h2 className="text-xl font-bold">Logo</h2>
+        <div className="relative px-6 py-6 flex items-center justify-center">
+          <Image
+            src="/eBikri-logo-white.svg"
+            alt="eBikri Logo"
+            width={120}
+            height={30}
+            className="cursor-pointer transition-transform hover:scale-105 mt-2"
+            onClick={() => window.location.href = "/dashboard"} // redirect to dashboard on logo click
+            priority
+          />
           <Bars3Icon
             className="h-6 w-6 text-white cursor-pointer md:hidden"
             onClick={() => setIsNavbarOpen(!isNavbarOpen)}
           />
         </div>
-        <nav className="mt-4">
+
+        <nav className="mt-2">
           <ul>
             <li>
               <Link
                 href="/dashboard"
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
-                  isActive('/dashboard') ? '!border-l-4 !border-white-400 font-bold' : ''
+                  isActive("/dashboard")
+                    ? "!border-l-4 !border-white-400 font-bold"
+                    : ""
                 }`}
               >
                 <HomeIcon className="h-5 w-5" />
@@ -60,10 +72,12 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             </li>
 
             <li>
-              <Link 
-                href="/inventory" 
+              <Link
+                href="/inventory"
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
-                  isActive('/inventory') ? '!border-l-4 !border-white-400 font-bold' : ''
+                  isActive("/inventory")
+                    ? "!border-l-4 !border-white-400 font-bold"
+                    : ""
                 }`}
               >
                 <CubeIcon className="h-5 w-5" />
@@ -72,10 +86,12 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             </li>
 
             <li>
-              <Link 
-                href="/orders" 
+              <Link
+                href="/orders"
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
-                  isActive('/orders') ? '!border-l-4 !border-white-400 font-bold' : ''
+                  isActive("/orders")
+                    ? "!border-l-4 !border-white-400 font-bold"
+                    : ""
                 }`}
               >
                 <ShoppingCartIcon className="h-5 w-5" />
@@ -84,10 +100,12 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             </li>
 
             <li>
-              <Link 
+              <Link
                 href="/customers"
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
-                  isActive('/customers') ? '!border-l-4 !border-white-400 font-bold' : ''
+                  isActive("/customers")
+                    ? "!border-l-4 !border-white-400 font-bold"
+                    : ""
                 }`}
               >
                 <UserIcon className="h-5 w-5" />
@@ -96,10 +114,12 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             </li>
 
             <li>
-              <Link 
+              <Link
                 href="/sales"
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
-                  isActive('/sales') ? '!border-l-4 !border-white-400 font-bold' : ''
+                  isActive("/sales")
+                    ? "!border-l-4 !border-white-400 font-bold"
+                    : ""
                 }`}
               >
                 <ChartBarIcon className="h-5 w-5" />
@@ -108,10 +128,12 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             </li>
 
             <li>
-              <Link 
+              <Link
                 href="/marketing"
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
-                  isActive('/marketing') ? '!border-l-4 !border-white-400 font-bold' : ''
+                  isActive("/marketing")
+                    ? "!border-l-4 !border-white-400 font-bold"
+                    : ""
                 }`}
               >
                 <PaperClipIcon className="h-5 w-5" />
@@ -120,10 +142,12 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
             </li>
 
             <li>
-              <Link 
+              <Link
                 href="/settings"
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
-                  isActive('/settings') ? '!border-l-4 !border-white-400 font-bold' : ''
+                  isActive("/settings")
+                    ? "!border-l-4 !border-white-400 font-bold"
+                    : ""
                 }`}
               >
                 <CogIcon className="h-5 w-5" />
@@ -144,7 +168,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
           </button>
         </div>
       </div>
-      
+
       {/* Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={isDialogOpen}

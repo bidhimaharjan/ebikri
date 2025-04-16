@@ -19,7 +19,7 @@ export async function GET(request, { params }) {
   }
 
   try {
-    const id = Number(params.id);
+    const { id } = await params;
 
     // verify user can only access their own data
     if (id !== session.user.id) {
@@ -72,7 +72,7 @@ export async function PUT(request, { params }) {
   }
 
   try {
-    const id = Number(params.id);
+    const { id } = await params;
 
     // verify user can only access their own data
     if (id !== session.user.id) {

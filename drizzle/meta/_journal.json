@@ -148,6 +148,111 @@
       "when": 1744541033544,
       "tag": "0020_useful_moondragon",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1744787151757,
+      "tag": "0021_rapid_professor_monster",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1744787485283,
+      "tag": "0022_premium_eternity",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1744788248157,
+      "tag": "0023_tired_skin",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1744789348028,
+      "tag": "0024_uneven_the_santerians",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1744789935698,
+      "tag": "0025_powerful_doctor_strange",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1744790041493,
+      "tag": "0026_kind_blonde_phantom",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1744791325796,
+      "tag": "0027_old_rawhide_kid",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1744791492370,
+      "tag": "0028_black_major_mapleleaf",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1744792739983,
+      "tag": "0029_workable_sunspot",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1744793238002,
+      "tag": "0030_left_kang",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1744793370734,
+      "tag": "0031_big_arclight",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1744793584321,
+      "tag": "0032_cynical_ultimo",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1744793777882,
+      "tag": "0033_mean_surge",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1744795400751,
+      "tag": "0034_overrated_wasp",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1744811555603,
+      "tag": "0035_loose_ikaris",
+      "breakpoints": true
     }
   ]
 }

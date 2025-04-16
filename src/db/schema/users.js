@@ -1,13 +1,19 @@
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { bigint, pgTable, varchar, timestamp, text } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: varchar('id').primaryKey(),
 
   name: varchar({ length: 255 }).notNull(),
 
-  phoneNumber: varchar({ length: 10 }).notNull().unique(),
+  phoneNumber: varchar({ length: 10 }).unique(),
 
   email: varchar({ length: 255 }).notNull().unique(),
 
-  password: varchar({ length: 255 }).notNull(),
+  password: varchar({ length: 255 }),
+
+  emailVerified: timestamp('email_verified'),
+
+  image: text('image'), // for storing Google profile picture
+
+  provider: text('provider'), // 'credentials' or 'google'
 });

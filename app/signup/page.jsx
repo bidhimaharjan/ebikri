@@ -9,6 +9,7 @@ import Link from "next/link";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import { validateSignupForm } from "@/app/validation/signup";
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton'; 
 
 export default function SignupPage() {
   const router = useRouter();
@@ -77,7 +78,7 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col p-6 bg-gray-50">
+    <main className="flex min-h-screen flex-col p-4 bg-gray-50">
       {/* <div className="flex h-20 shrink-0 items-end rounded-lg bg-purple-500 p-4 md:h-20">
         <EbikriLogo />
         </div> */}
@@ -109,12 +110,21 @@ export default function SignupPage() {
         <div className="hidden md:block w-px bg-gray-300"></div>
 
         {/* Right Section */}
-        <div className="flex flex-col justify-center gap-6 px-6 py-10 md:w-1/2 md:px-20">
+        <div className="flex flex-col justify-center gap-2 px-6 py-10 md:w-1/2 md:px-20">
           <SignupForm
             formData={formData}
             onChange={handleChange}
             onSubmit={handleSubmit}
           />
+
+          {/* Add Google Sign-In Button */}
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="flex-shrink mx-4 text-gray-400 mb-4">OR</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+
+          <GoogleSignInButton />
         </div>
       </div>
     </main>

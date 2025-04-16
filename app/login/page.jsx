@@ -9,6 +9,7 @@ import { Button } from '@/app/ui/button';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
 import { validateLoginForm } from '@/app/validation/login';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -79,6 +80,15 @@ export default function LoginPage() {
             fieldErrors={fieldErrors}
             getFieldError={getFieldError}
           />
+
+          {/* Google Sign-In Button */}
+          <div className="relative flex items-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="flex-shrink mx-4 text-gray-400">OR</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+          
+          <GoogleSignInButton />
         </div>
 
         {/* Vertical line */}

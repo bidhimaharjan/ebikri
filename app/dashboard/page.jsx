@@ -111,7 +111,7 @@ const DashboardLayout = () => {
   if (!session) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p>You are not authenticated. Please log in to access the dashboard.</p>;
+        <p>You are not authenticated. Please log in to access the dashboard.</p>
       </div>
     );
   }

@@ -54,21 +54,21 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-3">
-      <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4">
+      <div className="flex-1 rounded-lg bg-gray-50 px-6">
         <h1
-          className={`${lusitana.className} mb-3 text-2xl font-bold text-purple-500`}
+          className={`${lusitana.className} text-xl font-bold text-purple-500`}
         >
           Register Your Business
         </h1>
 
         {/* Step 1: User Details */}
-        <h3 className="text-lg font-semibold text-purple-500 mt-6 mb-4">
+        <h3 className="text-base font-semibold text-purple-500 mt-4 mb-2">
           Step 1: User Details
         </h3>
         <div className="w-full flex gap-4">
           {/* Name Field */}
           <div className="flex-1">
-            <label className="mb-3 block font-medium text-gray-900" htmlFor="name">
+            <label className="mb-3 block font-medium text-sm text-gray-900" htmlFor="name">
               Name *
             </label>
             <input
@@ -88,7 +88,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
           {/* Phone Number Field */}
           <div className="flex-1">
-            <label className="mb-3 block font-medium text-gray-900" htmlFor="phoneNumber">
+            <label className="mb-3 block font-medium text-sm text-gray-900" htmlFor="phoneNumber">
               Phone Number *
             </label>
             <input
@@ -109,7 +109,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
         {/* Email Field */}
         <div>
-          <label className="mb-3 mt-5 block font-medium text-gray-900" htmlFor="email">
+          <label className="mb-3 mt-5 block font-medium text-sm text-gray-900" htmlFor="email">
             Email *
           </label>
           <input
@@ -133,7 +133,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         {/* Password Fields */}
         <div className="w-full flex gap-4">
           <div className="flex-1">
-            <label className="mb-3 mt-5 block font-medium text-gray-900" htmlFor="password">
+            <label className="mb-3 mt-5 block font-medium text-sm text-gray-900" htmlFor="password">
               Password *
             </label>
             <div className="relative">
@@ -190,7 +190,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
           
           {/* Confirm Password Field */}
           <div className="flex-1">
-            <label className="mb-3 mt-5 block font-medium text-gray-900" htmlFor="confirmPassword">
+            <label className="mb-3 mt-5 block font-medium text-sm text-gray-900" htmlFor="confirmPassword">
               Confirm Password *
             </label>
             <div className="relative">
@@ -223,13 +223,13 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         </div>
 
         {/* Step 2: Business Details */}
-        <h3 className="mt-10 text-lg font-semibold text-purple-500 mb-4">
+        <h3 className="mt-8 text-base font-semibold text-purple-500 mb-2">
           Step 2: Business Details
         </h3>
         <div className="w-full flex gap-4">
           {/* Business Name Field */}
           <div className="flex-1">
-            <label className="mb-3 block font-medium text-gray-900" htmlFor="businessName">
+            <label className="mb-3 block font-medium text-sm text-gray-900" htmlFor="businessName">
               Business Name *
             </label>
             <input
@@ -249,7 +249,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
           {/* Business Type Field */}
           <div className="flex-1">
-            <label className="mb-3 block font-medium text-gray-900" htmlFor="businessType">
+            <label className="mb-3 block font-medium text-sm text-gray-900" htmlFor="businessType">
               Business Type *
             </label>
             <select
@@ -277,7 +277,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         {/* Business Email Field */}
         <div className="w-full flex gap-4">
           <div className="flex-1">
-            <label className="mt-5 mb-3 block font-medium text-gray-900" htmlFor="businessEmail">
+            <label className="mt-5 mb-3 block font-medium text-sm text-gray-900" htmlFor="businessEmail">
               Business Email
             </label>
             <input
@@ -300,7 +300,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
           {/* PAN Number Field */}
           <div className="flex-1">
-            <label className="mt-5 mb-3 block font-medium text-gray-900" htmlFor="panNumber">
+            <label className="mt-5 mb-3 block font-medium text-sm text-gray-900" htmlFor="panNumber">
               PAN Number
             </label>
             <input
@@ -323,7 +323,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         <div className="flex justify-center items-center h-full">
           <Button
             type="submit"
-            className="flex items-center gap-4 rounded-xl bg-purple-500 px-4 py-2 mt-8 text-base font-medium text-white transition-colors hover:bg-purple-400"
+            className="flex items-center gap-4 rounded-xl bg-purple-500 px-4 py-2 mt-4 text-base font-medium text-white transition-colors hover:bg-purple-400"
             disabled={Object.keys(fieldErrors).some(key => fieldErrors[key])}
           >
             <span>Sign up</span> <ArrowRightIcon className="w-4" />

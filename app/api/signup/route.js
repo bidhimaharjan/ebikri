@@ -4,6 +4,7 @@ import { usersTable } from '@/src/db/schema/users';
 import { businessTable } from '@/src/db/schema/business';
 import { hash } from 'bcrypt';
 import { eq } from 'drizzle-orm';
+const { v4: uuidv4 } = require('uuid');
 
 export async function POST(req) {
   try {
@@ -40,10 +41,14 @@ export async function POST(req) {
 
     // insert new user and get the inserted ID using .returning
     const [newUser] = await db.insert(usersTable).values({
+      id: uuidv4(),
       name: data.name,
       phoneNumber: data.phoneNumber,
       email: data.email,
       password: hashedPassword,
+      emailVerified: null,
+      image: null,
+      provider: 'credentials',
     }).returning();
 
     // check if newUser is valid and contains the userId

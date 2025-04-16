@@ -8,19 +8,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(req) {
   try {
-    // get user session
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    // get user session
+    if (!session?.user?.businessId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const businessId = session.user.businessId;
-    if (!businessId) {
-      return NextResponse.json({ error: "No associated business found" }, { status: 404 });
-    }
 
     // fetch revenue
     const revenueResult = await db

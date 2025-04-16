@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/src/index";
 import { businessTable } from "@/src/db/schema/business";
 import { eq } from "drizzle-orm";
+import { v4 as uuidv4, validate } from "uuid";
 
 // handle GET request to fetch the business name based on user ID
 export async function GET(req) {
@@ -18,7 +19,7 @@ export async function GET(req) {
     const business = await db
       .select({ name: businessTable.businessName }) // select only the businessName field
       .from(businessTable)
-      .where(eq(businessTable.userId, Number(userId))) // filter by userId
+      .where(eq(businessTable.userId, userId)) // filter by userId
       .limit(1);
 
     // return the business name if found, otherwise return null

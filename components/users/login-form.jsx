@@ -88,7 +88,7 @@ export default function LoginForm({ formData, onChange, onSubmit, onBlur, getFie
           </div>
 
           {/* Remember Me Checkbox */}
-          <div className="mt-4 flex items-center">
+          {/* <div className="mt-4 flex items-center">
             <input
               id="rememberMe"
               type="checkbox"
@@ -100,7 +100,7 @@ export default function LoginForm({ formData, onChange, onSubmit, onBlur, getFie
             >
               Remember me
             </label>
-          </div>
+          </div> */}
         </div>
 
         {/* Login Button */}
@@ -111,10 +111,6 @@ export default function LoginForm({ formData, onChange, onSubmit, onBlur, getFie
           >
             <span>Log in</span> <ArrowRightIcon className="w-4" />
           </Button>
-        </div>
-
-        <div className="flex h-8 items-end space-x-1">
-          {/* Add form errors here */}
         </div>
       </div>
     </form>
