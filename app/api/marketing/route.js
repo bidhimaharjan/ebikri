@@ -22,7 +22,7 @@ export async function GET(request) {
       .from(marketingTable)
       .where(eq(marketingTable.businessId, session.user.businessId));
 
-    console.log("Marketing Data from API:", campaigns);
+    // console.log("Marketing Data from API:", campaigns);
 
     return NextResponse.json(campaigns, { status: 200 });
   } catch (error) {

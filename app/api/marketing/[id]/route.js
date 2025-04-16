@@ -17,7 +17,7 @@ export async function PUT(request, { params }) {
   }
 
   try {
-    const id = params.id;
+    const { id } = await params;
     const updateData = await request.json();
 
     if (!id) {
@@ -89,7 +89,7 @@ export async function DELETE(request, { params }) {
   }
 
   try {
-    const id = params.id;
+    const { id } = await params;
 
     if (!id) {
       return NextResponse.json(
