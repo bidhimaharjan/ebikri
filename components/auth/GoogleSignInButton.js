@@ -9,8 +9,7 @@ export default function GoogleSignInButton() {
 
   const handleSignIn = async () => {
     try {
-      const result = await signIn('google', { 
-        redirect: false,
+      const result = await signIn('google', {
         callbackUrl: '/dashboard' // Default callback URL
       });
       

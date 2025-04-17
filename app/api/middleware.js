@@ -6,7 +6,7 @@ export async function middleware(request) {
   const pathname = request.nextUrl.pathname;
 
   // Public routes
-  const publicRoutes = ['/login', '/auth/error'];
+  const publicRoutes = ['/login', '/auth/error', '/auth/complete-profile'];
   if (publicRoutes.includes(pathname)) return NextResponse.next();
 
   // Block all API routes except NextAuth

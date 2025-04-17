@@ -69,8 +69,6 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt", // use JWT tokens for session management
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -149,37 +147,29 @@ export const authOptions = {
             requiresProfileCompletion: !dbUser[0].phoneNumber,
           };
 
-          // console.log("\n[Google JWT] Returning token:", newToken);
+          console.log("\n[Google JWT] Returning token:", newToken);
           return newToken;
         }
       }
 
       // handle credential sign-in
       if (user) {
-        // console.log("\n[Credentials JWT] Processing credentials sign-in");
-        const newToken = {
+        return {
           ...token,
           id: user.id,
           email: user.email,
           name: user.name,
-          businessId: user.businessId,
+          businessId: user.businessId, // this should come from the authorize callback
           provider: "credentials",
           requiresProfileCompletion: !user.phoneNumber,
         };
-
-        // console.log("\n[Credentials JWT] Returning token:", newToken);
-        return newToken;
       }
 
       return token;
     },
     async session({ session, token }) {
-      // // ensure all fields are properly transferred from token to session
-      // console.log("\n[session callback] Starting session callback");
-      // console.log("Incoming session:", session);
-      // console.log("Incoming token:", token);
-
-      const newSession = {
+      // ensure all fields are properly transferred from token to session
+      return {
         ...session,
         user: {
           ...session.user,
@@ -192,16 +182,9 @@ export const authOptions = {
           requiresProfileCompletion: token.requiresProfileCompletion,
         },
       };
-
-      console.log("\n[session callback] Returning session:", newSession);
-      return newSession;
     },
   },
-  pages: {
-  signIn: "/login",
-  error: "/auth/error",
-  newUser: "/auth/complete-profile",
-},
+
   secret: process.env.NEXTAUTH_SECRET,
 };
 

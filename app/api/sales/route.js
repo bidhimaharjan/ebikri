@@ -26,7 +26,7 @@ export async function GET(request) {
       unitPrice: productTable.unitPrice,
     })
     .from(salesTable)
-    .innerJoin(productTable, eq(salesTable.productId, productTable.id)) // Corrected join
+    .innerJoin(productTable, eq(salesTable.productId, productTable.id))
     .where(eq(salesTable.businessId, session.user.businessId));
 
     // return the sales data as JSON

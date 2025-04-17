@@ -75,9 +75,7 @@ export const validateBusinessInfo = (businessInfo) => {
   }
 
   // Business email validation (if provided)
-  if (!businessInfo.businessEmail || !businessInfo.businessEmail.trim()) {
-    errors.businessEmail = "Business email is required";
-  } else {
+  if (!businessInfo.businessEmail && !businessInfo.businessEmail.trim()) {
     if (
       !/^(?!.*\.\.)(?!.*\._)(?!.*_\.)(?!^[_.])(?!.*[_.]$)[a-zA-Z0-9._]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(
         businessInfo.businessEmail

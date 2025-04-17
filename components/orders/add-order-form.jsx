@@ -617,7 +617,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                         <>
                           <div className="h-6 w-px bg-gray-300"></div>
                           <p className="text-sm text-gray-800">
-                            Discount: Rs. {discountAmount} ({discountPercent}%)
+                            Discount: Rs. {Number(discountAmount).toFixed(2)} ({discountPercent}%)
                           </p>
                         </>
                       )}

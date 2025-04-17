@@ -57,21 +57,24 @@ export async function POST(request) {
     }
 
     // check if customer already exists
-    const [existingCustomer] = await db
+    const existingCustomer = await db
       .select()
       .from(customerTable)
       .where(
         and(
-          eq(customerTable.phoneNumber, phoneNumber),
           eq(customerTable.email, email),
           eq(customerTable.businessId, session.user.businessId)
         )
-      );
+      )
+      .limit(1);
 
-    if (existingCustomer) {
+    if (existingCustomer.length > 0) {
       return NextResponse.json(
-        { error: "Customer with this email already exists" },
-        { status: 400 }
+        { 
+          message: "Customer with this email already exists",
+          error: "DUPLICATE_EMAIL" 
+        },
+        { status: 409 }
       );
     }
 
@@ -95,6 +98,18 @@ export async function POST(request) {
     );
   } catch (error) {
     console.error("Error adding customer:", error);
+  
+    // Hhndle specific database errors
+    if (error.code === '23505') { // PostgreSQL unique violation code
+      return NextResponse.json(
+        { 
+          message: "Customer with this email already exists",
+          error: "DUPLICATE_EMAIL" 
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       { message: "Error adding customer", error: error.message },
       { status: 500 }

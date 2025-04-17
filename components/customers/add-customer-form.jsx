@@ -52,6 +52,7 @@ const AddCustomerForm = ({ isOpen, onClose, onConfirm }) => {
         onConfirm();
       } else {
         const errorData = await response.json();
+        console.log("Error adding customer:", errorData);
         toast.error(errorData.message || "Error adding customer");
       }
     } catch (error) {
