@@ -1,4 +1,4 @@
-import { bigint, pgTable, varchar, timestamp, text } from "drizzle-orm/pg-core";
+import { boolean, pgTable, varchar, timestamp, text } from "drizzle-orm/pg-core";
 
 export const usersTable = pgTable("users", {
   id: varchar('id').primaryKey(),
@@ -16,4 +16,6 @@ export const usersTable = pgTable("users", {
   image: text('image'), // for storing Google profile picture
 
   provider: text('provider'), // 'credentials' or 'google'
+
+  requiresProfileCompletion: boolean('requires_profile_completion').notNull().default(true)
 });

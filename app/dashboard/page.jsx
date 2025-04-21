@@ -17,6 +17,7 @@ const DashboardLayout = () => {
 
   // fetch dashboard data
   useEffect(() => {
+    console.log('Session data:', session); 
     if (session) {
       const fetchDashboardData = async () => {
         try {

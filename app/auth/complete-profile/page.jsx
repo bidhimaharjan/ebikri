@@ -1,25 +1,34 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { lusitana } from '@/app/ui/fonts';
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function CompleteProfile() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    phoneNumber: "",
+    businessName: "",
+    businessType: "",
+    businessEmail: "",
+    panNumber: "",
+  });
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (status === 'loading') return;
+    if (status === "loading") return;
 
     if (!session) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
     if (!session.user?.requiresProfileCompletion) {
-      router.push('/dashboard');
+      router.push("/dashboard");
       return;
     }
 
@@ -30,17 +39,6 @@ export default function CompleteProfile() {
     return <div>Loading...</div>;
   }
 
-  const [formData, setFormData] = useState({
-    phoneNumber: '',
-    businessName: '',
-    businessType: '',
-    businessEmail: '',
-    panNumber: '',
-  });
-
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -48,24 +46,34 @@ export default function CompleteProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/complete-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+      const response = await fetch("/api/auth/complete-profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Submission failed");
 
-      await update({ requiresProfileCompletion: false });
-      router.push('/dashboard');
+      // Force a complete session refresh with all user data
+      await update({
+        user: {
+          ...session.user,
+          ...data.user, // Include all returned user data
+          requiresProfileCompletion: false,
+        },
+      });
+
+      // Hard redirect to ensure middleware picks up changes
+      window.location.href = "/dashboard";
     } catch (err) {
-      setError(err.message || 'Failed to update profile');
+      setError(err.message || "Failed to update profile");
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +88,7 @@ export default function CompleteProfile() {
         onSubmit={handleSubmit}
         className="bg-white rounded-xl shadow-lg px-6 py-8 w-full max-w-xl space-y-5"
       >
-        <h1 className={`${lusitana.className} text-xl font-bold text-purple-500 text-center`}>
+        <h1 className={`$ text-xl font-bold text-purple-500 text-center`}>
           Complete Your Profile
         </h1>
 
@@ -96,7 +104,10 @@ export default function CompleteProfile() {
 
         {/* Phone Number */}
         <div>
-          <label className="block font-medium text-sm text-gray-900 mb-2" htmlFor="phoneNumber">
+          <label
+            className="block font-medium text-sm text-gray-900 mb-2"
+            htmlFor="phoneNumber"
+          >
             Phone Number *
           </label>
           <input
@@ -107,13 +118,16 @@ export default function CompleteProfile() {
             placeholder="Enter a 10-digit phone number"
             value={formData.phoneNumber}
             onChange={handleChange}
-            className={getInputClass('phoneNumber')}
+            className={getInputClass("phoneNumber")}
           />
         </div>
 
         {/* Business Name */}
         <div>
-          <label className="block font-medium text-sm text-gray-900 mb-2" htmlFor="businessName">
+          <label
+            className="block font-medium text-sm text-gray-900 mb-2"
+            htmlFor="businessName"
+          >
             Business Name *
           </label>
           <input
@@ -124,13 +138,16 @@ export default function CompleteProfile() {
             placeholder="Enter your business name"
             value={formData.businessName}
             onChange={handleChange}
-            className={getInputClass('businessName')}
+            className={getInputClass("businessName")}
           />
         </div>
 
         {/* Business Type */}
         <div>
-          <label className="block font-medium text-sm text-gray-900 mb-2" htmlFor="businessType">
+          <label
+            className="block font-medium text-sm text-gray-900 mb-2"
+            htmlFor="businessType"
+          >
             Business Type *
           </label>
           <select
@@ -139,7 +156,7 @@ export default function CompleteProfile() {
             required
             value={formData.businessType}
             onChange={handleChange}
-            className={getInputClass('businessType')}
+            className={getInputClass("businessType")}
           >
             <option value="">Select business type</option>
             <option value="Retail">Retail</option>
@@ -153,7 +170,10 @@ export default function CompleteProfile() {
 
         {/* Business Email */}
         <div>
-          <label className="block font-medium text-sm text-gray-900 mb-2" htmlFor="businessEmail">
+          <label
+            className="block font-medium text-sm text-gray-900 mb-2"
+            htmlFor="businessEmail"
+          >
             Business Email
           </label>
           <input
@@ -163,13 +183,16 @@ export default function CompleteProfile() {
             placeholder="Enter business email"
             value={formData.businessEmail}
             onChange={handleChange}
-            className={getInputClass('businessEmail')}
+            className={getInputClass("businessEmail")}
           />
         </div>
 
         {/* PAN Number */}
         <div>
-          <label className="block font-medium text-sm text-gray-900 mb-2" htmlFor="panNumber">
+          <label
+            className="block font-medium text-sm text-gray-900 mb-2"
+            htmlFor="panNumber"
+          >
             PAN Number
           </label>
           <input
@@ -179,7 +202,7 @@ export default function CompleteProfile() {
             placeholder="Enter 9-digit PAN number"
             value={formData.panNumber}
             onChange={handleChange}
-            className={getInputClass('panNumber')}
+            className={getInputClass("panNumber")}
           />
         </div>
 
@@ -188,7 +211,7 @@ export default function CompleteProfile() {
           disabled={isSubmitting}
           className="w-full bg-purple-600 text-white py-2 px-4 rounded-xl hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-sm disabled:opacity-50"
         >
-          {isSubmitting ? 'Submitting...' : 'Complete Profile'}
+          {isSubmitting ? "Submitting..." : "Complete Profile"}
         </button>
       </form>
     </div>

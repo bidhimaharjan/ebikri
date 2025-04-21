@@ -10,17 +10,19 @@ import { compare } from "bcrypt";
 export const authOptions = {
   // define authentication providers
   providers: [
+    // Google OAuth Provider
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorization: {
         params: {
           prompt: "select_account", // forces account selection
-          access_type: "offline",
+          access_type: "offline", // allows refresh tokens
           response_type: "code",
         },
       },
     }),
+    // Email/Password Credentials Provider
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -31,7 +33,7 @@ export const authOptions = {
         // email and password from user input
         const { email, password } = credentials;
 
-        // query database to find user by email
+        // find user by email
         const user = await db
           .select()
           .from(usersTable)
@@ -39,30 +41,28 @@ export const authOptions = {
           .limit(1);
 
         // if no user is found, throw an error
-        if (user.length === 0) {
-          throw new Error("No user found with this email");
-        }
+        if (user.length === 0) throw new Error("No user found with this email");
 
-        // if password is incorrect, throw an error
+        // verify password
         const isValid = await compare(password, user[0].password);
-        if (!isValid) {
-          throw new Error("Password is incorrect");
-        }
+        // if password is incorrect, throw an error
+        if (!isValid) throw new Error("Password is incorrect");
 
         // fetch business ID linked to the user
         const business = await db
-          .select({ businessId: businessTable.id }) // select only the business ID
+          .select({ businessId: businessTable.id })
           .from(businessTable)
           .where(eq(businessTable.userId, user[0].id)) // match business with user ID
           .limit(1);
 
-        // return user session data
+        // return user data for session
         return {
           id: user[0].id,
           email: user[0].email,
           name: user[0].name,
           businessId: business[0]?.businessId || null,
           phoneNumber: user[0].phoneNumber,
+          requiresProfileCompletion: user[0].requiresProfileCompletion,
         };
       },
     }),
@@ -72,16 +72,19 @@ export const authOptions = {
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account.provider === "google") {
+      // handle Google sign in
+      if (account?.provider === "google") {
         try {
-          const existingUser = await db
+          // check if user exists
+          const [existingUser] = await db
             .select()
             .from(usersTable)
             .where(eq(usersTable.email, profile.email))
             .limit(1);
 
-          if (existingUser.length === 0) {
-            // New Google user - create user and business
+          // New Google user
+          if (!existingUser) {
+            // create new user record for Google sign in
             const [newUser] = await db
               .insert(usersTable)
               .values({
@@ -91,86 +94,93 @@ export const authOptions = {
                 image: profile.picture,
                 provider: "google",
                 emailVerified: new Date(),
+                requiresProfileCompletion: true, // new users must complete profile
               })
               .returning();
-
-            await db
-              .insert(businessTable)
-              .values({
-                userId: newUser.id,
-              });
-
-            // Return true to allow sign-in but indicate profile needs completion
-            return true;
-          } else {
-            // Existing Google user - check if profile is complete
-            if (!existingUser[0].phoneNumber) {
-              // Profile needs completion
-              return true;
-            }
-            // Profile is complete
-            return true;
+              
+            // create empty business profile
+            await db.insert(businessTable).values({
+              userId: newUser.id
+            });
+    
+            return true; // allow sign in but redirect to profile completion
           }
+          
+          // for existing users, check if profile needs completion
+          return !existingUser.requiresProfileCompletion;
         } catch (error) {
           console.error("Google sign-in error:", error);
-          return `/auth/error?error=${encodeURIComponent(error.message)}`;
+          return false;
         }
       }
       return true;
     },
+    // build the JWT token
     async jwt({ token, user, account, profile }) {
-      // handle Google sign-in
-      if (account?.provider === "google" && profile) {
-        const dbUser = await db
-          .select()
-          .from(usersTable)
-          .where(eq(usersTable.email, profile.email))
-          .limit(1);
-
-        if (dbUser.length > 0) {
-          // get the business ID
-          const business = await db
-            .select({ id: businessTable.id })
-            .from(businessTable)
-            .where(eq(businessTable.userId, dbUser[0].id))
-            .limit(1);
-
-          // update token with all necessary data
-          const newToken = {
-            ...token,
-            id: dbUser[0].id,
-            email: dbUser[0].email,
-            name: dbUser[0].name,
-            businessId: business[0]?.id || null,
-            picture: profile.picture,
-            provider: "google",
-            requiresProfileCompletion: !dbUser[0].phoneNumber,
-          };
-
-          console.log("\n[Google JWT] Returning token:", newToken);
-          return newToken;
-        }
-      }
-
-      // handle credential sign-in
+      // handle initial sign in
       if (user) {
+        // for Google sign in
+        if (account?.provider === "google") {
+          const [dbUser] = await db
+            .select()
+            .from(usersTable)
+            .where(eq(usersTable.email, user.email || profile?.email))  // get user by email
+            .limit(1);
+    
+          if (dbUser) {
+            const [business] = await db
+              .select({ id: businessTable.id })
+              .from(businessTable)
+              .where(eq(businessTable.userId, dbUser.id)) // get user's business, if exists
+              .limit(1);
+              
+            // return token with user data
+            return {
+              ...token,
+              id: dbUser.id,
+              email: dbUser.email,
+              name: dbUser.name,
+              businessId: business?.id || null,
+              picture: dbUser.image,
+              provider: "google",
+              requiresProfileCompletion: dbUser.requiresProfileCompletion,
+            };
+          }
+        }
+    
+        // for credential sign in
         return {
           ...token,
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          businessId: user.businessId, // this should come from the authorize callback
-          provider: "credentials",
-          requiresProfileCompletion: !user.phoneNumber,
+          ...user,
+          requiresProfileCompletion: user.requiresProfileCompletion ?? true
         };
       }
-
+    
+      // subsequent requests - refresh from database
+      if (token?.id) {
+        const [dbUser] = await db
+          .select({
+            requiresProfileCompletion: usersTable.requiresProfileCompletion,
+            phoneNumber: usersTable.phoneNumber
+          })
+          .from(usersTable)
+          .where(eq(usersTable.id, token.id))
+          .limit(1);
+    
+        if (dbUser) {
+          return {
+            ...token,
+            requiresProfileCompletion: dbUser.requiresProfileCompletion
+          };
+        }
+      }
+    
       return token;
     },
+    // token data into session data
     async session({ session, token }) {
-      // ensure all fields are properly transferred from token to session
       return {
-        ...session,
+        ...session, // keep existing session data
         user: {
           ...session.user,
           id: token.id,
@@ -183,6 +193,12 @@ export const authOptions = {
         },
       };
     },
+  },
+  // custom page routes
+  pages: {
+    signIn: '/login', // for login
+    error: '/auth/error', // for errors
+    newUser: '/auth/complete-profile', // for new users to complete their profile
   },
 
   secret: process.env.NEXTAUTH_SECRET,

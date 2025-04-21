@@ -49,6 +49,7 @@ export async function POST(req) {
       emailVerified: null,
       image: null,
       provider: 'credentials',
+      requiresProfileCompletion: false,
     }).returning();
 
     // check if newUser is valid and contains the userId

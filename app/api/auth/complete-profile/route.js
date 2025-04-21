@@ -75,7 +75,10 @@ export async function POST(req) {
     // Update user's phone number
     await db
       .update(usersTable)
-      .set({ phoneNumber })
+      .set({ 
+        phoneNumber,
+        requiresProfileCompletion: false
+      })
       .where(eq(usersTable.id, session.user.id));
 
     // Update existing business or insert if none
@@ -99,7 +102,24 @@ export async function POST(req) {
       });
     }
 
-    return NextResponse.json({ message: 'Profile completed successfully' }, { status: 200 });
+
+    // After successful updates, fetch the complete updated user
+    const [updatedUser] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, session.user.id))
+      .limit(1);
+
+    return NextResponse.json({ 
+      message: 'Profile completed successfully',
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        phoneNumber: updatedUser.phoneNumber,
+        requiresProfileCompletion: updatedUser.requiresProfileCompletion,
+      }
+    }, { status: 200 });
 
   } catch (error) {
     console.error('Error completing profile:', error);
