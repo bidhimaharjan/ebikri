@@ -81,7 +81,7 @@ const ProfileLayout = () => {
 
           {/* Footer */}
           <div className="text-center text-gray-500 text-sm mt-2">
-            ©2025 eBikri. All Rights Reserved
+            &copy; {new Date().getFullYear()} eBikri. All Rights Reserved
           </div>
         </div>
       </div>

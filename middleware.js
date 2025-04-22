@@ -47,6 +47,5 @@ export const config = {
     '/marketing',
     '/settings',
     '/profile',
-    '/api/:path*',
   ],
 };

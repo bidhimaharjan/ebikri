@@ -325,7 +325,7 @@ const OrdersLayout = () => {
 
         {/* Footer */}
         <div className="text-center text-gray-500 text-sm mt-6">
-          ©2025 eBikri. All Rights Reserved
+          &copy; {new Date().getFullYear()} eBikri. All Rights Reserved
         </div>
 
         {/* Add Order Form */}
