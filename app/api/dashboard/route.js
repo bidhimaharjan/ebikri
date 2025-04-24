@@ -5,16 +5,31 @@ import { customerTable } from "@/src/db/schema/customer";
 import { eq, sum, count } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import jwt from 'jsonwebtoken';
 
 export async function GET(req) {
   try {
-    const session = await getServerSession(authOptions);
-    // get user session
-    if (!session?.user?.businessId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    let businessId;
+    const authHeader = req.headers.get('authorization');
+    
+    // Check for mobile JWT token first
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+        businessId = decoded.businessId;
+      } catch (err) {
+        return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+      }
+    } 
+    // Fall back to NextAuth session for web
+    else {
+      const session = await getServerSession(authOptions);
+      if (!session?.user?.businessId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      businessId = session.user.businessId;
     }
-
-    const businessId = session.user.businessId;
 
     // fetch revenue
     const revenueResult = await db

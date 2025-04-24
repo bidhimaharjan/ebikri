@@ -19,6 +19,7 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.4",
     "framer-motion": "^12.7.4",
+    "jsonwebtoken": "^9.0.2",
     "khalti-checkout-web": "^2.2.0",
     "next": "^15.1.7",
     "next-auth": "4.24.11",
