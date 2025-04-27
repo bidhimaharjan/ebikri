@@ -16,34 +16,34 @@ const DashboardLayout = () => {
   const [topProducts, setTopProducts] = useState([]);
 
   // fetch dashboard data
+  const fetchDashboardData = async () => {
+    try {
+      // Fetch dashboard data
+      const dashboardResponse = await fetch('/api/dashboard');
+      if (!dashboardResponse.ok) throw new Error('Failed to fetch dashboard data');
+      const dashboardData = await dashboardResponse.json();
+      setDashboardData(dashboardData);
+
+      // Fetch sales data for monthly trends and top products
+      const salesResponse = await fetch(`/api/sales?businessId=${session.user.businessId}`);
+      if (!salesResponse.ok) throw new Error('Failed to fetch sales data');
+      const salesData = await salesResponse.json();
+
+      // Calculate monthly trends
+      const monthly = calculateTrends(salesData, "month");
+      setMonthlyTrends(monthly);
+
+      // Calculate top 3 products for the month
+      const topProducts = calculateTopProducts(salesData, "month");
+      setTopProducts(topProducts);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  // fetch dashboard data on component mount
   useEffect(() => {
-    console.log('Session data:', session); 
     if (session) {
-      const fetchDashboardData = async () => {
-        try {
-          // Fetch dashboard data
-          const dashboardResponse = await fetch('/api/dashboard');
-          if (!dashboardResponse.ok) throw new Error('Failed to fetch dashboard data');
-          const dashboardData = await dashboardResponse.json();
-          setDashboardData(dashboardData);
-
-          // Fetch sales data for monthly trends and top products
-          const salesResponse = await fetch(`/api/sales?businessId=${session.user.businessId}`);
-          if (!salesResponse.ok) throw new Error('Failed to fetch sales data');
-          const salesData = await salesResponse.json();
-
-          // Calculate monthly trends
-          const monthly = calculateTrends(salesData, "month");
-          setMonthlyTrends(monthly);
-
-          // Calculate top 3 products for the month
-          const topProducts = calculateTopProducts(salesData, "month");
-          setTopProducts(topProducts);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      };
-
       fetchDashboardData();
     }
   }, [session]);
@@ -133,7 +133,7 @@ const DashboardLayout = () => {
             Hello, {userName}! Hope you have a great sales day!
           </span>
           
-          <Link href="/profile">
+          <Link href="/profile" passHref prefetch>
             <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
               <UserCircleIcon className="h-5 w-5 mr-2" />
               <BusinessName userId={session.user.id} />
@@ -216,7 +216,7 @@ const DashboardLayout = () => {
           <div className="w-1/3 bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
               <TrophyIcon className="h-6 w-6 text-yellow-500 mr-2" />
-              Top 3 Products of the Month
+              Top Products This Month
             </h2>
             <div className="flex flex-col space-y-4 text-center">
               {topProducts.map((product) => (

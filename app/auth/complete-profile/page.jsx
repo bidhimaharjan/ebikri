@@ -79,9 +79,9 @@ export default function CompleteProfile() {
 
       toast.success("Profile completed successfully!");
       // force a full page reload to trigger NextAuth middleware updates
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 1500);
+      // setTimeout(() => {
+      //   window.location.href = "/dashboard";
+      // }, 3000);
     } catch (err) {
       toast.error(err.message || "An unexpected error occurred. Please try again.");
     } finally {
@@ -94,7 +94,7 @@ export default function CompleteProfile() {
     `peer block w-full rounded-xl border border-gray-200 py-[8px] pl-4 text-xs outline-2 placeholder:text-gray-500`;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <form
         onSubmit={handleSubmit}
         className="bg-white rounded-xl shadow-lg px-6 py-8 w-full max-w-xl space-y-5"
@@ -120,7 +120,7 @@ export default function CompleteProfile() {
             id="phoneNumber"
             name="phoneNumber"
             type="tel"
-            required
+
             placeholder="Enter a 10-digit phone number"
             value={formData.phoneNumber}
             onChange={handleChange}
@@ -140,7 +140,6 @@ export default function CompleteProfile() {
             id="businessName"
             name="businessName"
             type="text"
-            required
             placeholder="Enter your business name"
             value={formData.businessName}
             onChange={handleChange}
@@ -159,7 +158,6 @@ export default function CompleteProfile() {
           <select
             id="businessType"
             name="businessType"
-            required
             value={formData.businessType}
             onChange={handleChange}
             className={getInputClass("businessType")}
@@ -216,11 +214,16 @@ export default function CompleteProfile() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-purple-600 text-white py-2 px-4 rounded-xl hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-sm disabled:opacity-50"
+          className="w-full bg-purple-500 text-white py-2 px-4 rounded-xl hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-sm disabled:opacity-50"
         >
           {isSubmitting ? "Submitting..." : "Complete Profile"}
         </button>
       </form>
+
+      {/* Footer */}
+      <div className="text-center text-gray-500 text-sm mt-8">
+        &copy; {new Date().getFullYear()} eBikri. All Rights Reserved
+      </div>
     </div>
   );
 }

@@ -40,15 +40,17 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
         } fixed z-50 inset-y-0 left-0 w-64 bg-purple-500 text-white transform transition-transform md:relative md:translate-x-0 h-full`}
       >
         <div className="relative px-6 py-6 flex items-center justify-center">
-          <Image
-            src="/eBikri-logo-white.svg"
-            alt="eBikri Logo"
-            width={120}
-            height={30}
-            className="cursor-pointer transition-transform hover:scale-105 mt-2"
-            onClick={() => window.location.href = "/dashboard"} // redirect to dashboard on logo click
-            priority
-          />
+          {/* redirect to dashboard on logo click */}
+          <Link href="/dashboard" passHref>
+            <Image
+              src="/eBikri-logo-white.svg"
+              alt="eBikri Logo"
+              width={120}
+              height={30}
+              className="cursor-pointer transition-transform hover:scale-105 mt-2"
+              priority
+            />
+          </Link>
           <Bars3Icon
             className="h-6 w-6 text-white cursor-pointer md:hidden"
             onClick={() => setIsNavbarOpen(!isNavbarOpen)}
@@ -59,7 +61,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
           <ul>
             <li>
               <Link
-                href="/dashboard"
+                href="/dashboard" passHref prefetch
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive("/dashboard")
                     ? "!border-l-4 !border-white-400 font-bold"
@@ -73,7 +75,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
 
             <li>
               <Link
-                href="/inventory"
+                href="/inventory" passHref prefetch
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive("/inventory")
                     ? "!border-l-4 !border-white-400 font-bold"
@@ -87,7 +89,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
 
             <li>
               <Link
-                href="/orders"
+                href="/orders" passHref prefetch
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive("/orders")
                     ? "!border-l-4 !border-white-400 font-bold"
@@ -101,7 +103,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
 
             <li>
               <Link
-                href="/customers"
+                href="/customers" passHref prefetch
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive("/customers")
                     ? "!border-l-4 !border-white-400 font-bold"
@@ -115,7 +117,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
 
             <li>
               <Link
-                href="/sales"
+                href="/sales" passHref prefetch
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive("/sales")
                     ? "!border-l-4 !border-white-400 font-bold"
@@ -129,7 +131,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
 
             <li>
               <Link
-                href="/marketing"
+                href="/marketing" passHref prefetch
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive("/marketing")
                     ? "!border-l-4 !border-white-400 font-bold"
@@ -143,7 +145,7 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
 
             <li>
               <Link
-                href="/settings"
+                href="/settings" passHref prefetch
                 className={`block px-6 py-6 text-lg text-white hover:border-l-4 hover:border-purple-500 transition-transform hover:font-bold flex items-center gap-3 ${
                   isActive("/settings")
                     ? "!border-l-4 !border-white-400 font-bold"

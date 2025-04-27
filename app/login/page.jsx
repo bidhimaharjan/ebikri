@@ -72,7 +72,7 @@ export default function LoginPage() {
       <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
         {/* Left Section */}
         <div className="flex flex-col justify-center gap-6 px-6 py-10 md:w-1/2 md:px-20">
-        <LoginForm 
+          <LoginForm 
             formData={formData} 
             onChange={handleChange} 
             onSubmit={handleSubmit}
@@ -82,13 +82,16 @@ export default function LoginPage() {
           />
 
           {/* Google Sign-In Button */}
-          <div className="relative flex items-center">
+          <div className="relative flex items-center px-6">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="flex-shrink mx-4 text-gray-400">OR</span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
           
-          <GoogleSignInButton />
+          <div className="relative flex items-center px-6">
+            <GoogleSignInButton />
+          </div>
+          
         </div>
 
         {/* Vertical line */}

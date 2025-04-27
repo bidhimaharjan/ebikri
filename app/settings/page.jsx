@@ -60,48 +60,51 @@ const SettingsLayout = () => {
   const [businessErrors, setBusinessErrors] = useState({});
   const [passwordErrors, setPasswordErrors] = useState({});
 
+  // fetch user data
+  const fetchUserData = async () => {
+    if (session?.user?.id) {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/settings/${session.user.id}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to fetch user data");
+        }
+
+        const data = await response.json();
+
+        setUserData({
+          personalInfo: {
+            name: data.user?.name || "",
+            email: data.user?.email || "",
+            phoneNumber: data.user?.phoneNumber || "",
+          },
+          businessInfo: {
+            businessName: data.business?.businessName || "",
+            businessType: data.business?.businessType || "",
+            businessEmail: data.business?.businessEmail || "",
+            panNumber: data.business?.panNumber || "",
+          },
+        });
+      } catch (error) {
+        toast.error("Failed to load user data");
+        console.error("Error fetching user data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
   // fetch user data on component mount
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (session?.user?.id) {
-        try {
-          setIsLoading(true);
-          const response = await fetch(`/api/settings/${session.user.id}`, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Failed to fetch user data");
-          }
-
-          const data = await response.json();
-
-          setUserData({
-            personalInfo: {
-              name: data.user?.name || "",
-              email: data.user?.email || "",
-              phoneNumber: data.user?.phoneNumber || "",
-            },
-            businessInfo: {
-              businessName: data.business?.businessName || "",
-              businessType: data.business?.businessType || "",
-              businessEmail: data.business?.businessEmail || "",
-              panNumber: data.business?.panNumber || "",
-            },
-          });
-        } catch (error) {
-          toast.error("Failed to load user data");
-          console.error("Error fetching user data:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchUserData();
+    if (session) {
+      fetchUserData();
+    }
   }, [session]);
 
   // handle changes in personal fields
@@ -326,7 +329,7 @@ const SettingsLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <Link href="/profile">
+          <Link href="/profile" passHref prefetch>
             <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
               <UserCircleIcon className="h-5 w-5 mr-2" />
               <BusinessName userId={session.user.id} />

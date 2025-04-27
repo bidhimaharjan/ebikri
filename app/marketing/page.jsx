@@ -47,6 +47,7 @@ const MarketingLayout = () => {
     }
   };
 
+  // fetch marketing data on component mount
   useEffect(() => {
     if (session) {
       fetchCampaigns();
@@ -172,7 +173,7 @@ const MarketingLayout = () => {
       <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
         {/* Profile Button */}
         <div className="flex justify-end mb-2">
-          <Link href="/profile">
+          <Link href="/profile" passHref prefetch>
             <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
               <UserCircleIcon className="h-5 w-5 mr-2" />
               <BusinessName userId={session.user.id} />

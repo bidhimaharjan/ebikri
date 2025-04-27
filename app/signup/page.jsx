@@ -1,6 +1,5 @@
 "use client";
 
-// import EbikriLogo from '@app/ui/ebikri-logo';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SignupForm from "@/components/users/signup-form";
@@ -118,25 +117,17 @@ export default function SignupPage() {
           />
 
           {/* Add Google Sign-In Button */}
-          <div className="relative flex items-center">
+          <div className="relative flex items-center px-6">
             <div className="flex-grow border-t border-gray-300"></div>
             <span className="flex-shrink mx-4 text-gray-400 mb-4">OR</span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
 
-          <GoogleSignInButton />
+          <div className="relative flex items-center px-6">
+            <GoogleSignInButton />
+          </div>
         </div>
       </div>
     </main>
-    // <main className="flex items-center justify-center md:h-screen">
-    //   <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4 md:-mt-32">
-    //     <div className="flex h-20 w-full items-end rounded-lg bg-blue-500 p-3 md:h-36">
-    //       <div className="w-32 text-white md:w-36">
-    //         <AcmeLogo />
-    //       </div>
-    //     </div>
-    //     <LoginForm />
-    //   </div>
-    // </main>
   );
 }
