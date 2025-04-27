@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
-import { UserCircleIcon, PencilIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, PencilIcon, BuildingOfficeIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import BusinessName from "@/components/businessname";
@@ -111,81 +111,62 @@ const ProfileLayout = () => {
           </button>
         </Link>
 
-        {/* Content Container */}
-        <div className="flex-grow">
-          {/* Personal Information Section */}
-          <div className="px-4 py-5 sm:p-6 mb-4">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4">
-              Personal Information
-            </h4>
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-semibold text-gray-500">
-                  Full name
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">{userData.name}</dd>
+        {/* Cards Container */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Personal Information Card */}
+          <div className="bg-white rounded-lg shadow-sm p-10">
+            <div className="flex items-center mb-4 pb-4 border-b border-gray-200">
+              <UserCircleIcon className="h-6 w-6 text-purple-500 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-800">
+                Personal Information
+              </h2>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Full name</p>
+                <p className="text-sm text-gray-900 mt-1">{userData.name}</p>
               </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-semibold text-gray-500">
-                  Email address
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">{userData.email}</dd>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Email address</p>
+                <p className="text-sm text-gray-900 mt-1">{userData.email}</p>
               </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-semibold text-gray-500">
-                  Phone number
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {userData.phoneNumber}
-                </dd>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Phone number</p>
+                <p className="text-sm text-gray-900 mt-1">{userData.phoneNumber}</p>
               </div>
-            </dl>
+            </div>
           </div>
 
-          {/* Business Information Section */}
-          <div className="px-4 py-5 sm:p-6 border-t border-gray-300">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4 mt-4">
-              Business Information
-            </h4>
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-semibold text-gray-500">
-                  Business name
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {businessData.businessName}
-                </dd>
+          {/* Business Information Card */}
+          <div className="bg-white rounded-lg shadow-sm p-10">
+            <div className="flex items-center mb-4 pb-4 border-b border-gray-200">
+              <BuildingOfficeIcon className="h-6 w-6 text-purple-500 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-800">
+                Business Information
+              </h2>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Business name</p>
+                <p className="text-sm text-gray-900 mt-1">{businessData.businessName}</p>
               </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-semibold text-gray-500">
-                  Business type
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {businessData.businessType}
-                </dd>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Business type</p>
+                <p className="text-sm text-gray-900 mt-1">{businessData.businessType}</p>
               </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-semibold text-gray-500">
-                  Business email
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {businessData.businessEmail}
-                </dd>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Business email</p>
+                <p className="text-sm text-gray-900 mt-1">{businessData.businessEmail}</p>
               </div>
-              <div className="sm:col-span-1">
-                <dt className="text-sm font-semibold text-gray-500">
-                  PAN number
-                </dt>
-                <dd className="mt-1 text-sm text-gray-900">
-                  {businessData.panNumber}
-                </dd>
+              <div>
+                <p className="text-sm font-medium text-gray-500">PAN number</p>
+                <p className="text-sm text-gray-900 mt-1">{businessData.panNumber}</p>
               </div>
-            </dl>
+            </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center text-gray-500 text-sm mt-20">
+        <div className="text-center text-gray-500 text-sm mt-40">
           &copy; {new Date().getFullYear()} eBikri. All Rights Reserved
         </div>
       </div>

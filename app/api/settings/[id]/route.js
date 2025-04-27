@@ -6,31 +6,49 @@ import { usersTable } from "@/src/db/schema/users";
 import { businessTable } from "@/src/db/schema/business";
 import { eq } from "drizzle-orm";
 import { compare, hash } from "bcrypt";
+import jwt from 'jsonwebtoken';
 
 // fetch user and business data
-export async function GET(request, { params }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-
+export async function GET(req, { params }) {
   try {
-    const { id } = await params;
-
-    // verify user can only access their own data
-    if (id !== session.user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    let userId;
+    const authHeader = req.headers.get('authorization');
+    
+    // check for mobile JWT token first
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+        userId = decoded.userId;
+        
+        // verify the requested ID matches the token's user ID
+        if (params.id !== userId) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+      } catch (err) {
+        return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+      }
+    } 
+    // fall back to NextAuth session for web requests
+    else {
+      const session = await getServerSession(authOptions);
+      if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      
+      // verify user can only access their own data
+      if (params.id !== session.user.id) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      
+      userId = session.user.id;
     }
 
     // fetch user data
     const [user] = await db
       .select()
       .from(usersTable)
-      .where(eq(usersTable.id, id));
+      .where(eq(usersTable.id, userId));
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -40,7 +58,7 @@ export async function GET(request, { params }) {
     const [business] = await db
       .select()
       .from(businessTable)
-      .where(eq(businessTable.userId, id));
+      .where(eq(businessTable.userId, userId));
 
     // remove sensitive fields before sending response
     const { password, ...safeUserData } = user;
