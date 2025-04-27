@@ -20,6 +20,7 @@ export async function GET(req) {
       const token = authHeader.split(' ')[1]; // extract the token from the header
       try {
         const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET); // verify the token
+        businessId = decoded.businessId;
       } catch (err) {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
       }

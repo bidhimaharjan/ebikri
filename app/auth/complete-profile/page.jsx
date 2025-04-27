@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function CompleteProfile() {
   const { data: session, status, update } = useSession();
   const router = useRouter();
-
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     phoneNumber: "",
@@ -16,18 +16,20 @@ export default function CompleteProfile() {
     businessEmail: "",
     panNumber: "",
   });
-  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // check session status and user profile completion requirement on component mount
   useEffect(() => {
     if (status === "loading") return;
 
     if (!session) {
+      // if no active session, redirect to login
       router.push("/login");
       return;
     }
 
     if (!session.user?.requiresProfileCompletion) {
+      // if profile completion is not required, redirect to dashboard
       router.push("/dashboard");
       return;
     }
@@ -39,16 +41,18 @@ export default function CompleteProfile() {
     return <div>Loading...</div>;
   }
 
+  // handle input field changes and update form state
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError("");
 
     try {
+      // send form data to API endpoint for profile completion
       const response = await fetch("/api/auth/complete-profile", {
         method: "POST",
         headers: {
@@ -59,26 +63,33 @@ export default function CompleteProfile() {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Submission failed");
+      if (!response.ok) {
+        toast.error(data.error || "Failed to update profile");
+        return;
+      }
 
-      // Force a complete session refresh with all user data
+      // update session with new user data and mark profile completion as done
       await update({
         user: {
           ...session.user,
-          ...data.user, // Include all returned user data
+          ...data.user, // include all returned user data
           requiresProfileCompletion: false,
         },
       });
 
-      // Hard redirect to ensure middleware picks up changes
-      window.location.href = "/dashboard";
+      toast.success("Profile completed successfully!");
+      // force a full page reload to trigger NextAuth middleware updates
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1500);
     } catch (err) {
-      setError(err.message || "Failed to update profile");
+      toast.error(err.message || "An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // function for consistent input styling
   const getInputClass = (name) =>
     `peer block w-full rounded-xl border border-gray-200 py-[8px] pl-4 text-xs outline-2 placeholder:text-gray-500`;
 
@@ -88,6 +99,7 @@ export default function CompleteProfile() {
         onSubmit={handleSubmit}
         className="bg-white rounded-xl shadow-lg px-6 py-8 w-full max-w-xl space-y-5"
       >
+        {/* Title */}
         <h1 className={`$ text-xl font-bold text-purple-500 text-center`}>
           Complete Your Profile
         </h1>
@@ -96,13 +108,7 @@ export default function CompleteProfile() {
           Please provide your personal and business details to continue.
         </p>
 
-        {error && (
-          <div className="p-3 bg-red-100 text-red-700 rounded text-sm text-center">
-            {error}
-          </div>
-        )}
-
-        {/* Phone Number */}
+        {/* Phone Number Field */}
         <div>
           <label
             className="block font-medium text-sm text-gray-900 mb-2"
@@ -122,7 +128,7 @@ export default function CompleteProfile() {
           />
         </div>
 
-        {/* Business Name */}
+        {/* Business Name Field */}
         <div>
           <label
             className="block font-medium text-sm text-gray-900 mb-2"
@@ -142,7 +148,7 @@ export default function CompleteProfile() {
           />
         </div>
 
-        {/* Business Type */}
+        {/* Business Type Field */}
         <div>
           <label
             className="block font-medium text-sm text-gray-900 mb-2"
@@ -168,7 +174,7 @@ export default function CompleteProfile() {
           </select>
         </div>
 
-        {/* Business Email */}
+        {/* Business Email Field */}
         <div>
           <label
             className="block font-medium text-sm text-gray-900 mb-2"
@@ -187,7 +193,7 @@ export default function CompleteProfile() {
           />
         </div>
 
-        {/* PAN Number */}
+        {/* PAN Number Field */}
         <div>
           <label
             className="block font-medium text-sm text-gray-900 mb-2"
@@ -206,6 +212,7 @@ export default function CompleteProfile() {
           />
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={isSubmitting}

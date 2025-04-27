@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+// middleware function runs on every request matching the config.matcher paths
 export async function middleware(request) {
   console.log('Middleware triggered for:', request.url);
   console.log('Request method:', request.method);
@@ -8,17 +9,17 @@ export async function middleware(request) {
 
   const response = NextResponse.next();
 
-  // Set CORS headers
-  response.headers.set('Access-Control-Allow-Origin', '*'); // Replace '*' with your specific origin
+  // set CORS headers for the response
+  response.headers.set('Access-Control-Allow-Origin', '*');
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  // Handle preflight requests
+  // handle preflight requests
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
       headers: {
-        'Access-Control-Allow-Origin': '*', // Replace '*' with your specific origin
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
@@ -58,8 +59,9 @@ export async function middleware(request) {
   return response;
 }
 
+// define which routes this middleware applies to
 export const config = {
-  // all protected routes that require authentication:
+  // all protected routes that require authentication
   matcher: [
     '/dashboard',
     '/auth/complete-profile',

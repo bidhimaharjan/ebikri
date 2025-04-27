@@ -21,7 +21,7 @@ export async function POST(req) {
     panNumber,
   } = await req.json();
 
-  // Validate required fields
+  // validate required fields
   if (!phoneNumber || !/^\d{10}$/.test(phoneNumber)) {
     return NextResponse.json({ error: 'Valid 10-digit phone number is required' }, { status: 400 });
   }
@@ -31,7 +31,7 @@ export async function POST(req) {
   }
 
   try {
-    // Check for phone number conflict
+     // check for phone number, email, and PAN conflicts
     const existingPhone = await db
       .select()
       .from(usersTable)
@@ -41,14 +41,13 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Phone number already in use' }, { status: 400 });
     }
 
-    // Check for existing business for this user
+    // check for existing business for this user
     const existingBusiness = await db
       .select()
       .from(businessTable)
       .where(eq(businessTable.userId, session.user.id))
       .limit(1);
 
-    // Check for business email conflict (if provided)
     if (businessEmail) {
       const existingEmail = await db
         .select()
@@ -60,7 +59,6 @@ export async function POST(req) {
       }
     }
 
-    // Check for PAN number conflict (if provided)
     if (panNumber) {
       const existingPan = await db
         .select()
@@ -72,7 +70,7 @@ export async function POST(req) {
       }
     }
 
-    // Update user's phone number
+    // update phone number
     await db
       .update(usersTable)
       .set({ 
@@ -81,7 +79,7 @@ export async function POST(req) {
       })
       .where(eq(usersTable.id, session.user.id));
 
-    // Update existing business or insert if none
+    // update business info
     if (existingBusiness.length > 0) {
       await db
         .update(businessTable)
@@ -102,8 +100,7 @@ export async function POST(req) {
       });
     }
 
-
-    // After successful updates, fetch the complete updated user
+    // after successful updates, fetch the complete updated user
     const [updatedUser] = await db
       .select()
       .from(usersTable)

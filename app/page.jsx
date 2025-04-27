@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 export default function Page() {
+  // list of feature cards with their icons, descriptions, and animation delay
   const features = [
     {
       title: "Sales Tracking",
@@ -50,31 +51,31 @@ export default function Page() {
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
     {/* Logo Header Section */}
     <header className="px-4 sm:px-6 lg:px-8 py-4 overflow-hidden">
-  <div className="max-w-7xl mx-auto">
-    <motion.div
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{
-        type: "spring",
-        duration: 0.8,
-        delay: 0.2
-      }}
-      className="flex items-center mt-6"
-    >
-      <Image
-        src="/eBikri-logo-purple.svg"
-        alt="eBikri Logo"
-        width={120}
-        height={30}
-        className="h-12 w-auto cursor-pointer transition-transform hover:scale-105"
-        onClick={() => window.location.href = "/"}
-        priority
-      />
-    </motion.div>
-  </div>
-</header>
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{
+            type: "spring",
+            duration: 0.8,
+            delay: 0.2
+          }}
+          className="flex items-center mt-6"
+        >
+          <Image
+            src="/eBikri-logo-purple.svg"
+            alt="eBikri Logo"
+            width={120}
+            height={30}
+            className="h-12 w-auto cursor-pointer transition-transform hover:scale-105"
+            onClick={() => window.location.href = "/"}
+            priority
+          />
+        </motion.div>
+      </div>
+    </header>
 
-      {/* Hero Section */}
+      {/* Main Headline Section */}
       <section className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -90,6 +91,7 @@ export default function Page() {
               <p className="text-lg md:text-xl text-gray-600">
                 The complete retail management solution designed for small businesses to streamline operations and boost sales.
               </p>
+              {/* Sign up and Log in Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/signup">
                   <Button className="px-8 py-4 text-lg font-semibold rounded-xl bg-purple-500 text-white hover:bg-purple-600 transition-colors shadow-lg hover:shadow-xl">
@@ -104,6 +106,7 @@ export default function Page() {
               </div>
             </motion.div>
 
+            {/* Dashboard Preview Image */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -117,6 +120,7 @@ export default function Page() {
                 height={600} 
                 className="rounded-xl shadow-2xl border border-gray-200"
               />
+              {/* Floating Animated Card */}
               <motion.div 
                 animate={{ 
                   y: [0, -10, 0],
@@ -162,6 +166,7 @@ export default function Page() {
             </motion.p>
           </div>
 
+          {/* Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <motion.div
@@ -184,7 +189,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Testimonial Section */}
+      {/* User Review Section */}
       <section className="py-20 bg-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 

@@ -10,7 +10,7 @@ export async function POST(req) {
   try {
     const data = await req.json();
 
-    // check if user already exists
+    // check if user with the given email already exists
     const existingUser = await db
       .select()
       .from(usersTable)
@@ -36,16 +36,16 @@ export async function POST(req) {
       );
     }
 
-    // hash password
+    // hash password before storing
     const hashedPassword = await hash(data.password, 10);
 
-    // insert new user and get the inserted ID using .returning
+    // insert new user into usersTable and return the inserted record
     const [newUser] = await db.insert(usersTable).values({
-      id: uuidv4(),
+      id: uuidv4(), // generate a unique uuid for the new user
       name: data.name,
       phoneNumber: data.phoneNumber,
       email: data.email,
-      password: hashedPassword,
+      password: hashedPassword, // store the hashed password
       emailVerified: null,
       image: null,
       provider: 'credentials',
@@ -54,8 +54,9 @@ export async function POST(req) {
 
     // check if newUser is valid and contains the userId
     if (newUser && newUser.id) {
+      // insert associated business details into businessTable
       await db.insert(businessTable).values({
-        userId: newUser.id,
+        userId: newUser.id, // link business to newly created user
         businessName: data.businessName,
         businessType: data.businessType,
         businessEmail: data.businessEmail,

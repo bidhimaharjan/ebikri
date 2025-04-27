@@ -2,19 +2,16 @@
 
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 export default function GoogleSignInButton() {
-  const router = useRouter();
-
-  // handle sign in with Google
+  // handle sign in with Google provider
   const handleSignIn = async () => {
     try {
       const result = await signIn('google', {
+        // trigger NextAuth signIn with Google and redirect to dashboard on success
         callbackUrl: '/dashboard', // default callback URL      
       });
       
-      // redirect URL after successful login
       if (result?.error) {
         throw new Error(result.error);
       }

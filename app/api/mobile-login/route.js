@@ -6,12 +6,13 @@ import { businessTable } from "@/src/db/schema/business";
 import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 
+// handle POST request for mobile login
 export async function POST(req) {
   try {
-    // Parse the incoming request body
+    // parse the incoming request body to extract email and password
     const { email, password } = await req.json();
 
-    // Find user in database
+    // find user in database
     const [user] = await db.select()
       .from(usersTable)
       .where(eq(usersTable.email, email))
@@ -21,29 +22,30 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Verify password
+    // verify password
     const isValid = await compare(password, user.password);
     if (!isValid) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    // fetch business details if needed
+    // fetch the associated business details using userId
     const [business] = await db.select()
       .from(businessTable)
       .where(eq(businessTable.userId, user.id))
       .limit(1);
 
-    // Create JWT token (valid for 7 days)
+    // create JWT token containing userId, email, and businessId
     const token = sign(
       {
         userId: user.id,
         email: user.email,
         businessId: business.id
       },
-      process.env.NEXTAUTH_SECRET,
-      { expiresIn: '7d' }
+      process.env.NEXTAUTH_SECRET, // NextAuth secret key from .env
+      { expiresIn: '7d' } // valid for 7 days
     );
 
+    // return response with the token and basic user info
     return NextResponse.json({
       token,
       user: {

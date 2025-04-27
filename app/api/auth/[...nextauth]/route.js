@@ -29,6 +29,7 @@ export const authOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
+      // runs when a user submits login form
       async authorize(credentials) {
         // email and password from user input
         const { email, password } = credentials;
@@ -45,7 +46,6 @@ export const authOptions = {
 
         // verify password
         const isValid = await compare(password, user[0].password);
-        // if password is incorrect, throw an error
         if (!isValid) throw new Error("Password is incorrect");
 
         // fetch business ID linked to the user
@@ -68,14 +68,14 @@ export const authOptions = {
     }),
   ],
   session: {
-    strategy: "jwt", // use JWT tokens for session management
+    strategy: "jwt", // use JWT web tokens for session management
   },
   callbacks: {
+    // custom sign in callback to handle Google sign ins
     async signIn({ user, account, profile }) {
-      // handle Google sign in
       if (account?.provider === "google") {
         try {
-          // check if user exists
+          // check if user already exists
           const [existingUser] = await db
             .select()
             .from(usersTable)
@@ -115,7 +115,7 @@ export const authOptions = {
       }
       return true;
     },
-    // build the JWT token
+    // build the JWT token with additional data attached
     async jwt({ token, user, account, profile }) {
       // handle initial sign in
       if (user) {
@@ -156,8 +156,10 @@ export const authOptions = {
         };
       }
     
-      // subsequent requests - refresh from database
+      // refresh 'requiresProfileCompletion' from database to make sure that the JWT is up-to-date 
+      // and prevent users who have already completed their profile from being redirected to complete-profile page
       if (token?.id) {
+        // fetch latest user info from database by their token.id
         const [dbUser] = await db
           .select({
             requiresProfileCompletion: usersTable.requiresProfileCompletion,
@@ -168,6 +170,7 @@ export const authOptions = {
           .limit(1);
     
         if (dbUser) {
+          // merge the latest requiresProfileCompletion value into token
           return {
             ...token,
             requiresProfileCompletion: dbUser.requiresProfileCompletion
@@ -194,16 +197,16 @@ export const authOptions = {
       };
     },
   },
-  // custom page routes
+  // custom page routes for auth flows
   pages: {
     signIn: '/login', // for login
     error: '/auth/error', // for errors
     newUser: '/auth/complete-profile', // for new users to complete their profile
   },
 
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET, // for token encryption
 };
 
-// create an authentication handler for GET and POST requests
+// create API handler for both GET and POST requests
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
