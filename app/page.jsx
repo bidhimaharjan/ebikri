@@ -99,7 +99,7 @@ export default function Page() {
                   </Button>
                 </Link>
                 <Link href="/login">
-                  <Button className="px-8 py-4 text-lg font-semibold rounded-xl bg-white text-purple-500 border border-purple-600 hover:bg-purple-100 transition-colors">
+                  <Button className="px-8 py-4 text-lg font-semibold rounded-xl bg-white text-purple-500 border border-purple-600 hover:bg-purple-100 transition-colors hover:text-white">
                     Existing User? Login
                   </Button>
                 </Link>
@@ -272,7 +272,7 @@ export default function Page() {
             viewport={{ once: true }}
           >
             <Link href="/signup">
-              <Button className="px-10 py-5 text-lg font-semibold rounded-xl bg-white text-purple-600 hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl flex items-center mx-auto">
+              <Button className="px-10 py-5 text-lg font-semibold rounded-xl bg-white text-purple-600 hover:bg-purple-100 hover-text-white transition-colors shadow-lg hover:shadow-xl flex items-center mx-auto">
                 Get Started Now <ArrowRightIcon className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -281,7 +281,7 @@ export default function Page() {
       </section>
       
       {/* Footer Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-center text-gray-500 text-sm py-4">
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-center text-white text-sm py-4">
           &copy; {new Date().getFullYear()} eBikri. All Rights Reserved
         </div>
     </main>

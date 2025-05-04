@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/src/index";
 import { usersTable } from "@/src/db/schema/users";
 import { businessTable } from "@/src/db/schema/business";
+import { paymentSecretsTable } from "@/src/db/schema/payment_secret";
 import { eq } from "drizzle-orm";
 import { compare, hash } from "bcrypt";
 import jwt from 'jsonwebtoken';
@@ -12,35 +13,35 @@ import jwt from 'jsonwebtoken';
 export async function GET(req, { params }) {
   try {
     let userId;
-    const authHeader = req.headers.get('authorization');
-    
+    const authHeader = req.headers.get("authorization");
+
     // check for mobile JWT token first
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.split(' ')[1];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
       try {
         const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
         userId = decoded.userId;
-        
+
         // verify the requested ID matches the token's user ID
         if (params.id !== userId) {
           return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
       } catch (err) {
-        return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        return NextResponse.json({ error: "Invalid token" }, { status: 401 });
       }
-    } 
+    }
     // fall back to NextAuth session for web requests
     else {
       const session = await getServerSession(authOptions);
       if (!session) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
-      
+
       // verify user can only access their own data
       if (params.id !== session.user.id) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
-      
+
       userId = session.user.id;
     }
 
@@ -60,6 +61,12 @@ export async function GET(req, { params }) {
       .from(businessTable)
       .where(eq(businessTable.userId, userId));
 
+    // fetch to check if payment secret exists (but do not return the actual secret)
+    const [paymentSecret] = await db
+      .select()
+      .from(paymentSecretsTable)
+      .where(eq(paymentSecretsTable.userId, userId));
+
     // remove sensitive fields before sending response
     const { password, ...safeUserData } = user;
 
@@ -67,17 +74,16 @@ export async function GET(req, { params }) {
       {
         user: safeUserData,
         business: business || null,
+        hasPaymentSecret: !!paymentSecret // only indicate if a secret exists (not the value)
       },
       { status: 200 }
     );
-    
   } catch (error) {
     console.error("Error fetching user settings:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
     );
-    
   }
 }
 
@@ -102,6 +108,7 @@ export async function PUT(request, { params }) {
       personalInfo, // { name, email, phoneNumber }
       businessInfo, // { businessName, businessType, businessEmail, panNumber }
       passwordInfo, // { currentPassword, newPassword }
+      paymentInfo, // { liveSecretKey }
     } = body;
 
     // get current user data to verify current password if changing password
@@ -193,6 +200,30 @@ export async function PUT(request, { params }) {
           })
           .where(eq(usersTable.id, id));
           
+        changesMade = true;
+      }
+      
+      // handle payment secret update if requested
+      if (paymentInfo?.liveSecretKey) {
+        const [existingSecret] = await tx
+          .select()
+          .from(paymentSecretsTable)
+          .where(eq(paymentSecretsTable.userId, id));
+
+        if (existingSecret) {
+          await tx
+            .update(paymentSecretsTable)
+            .set({
+              liveSecretKey: paymentInfo.liveSecretKey, // stored as plaintext but encrypted at rest
+            })
+            .where(eq(paymentSecretsTable.userId, id));
+        } else {
+          await tx.insert(paymentSecretsTable).values({
+            userId: id,
+            liveSecretKey: paymentInfo.liveSecretKey, // stored as plaintext but encrypted at rest
+            paymentProvider: 'khalti',
+          });
+        }
         changesMade = true;
       }
     });

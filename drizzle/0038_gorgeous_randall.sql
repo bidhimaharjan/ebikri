@@ -1,0 +1,1 @@
+ALTER TABLE "payment_secrets" RENAME COLUMN "secretKey" TO "liveSecretKey";

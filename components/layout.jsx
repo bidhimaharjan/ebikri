@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import Navbar from './navbar'; // Import Navbar
-import { useRouter } from 'next/router';
+import Navbar from './navbar';
 
 const Layout = ({ children }) => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
 
   const handleLogout = () => {
-    // alert('Logging out...');
-    window.location.href = '/login'; // Redirect to login page
+    window.location.href = '/login'; // redirect to login page
   };
 
   return (
