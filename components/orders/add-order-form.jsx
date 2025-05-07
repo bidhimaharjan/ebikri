@@ -28,11 +28,12 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountPercent, setDiscountPercent] = useState(0);
   const [orderData, setOrderData] = useState(null);
+  const [hasPaymentSecret, setHasPaymentSecret] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState("pending");
   const [errors, setErrors] = useState({});
 
-  // fetch products and customers when the form is opened
+  // fetch products customers, and payment secret when the form is opened
   useEffect(() => {
     if (isOpen) {
       const fetchData = async () => {
@@ -62,7 +63,22 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
         }
       };
 
+      // function to check if payment secret exists for this user
+      const checkPaymentSecret = async () => {
+        try {
+          const response = await fetch('/api/payment/check-secret');
+          if (response.ok) {
+            const data = await response.json();
+            // update state to show if payment secret exists
+            setHasPaymentSecret(data.hasSecret);
+          }
+        } catch (error) {
+          console.error("Error checking payment secret:", error);
+        }
+      };
+
       fetchData();
+      checkPaymentSecret();
     }
   }, [isOpen]);
 
@@ -495,9 +511,11 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   </label>
                   <input
                     type="text"
-                    name="deliveryLocation" 
+                    name="deliveryLocation"
                     className={`w-full p-2 mt-1 text-sm border ${
-                      errors.deliveryLocation ? 'border-red-500' : 'border-gray-300'
+                      errors.deliveryLocation
+                        ? "border-red-500"
+                        : "border-gray-300"
                     } rounded`}
                     value={deliveryLocation}
                     onChange={(e) => {
@@ -510,7 +528,9 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                     required
                   />
                   {errors.deliveryLocation && (
-                    <p className="mt-1 text-xs text-red-500">{errors.deliveryLocation}</p>
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.deliveryLocation}
+                    </p>
                   )}
                 </div>
               </div>
@@ -535,12 +555,13 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                       type="text"
                       name="name"
                       className={`w-full p-2 mt-1 text-sm border ${
-                        errors.name ? 'border-red-500' : 'border-gray-300'
+                        errors.name ? "border-red-500" : "border-gray-300"
                       } rounded`}
                       value={name}
                       onChange={(e) => {
                         setName(e.target.value);
-                        if (errors.name) setErrors({ ...errors, name: undefined });
+                        if (errors.name)
+                          setErrors({ ...errors, name: undefined });
                       }}
                     />
                     {errors.name && (
@@ -554,35 +575,45 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                       type="email"
                       name="email"
                       className={`w-full p-2 mt-1 text-sm border ${
-                        errors.email ? 'border-red-500' : 'border-gray-300'
+                        errors.email ? "border-red-500" : "border-gray-300"
                       } rounded`}
                       value={email}
                       onChange={(e) => {
                         setEmail(e.target.value);
-                        if (errors.email) setErrors({ ...errors, email: undefined });
+                        if (errors.email)
+                          setErrors({ ...errors, email: undefined });
                       }}
                     />
                     {errors.email && (
-                      <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.email}
+                      </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium">Phone Number *</label>
+                    <label className="block text-xs font-medium">
+                      Phone Number *
+                    </label>
                     <input
                       type="tel"
                       name="phoneNumber"
                       className={`w-full p-2 mt-1 text-sm border ${
-                        errors.phoneNumber ? 'borde r-red-500' : 'border-gray-300'
+                        errors.phoneNumber
+                          ? "borde r-red-500"
+                          : "border-gray-300"
                       } rounded`}
                       value={phoneNumber}
                       onChange={(e) => {
                         setPhoneNumber(e.target.value);
-                        if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: undefined });
+                        if (errors.phoneNumber)
+                          setErrors({ ...errors, phoneNumber: undefined });
                       }}
                     />
                     {errors.phoneNumber && (
-                      <p className="mt-1 text-xs text-red-500">{errors.phoneNumber}</p>
+                      <p className="mt-1 text-xs text-red-500">
+                        {errors.phoneNumber}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -617,7 +648,8 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                         <>
                           <div className="h-6 w-px bg-gray-300"></div>
                           <p className="text-sm text-gray-800">
-                            Discount: Rs. {Number(discountAmount).toFixed(2)} ({discountPercent}%)
+                            Discount: Rs. {Number(discountAmount).toFixed(2)} (
+                            {discountPercent}%)
                           </p>
                         </>
                       )}
@@ -627,7 +659,17 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                       <button
                         type="button"
                         onClick={handleGenerateQRCode}
-                        className="px-4 py-2 bg-green-500 text-sm text-white rounded-md hover:bg-green-600"
+                        disabled={!hasPaymentSecret} // disable button if payment is not configured
+                        className={`px-4 py-2 text-sm text-white rounded-md ${
+                          hasPaymentSecret
+                            ? "bg-green-500 hover:bg-green-600"
+                            : "bg-gray-400 cursor-not-allowed"
+                        }`}
+                        title={
+                          hasPaymentSecret
+                            ? ""
+                            : "Please configure payment settings first"
+                        }
                       >
                         Generate QR Code
                       </button>
@@ -662,7 +704,10 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
             {qrCodeUrl && !orderData?.khaltiFailed && (
               <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
                 <p className="font-semibold">Payment Notice:</p>
-                <p>Khalti payment initiated. Please scan the QR code or follow the link to complete the payment.</p>
+                <p>
+                  Khalti payment initiated. Please scan the QR code or follow
+                  the link to complete the payment.
+                </p>
               </div>
             )}
 
@@ -670,7 +715,10 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
             {isConfirmed && !orderData?.khaltiFailed && (
               <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
                 <p className="font-semibold">Payment Notice:</p>
-                <p>Offline payment initiated. Please change the payment status after payment is completed.</p>
+                <p>
+                  Offline payment initiated. Please change the payment status
+                  after payment is completed.
+                </p>
               </div>
             )}
 
@@ -678,9 +726,12 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
             {orderData?.khaltiFailed && (
               <div className="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 text-sm">
                 <p className="font-semibold">Payment Notice:</p>
-                <p>Khalti payment initiation failed. Please proceed with offline payment.</p>
+                <p>
+                  Khalti payment initiation failed. Please proceed with offline
+                  payment.
+                </p>
               </div>
-            )}         
+            )}
           </form>
         </div>
 
@@ -698,7 +749,9 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   onClick={handleRefreshPayment}
                   disabled={isRefreshing}
                   className={`flex items-center gap-1 text-sm font-semibold ${
-                    isRefreshing ? 'text-gray-500' : 'text-blue-500 hover:text-blue-700'
+                    isRefreshing
+                      ? "text-gray-500"
+                      : "text-blue-500 hover:text-blue-700"
                   }`}
                 >
                   {isRefreshing ? (
@@ -706,7 +759,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                   ) : (
                     <ArrowPathIcon className="h-4 w-4" />
                   )}
-                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                  {isRefreshing ? "Refreshing..." : "Refresh"}
                 </button>
               </div>
 

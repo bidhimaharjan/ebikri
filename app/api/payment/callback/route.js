@@ -2,25 +2,83 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import { db } from "@/src/index";
 import { paymentTable } from "@/src/db/schema/payment";
-import { eq } from "drizzle-orm";
+import { orderTable } from "@/src/db/schema/order";
+import { paymentSecretsTable } from "@/src/db/schema/payment_secret"
+import { eq, and } from "drizzle-orm";
+
+// constants for redirecting the user
+const SUCCESS_REDIRECT = "http://localhost:3000/payment-success";
+const FAILURE_REDIRECT = "http://localhost:3000/payment-failure";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const pidx = searchParams.get("pidx");
-  const transactionId = searchParams.get("transaction_id");
-  const amount = searchParams.get("amount");
-  const orderId = searchParams.get("purchase_order_id");
-  const status = searchParams.get("status");
+  
+  // debug log for incoming request
+  console.log("Payment callback received with pidx:", pidx);
+
+  // validate required parameters
+  if (!pidx) {
+    console.error("Missing required parameter: pidx");
+    return NextResponse.redirect(FAILURE_REDIRECT);
+  }
 
   try {
-    // // log the received query parameters
-    // console.log("Received Payment Callback:", {
-    //   pidx,
-    //   transactionId,
-    //   amount,
-    //   orderId,
-    //   status,
-    // });
+    // first check if we already have a completed payment for this pidx
+    const [existingPayment] = await db
+      .select()
+      .from(paymentTable)
+      .where(
+        and(
+          eq(paymentTable.pidx, pidx),
+          eq(paymentTable.status, "paid")
+        )
+      );
+
+    if (existingPayment) {
+      console.log("Payment already marked as completed, redirecting to success");
+      return NextResponse.redirect(SUCCESS_REDIRECT);
+    }
+
+    // fetch the payment record using pidx
+    const [payment] = await db
+      .select()
+      .from(paymentTable)
+      .where(eq(paymentTable.pidx, pidx));
+
+    if (!payment) {
+      console.error("Payment record not found for pidx:", pidx);
+      return NextResponse.redirect(FAILURE_REDIRECT);
+    }
+
+    // fetch the order to get businessId
+    const [order] = await db
+      .select()
+      .from(orderTable)
+      .where(eq(orderTable.id, payment.orderId));
+
+    if (!order) {
+      console.error("Order not found for payment:", payment);
+      return NextResponse.redirect(FAILURE_REDIRECT);
+    }
+
+    const businessId = order.businessId;
+
+    // fetch the user's Khalti secret key from database
+    const [paymentSecret] = await db
+      .select()
+      .from(paymentSecretsTable)
+      .where(
+        and(
+          eq(paymentSecretsTable.businessId, businessId),
+          eq(paymentSecretsTable.paymentProvider, "Khalti")
+        )
+      );
+
+    if (!paymentSecret?.liveSecretKey) {
+      console.error("Khalti payment credentials not configured for business:", businessId);
+      return NextResponse.redirect(FAILURE_REDIRECT);
+    }
 
     // verify payment with Khalti API
     const verificationResponse = await axios.post(
@@ -28,28 +86,23 @@ export async function GET(request) {
       { pidx },
       {
         headers: {
-          Authorization: `Key ${process.env.KHALTI_SECRET_KEY}`,
+          Authorization: `Key ${paymentSecret.liveSecretKey}`,
         },
       }
     );
+
+    // validate Khalti response
+    if (!verificationResponse.data?.status) {
+      console.error("Invalid response from Khalti API:", verificationResponse.data);
+      return NextResponse.redirect(FAILURE_REDIRECT);
+    }
 
     // // log Khalti's verification response
     // console.log("Khalti Verification Response:", verificationResponse.data);
 
     // console.log("Received PIDX in Callback:", pidx);
 
-    // fetch the payment record from the database
-    const [payment] = await db
-      .select()
-      .from(paymentTable)
-      .where(eq(paymentTable.pidx, pidx));
-
-    if (!payment) {
-      console.error("Payment record not found for PIDX:", pidx);
-      return NextResponse.redirect("http://localhost:3000/payment-failure");
-    }
-
-    // map Khalti's status to the schema's allowed values
+    // map Khalti's status to our schema
     const khaltiStatus = verificationResponse.data.status;
     let mappedStatus;
 
@@ -69,7 +122,7 @@ export async function GET(request) {
 
     // prepare the data for the database update
     const paymentData = {
-      transactionId: transactionId || null, // use null if transactionId is missing
+      transactionId: verificationResponse.data.transaction_id || null, // use null if transactionId is missing
       status: mappedStatus, // use the mapped status
       paymentDetails: JSON.stringify(verificationResponse.data), // store Khalti response
       paymentDate: new Date().toISOString(), // current date as the payment date
@@ -91,18 +144,14 @@ export async function GET(request) {
     // log the payment details
     console.log("Payment Details:", {
       pidx,
-      transactionId,
-      amount,
-      orderId,
-      status: mappedStatus, // Use the mapped status
-      verificationResponse: verificationResponse.data,
+      paymentData,
     });
 
     // redirect the user based on payment status
     if (mappedStatus === "paid") {
-      return NextResponse.redirect("http://localhost:3000/payment-success");
+      return NextResponse.redirect(SUCCESS_REDIRECT);
     } else {
-      return NextResponse.redirect("http://localhost:3000/payment-failure");
+      return NextResponse.redirect(FAILURE_REDIRECT);
     }
   } catch (error) {
     console.error("Error handling payment callback:", {
@@ -110,6 +159,6 @@ export async function GET(request) {
       response: error.response?.data,
       stack: error.stack,
     });
-    return NextResponse.redirect("http://localhost:3000/payment-failure");
+    return NextResponse.redirect(FAILURE_REDIRECT);
   }
 }

@@ -26,12 +26,14 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [paymentStatus, setPaymentStatus] = useState("pending");
   const [orderData, setOrderData] = useState(null);
+  const [hasPaymentSecret, setHasPaymentSecret] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // fetch available products when the form is opened
+  // fetch available products and payment secret when the form is opened
   useEffect(() => {
     if (isOpen) {
+      // function fetch available products
       const fetchAvailableProducts = async () => {
         try {
           const response = await fetch("/api/inventory");
@@ -43,7 +45,22 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
         }
       };
 
+      // function to check if payment secret exists for this user
+      const checkPaymentSecret = async () => {
+        try {
+          const response = await fetch('/api/payment/check-secret');
+          if (response.ok) {
+            const data = await response.json();
+            // update state to show if payment secret exists
+            setHasPaymentSecret(data.hasSecret);
+          }
+        } catch (error) {
+          console.error("Error checking payment secret:", error);
+        }
+      };
+
       fetchAvailableProducts();
+      checkPaymentSecret();
     }
   }, [isOpen]);
 
@@ -475,7 +492,9 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
                     type="text"
                     name="deliveryLocation"
                     className={`w-full p-2 mt-1 text-sm border ${
-                      errors.deliveryLocation ? 'border-red-500' : 'border-gray-300'
+                      errors.deliveryLocation
+                        ? "border-red-500"
+                        : "border-gray-300"
                     } rounded`}
                     value={deliveryLocation || ""}
                     onChange={(e) => {
@@ -486,7 +505,9 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
                     }}
                   />
                   {errors.deliveryLocation && (
-                    <p className="mt-1 text-xs text-red-500">{errors.deliveryLocation}</p>
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.deliveryLocation}
+                    </p>
                   )}
                 </div>
 
@@ -509,41 +530,52 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
                 {/* Generate QR Code Button */}
                 {/* Show total amount if  Confirm is clicked, otherwise show QR button */}
                 {isConfirmed ? (
-                    <div className="flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-md">
-                      <p className="text-base font-semibold text-gray-800">
-                        Total: Rs. {totalAmount}
-                      </p>
-                      {discountAmount > 0 && (
-                        <>
-                          <div className="h-6 w-px bg-gray-300"></div>
-                          <p className="text-sm text-gray-800">
-                            Discount: Rs. {Number(discountAmount).toFixed(2)} ({discountPercent}%)
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    !qrCodeUrl && (
-                      <button
-                        type="button"
-                        onClick={handleGenerateQRCode}
-                        className="px-4 py-2 bg-green-500 text-sm text-white rounded-md hover:bg-green-600"
-                      >
-                        Generate QR Code
-                      </button>
-                    )
-                  )}
+                  <div className="flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-md">
+                    <p className="text-base font-semibold text-gray-800">
+                      Total: Rs. {totalAmount}
+                    </p>
+                    {discountAmount > 0 && (
+                      <>
+                        <div className="h-6 w-px bg-gray-300"></div>
+                        <p className="text-sm text-gray-800">
+                          Discount: Rs. {Number(discountAmount).toFixed(2)} (
+                          {discountPercent}%)
+                        </p>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  !qrCodeUrl && (
+                    <button
+                      type="button"
+                      onClick={handleGenerateQRCode}
+                      disabled={!hasPaymentSecret} // disable button if payment is not configured
+                      className={`px-4 py-2 text-sm text-white rounded-md ${
+                        hasPaymentSecret
+                          ? "bg-green-500 hover:bg-green-600"
+                          : "bg-gray-400 cursor-not-allowed"
+                      }`}
+                      title={
+                        hasPaymentSecret
+                          ? ""
+                          : "Please configure payment settings first"
+                      }
+                    >
+                      Generate QR Code
+                    </button>
+                  )
+                )}
 
                 {/* Offline Button - Hidden when QR is shown or Confirm is clicked */}
                 {!qrCodeUrl && !isConfirmed && (
-                    <button
-                      type="button"
-                      onClick={handleConfirm}
-                      className="w-full sm:w-auto px-4 py-2 bg-purple-500 text-sm text-white rounded-md hover:bg-purple-400"
-                    >
-                      Confirm (Offline)
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={handleConfirm}
+                    className="w-full sm:w-auto px-4 py-2 bg-purple-500 text-sm text-white rounded-md hover:bg-purple-400"
+                  >
+                    Confirm (Offline)
+                  </button>
+                )}
 
                 {/* Done Button */}
                 <button
@@ -561,7 +593,10 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
             {qrCodeUrl && !orderData?.khaltiFailed && (
               <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
                 <p className="font-semibold">Payment Notice:</p>
-                <p>Khalti payment initiated. Please scan the QR code or follow the link to complete the payment.</p>
+                <p>
+                  Khalti payment initiated. Please scan the QR code or follow
+                  the link to complete the payment.
+                </p>
               </div>
             )}
 
@@ -569,7 +604,10 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
             {isConfirmed && !orderData?.khaltiFailed && (
               <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 text-sm">
                 <p className="font-semibold">Payment Notice:</p>
-                <p>Offline payment initiated. Please change the payment status after payment is completed.</p>
+                <p>
+                  Offline payment initiated. Please change the payment status
+                  after payment is completed.
+                </p>
               </div>
             )}
 
@@ -577,9 +615,12 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
             {orderData?.khaltiFailed && (
               <div className="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 text-sm">
                 <p className="font-semibold">Payment Notice:</p>
-                <p>Khalti payment initiation failed. Please proceed with offline payment.</p>
+                <p>
+                  Khalti payment initiation failed. Please proceed with offline
+                  payment.
+                </p>
               </div>
-            )} 
+            )}
           </form>
         </div>
 
@@ -597,7 +638,9 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
                   onClick={handleRefreshPayment}
                   disabled={isRefreshing}
                   className={`flex items-center gap-1 text-sm font-semibold ${
-                    isRefreshing ? 'text-gray-500' : 'text-blue-500 hover:text-blue-700'
+                    isRefreshing
+                      ? "text-gray-500"
+                      : "text-blue-500 hover:text-blue-700"
                   }`}
                 >
                   {isRefreshing ? (
@@ -605,7 +648,7 @@ const EditOrderForm = ({ isOpen, onClose, onConfirm, order }) => {
                   ) : (
                     <ArrowPathIcon className="h-4 w-4" />
                   )}
-                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                  {isRefreshing ? "Refreshing..." : "Refresh"}
                 </button>
               </div>
 

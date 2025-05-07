@@ -220,8 +220,9 @@ export async function PUT(request, { params }) {
         } else {
           await tx.insert(paymentSecretsTable).values({
             userId: id,
+            businessId: session.user.businessId, 
             liveSecretKey: paymentInfo.liveSecretKey, // stored as plaintext but encrypted at rest
-            paymentProvider: 'khalti',
+            paymentProvider: 'Khalti',
           });
         }
         changesMade = true;

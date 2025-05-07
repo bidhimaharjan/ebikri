@@ -31,11 +31,12 @@ const OrdersLayout = () => {
   const [selectedOrderId, setSelectedOrderId] = useState(null); // track selected order ID
   const [orderToEdit, setOrderToEdit] = useState(null); // track order to edit
   const [orderToDelete, setOrderToDelete] = useState(null); // track order to delete
+  const [hasPaymentSecret, setHasPaymentSecret] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false); // confirmation dialog state
   const rowsPerPage = 3;
 
-  // fetch order data
+  // function to fetch order data
   const fetchOrders = async () => {
     try {
       const response = await fetch(
@@ -51,10 +52,25 @@ const OrdersLayout = () => {
     }
   };
 
-  // fetch order data on component mount
+  // function to check if payment secret exists for this user
+  const checkPaymentSecret = async () => {
+    try {
+      const response = await fetch('/api/payment/check-secret');
+      if (response.ok) {
+        const data = await response.json();
+        // update state to show if payment secret exists
+        setHasPaymentSecret(data.hasSecret);
+      }
+    } catch (error) {
+      console.error("Error checking payment secret:", error);
+    }
+  };
+
+  // fetch order data and payment secret on component mount
   useEffect(() => {
     if (session) {
       fetchOrders();
+      checkPaymentSecret();
     }
   }, [session]);
 
@@ -176,7 +192,7 @@ const OrdersLayout = () => {
 
           {/* Search Bar */}
           <div className="flex-1 flex justify-center">
-            <div className="relative w-1/3">
+            <div className="relative w-1/2">
               <input
                 type="text"
                 placeholder="Search an order..."
@@ -187,6 +203,17 @@ const OrdersLayout = () => {
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
             </div>
           </div>
+
+          {/* Configure Payment Button (only shown when payment secret is missing) */}
+          {!hasPaymentSecret && (
+            <Link href="/settings" passHref>
+              <button className="h-10 px-4 py-2 bg-purple-500 text-white text-sm rounded-md flex items-center hover:bg-purple-400">
+                <CreditCardIcon className="h-4 w-4 mr-2" />
+                Configure Payment
+              </button>
+            </Link>
+          )}
+
         </div>
 
         {/* Orders Table */}

@@ -9,6 +9,7 @@ import { paymentTable } from "@/src/db/schema/payment";
 import { customerTable } from "@/src/db/schema/customer";
 import { marketingTable } from "@/src/db/schema/marketing";
 import { salesTable } from "@/src/db/schema/sales";
+import { paymentSecretsTable } from "@/src/db/schema/payment_secret"
 import { and, eq, sql } from "drizzle-orm";
 import axios from "axios";
 
@@ -328,6 +329,21 @@ export async function PUT(request, { params }) {
     // if payment method is Khalti, initiate payment
     if (paymentMethod === "Khalti") {
       try {
+        // fetch Khalti secret key from database
+        const [paymentSecret] = await db
+          .select()
+          .from(paymentSecretsTable)
+          .where(
+            and(
+              eq(paymentSecretsTable.userId, session.user.id),
+              eq(paymentSecretsTable.paymentProvider, "Khalti")
+            )
+          );
+
+        if (!paymentSecret?.liveSecretKey) {
+          throw new Error("Khalti payment credentials not configured");
+        }
+
         const khaltiResponse = await axios.post(
           "https://dev.khalti.com/api/v2/epayment/initiate/",
           {
@@ -344,7 +360,7 @@ export async function PUT(request, { params }) {
           },
           {
             headers: {
-              Authorization: `Key ${process.env.KHALTI_SECRET_KEY}`,
+              Authorization: `Key ${paymentSecret.liveSecretKey}`,
             },
             timeout: 5000,
           }
