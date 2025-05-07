@@ -9,6 +9,7 @@ import {
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from '@/app/ui/button';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function LoginForm({ formData, onChange, onSubmit, onBlur, getFieldError }) {
   const [showPassword, setShowPassword] = useState(false); // state for password visibility
@@ -85,6 +86,13 @@ export default function LoginForm({ formData, onChange, onSubmit, onBlur, getFie
             {getFieldError('password') && (
               <p className="mt-1 text-xs text-red-500">{getFieldError('password')}</p>
             )}
+          </div>
+
+          {/* Forgot Password Button */}
+          <div className="mt-4 text-center">
+            <Link href="/auth/forgot-password" className="text-purple-500 text-sm hover:underline">
+              Forgot password?
+            </Link>
           </div>
 
           {/* Remember Me Checkbox */}
