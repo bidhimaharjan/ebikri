@@ -14,15 +14,17 @@ export default function EditPaymentForm({ hasPaymentSecret, userId, onSuccess })
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // validate and save payment information
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!formData.liveSecretKey) {
-      toast.error("Please enter your Live Secret Key");
+      toast.info("Please enter your Live Secret Key");
       return;
     }
 
     try {
+      // API call to update payment information
       const response = await fetch(`/api/settings/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -42,7 +44,7 @@ export default function EditPaymentForm({ hasPaymentSecret, userId, onSuccess })
           : "Payment integration activated successfully"
       );
       setEditMode(false);
-      setFormData({ liveSecretKey: "" });
+      setFormData({ liveSecretKey: "" }); // clear after saving
       onSuccess?.();
     } catch (error) {
       toast.error(error.message);
@@ -51,9 +53,30 @@ export default function EditPaymentForm({ hasPaymentSecret, userId, onSuccess })
 
   return (
     <div>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Payment Integration
+        </h2>
+
+        {/* Edit Button */}
+        {!editMode && (
+          <button
+            onClick={() => setEditMode(true)}
+            className="p-2 text-purple-500 hover:bg-purple-50 rounded-full group relative"
+          >
+            <PencilIcon className="h-5 w-5" />
+            <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-90 transition-opacity whitespace-nowrap">
+              {hasPaymentSecret ? "Edit Key" : "Add Key"}
+            </span>
+          </button>
+        )}
+      </div>
+      
       {editMode ? (
+        // edit mode: show editable form
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
+            {/* Live Secret Key Field */}
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Khalti Live Secret Key
             </label>
@@ -86,23 +109,31 @@ export default function EditPaymentForm({ hasPaymentSecret, userId, onSuccess })
           <div className="flex space-x-2">
             <button
               type="submit"
-              className="p-2 text-green-500 hover:bg-green-50 rounded-full"
+              className="p-2 text-green-500 hover:bg-green-50 rounded-full group relative"
             >
               <CheckIcon className="h-5 w-5" />
+              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-90 transition-opacity whitespace-nowrap">
+                {hasPaymentSecret ? "Update" : "Activate"}
+              </span>
             </button>
+
             <button
               type="button"
               onClick={() => {
                 setEditMode(false);
                 setFormData({ liveSecretKey: "" });
               }}
-              className="p-2 text-red-500 hover:bg-red-50 rounded-full"
+              className="p-2 text-red-500 hover:bg-red-50 rounded-full group relative"
             >
               <XMarkIcon className="h-5 w-5" />
+              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-90 transition-opacity whitespace-nowrap">
+                Cancel
+              </span>
             </button>
           </div>
         </form>
       ) : (
+        // view mode: show read-only information
         <div className="space-y-2">
           <div className="flex items-center">
             <span
@@ -121,12 +152,6 @@ export default function EditPaymentForm({ hasPaymentSecret, userId, onSuccess })
               ? "Your Khalti payment integration is active"
               : "Add your Khalti Live Secret Key to enable payments"}
           </p>
-          <button
-            onClick={() => setEditMode(true)}
-            className="p-2 text-purple-500 hover:bg-purple-50 rounded-full"
-          >
-            <PencilIcon className="h-5 w-5" />
-          </button>
         </div>
       )}
     </div>
