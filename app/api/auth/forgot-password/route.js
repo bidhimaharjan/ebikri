@@ -20,7 +20,7 @@ export async function POST(request) {
   const { email } = await request.json();
 
   try {
-    // Check if user exists
+    // check if user exists
     const [user] = await db
       .select()
       .from(usersTable)
@@ -28,14 +28,14 @@ export async function POST(request) {
       .limit(1);
 
     if (!user) {
-      // Return success even if user doesn't exist (security measure)
+      // return success even if user does not exist
       return NextResponse.json(
         { message: "If this email exists, we've sent a reset link" },
         { status: 200 }
       );
     }
 
-    // Delete any existing tokens for this user
+    // delete any existing tokens for this user
     await db
       .delete(passwordResetTokensTable)
       .where(eq(passwordResetTokensTable.userId, user.id));
@@ -52,7 +52,7 @@ export async function POST(request) {
       expiresAt,
     });
 
-    // Send email with reset link using Mailtrap
+    // send email with reset link using Mailtrap
     const resetLink = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}`;
     
     const mailOptions = {
@@ -68,7 +68,7 @@ export async function POST(request) {
             Reset Password
           </a>
           <p>This link will expire in 1 hour.</p>
-          <p>If you didn't request this password reset, please ignore this email or contact support if you have concerns.</p>
+          <p>If you didn't request this password reset, please ignore this email.</p>
           <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
           <p style="font-size: 12px; color: #718096;">This is an automated message. Please do not reply directly to this email.</p>
         </div>

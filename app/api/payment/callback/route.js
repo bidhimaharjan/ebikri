@@ -5,6 +5,7 @@ import { paymentTable } from "@/src/db/schema/payment";
 import { orderTable } from "@/src/db/schema/order";
 import { paymentSecretsTable } from "@/src/db/schema/payment_secret"
 import { eq, and } from "drizzle-orm";
+import { decryptData } from '@/lib/encryption';
 
 // constants for redirecting the user
 const SUCCESS_REDIRECT = "http://localhost:3000/payment-success";
@@ -80,13 +81,16 @@ export async function GET(request) {
       return NextResponse.redirect(FAILURE_REDIRECT);
     }
 
+    // decrypt the secret key before using it
+    const decryptedSecretKey = decryptData(paymentSecret.liveSecretKey);
+
     // verify payment with Khalti API
     const verificationResponse = await axios.post(
       "https://dev.khalti.com/api/v2/epayment/lookup/",
       { pidx },
       {
         headers: {
-          Authorization: `Key ${paymentSecret.liveSecretKey}`,
+          Authorization: `Key ${decryptedSecretKey}`,
         },
       }
     );

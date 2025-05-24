@@ -9,7 +9,7 @@ export async function POST(request) {
   const { token, password } = await request.json();
 
   try {
-    // Find valid token
+    // find valid token
     const [resetToken] = await db
       .select()
       .from(passwordResetTokensTable)
@@ -28,16 +28,16 @@ export async function POST(request) {
       );
     }
 
-    // Hash new password
+    // hash new password
     const hashedPassword = await hash(password, 10);
 
-    // Update user password
+    // update user password
     await db
       .update(usersTable)
       .set({ password: hashedPassword })
       .where(eq(usersTable.id, resetToken.userId));
 
-    // Delete used token
+    // delete used token
     await db
       .delete(passwordResetTokensTable)
       .where(eq(passwordResetTokensTable.id, resetToken.id));

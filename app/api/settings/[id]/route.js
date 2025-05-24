@@ -7,6 +7,7 @@ import { businessTable } from "@/src/db/schema/business";
 import { paymentSecretsTable } from "@/src/db/schema/payment_secret";
 import { eq } from "drizzle-orm";
 import { compare, hash } from "bcrypt";
+import { encryptData } from '@/lib/encryption';
 import jwt from 'jsonwebtoken';
 
 // fetch user and business data
@@ -205,6 +206,9 @@ export async function PUT(request, { params }) {
       
       // handle payment secret update if requested
       if (paymentInfo?.liveSecretKey) {
+        // encrypt the live secret key
+        const encryptedSecret = encryptData(paymentInfo.liveSecretKey);
+
         const [existingSecret] = await tx
           .select()
           .from(paymentSecretsTable)
@@ -214,14 +218,14 @@ export async function PUT(request, { params }) {
           await tx
             .update(paymentSecretsTable)
             .set({
-              liveSecretKey: paymentInfo.liveSecretKey, // stored as plaintext but encrypted at rest
+              liveSecretKey: encryptedSecret, // store the encrypted key
             })
             .where(eq(paymentSecretsTable.userId, id));
         } else {
           await tx.insert(paymentSecretsTable).values({
             userId: id,
             businessId: session.user.businessId, 
-            liveSecretKey: paymentInfo.liveSecretKey, // stored as plaintext but encrypted at rest
+            liveSecretKey: encryptedSecret, // store the encrypted key
             paymentProvider: 'Khalti',
           });
         }

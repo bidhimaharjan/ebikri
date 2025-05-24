@@ -12,6 +12,7 @@ import { salesTable } from "@/src/db/schema/sales";
 import { paymentSecretsTable } from "@/src/db/schema/payment_secret"
 import { and, eq, sql } from "drizzle-orm";
 import axios from "axios";
+import { decryptData } from '@/lib/encryption';
 
 // fetch order data
 export async function GET(request) {
@@ -358,6 +359,9 @@ export async function POST(request) {
           throw new Error("Khalti payment credentials not configured");
         }
 
+        // decrypt the secret key before using it
+        const decryptedSecretKey = decryptData(paymentSecret.liveSecretKey);
+
         const khaltiResponse = await axios.post(
           "https://dev.khalti.com/api/v2/epayment/initiate/",
           {
@@ -374,7 +378,7 @@ export async function POST(request) {
           },
           {
             headers: {
-              Authorization: `Key ${paymentSecret.liveSecretKey}`,
+              Authorization: `Key ${decryptedSecretKey}`,
             },
             timeout: 5000
           }

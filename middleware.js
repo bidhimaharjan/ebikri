@@ -3,9 +3,10 @@ import { getToken } from "next-auth/jwt";
 
 // middleware function runs on every request matching the config.matcher paths
 export async function middleware(request) {
-  console.log('Middleware triggered for:', request.url);
-  console.log('Request method:', request.method);
-  console.log('Request headers:', Object.fromEntries(request.headers.entries()));
+  // debugging logs
+  // console.log('Middleware triggered for:', request.url);
+  // console.log('Request method:', request.method);
+  // console.log('Request headers:', Object.fromEntries(request.headers.entries()));
 
   const response = NextResponse.next();
 

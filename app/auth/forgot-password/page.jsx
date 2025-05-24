@@ -16,12 +16,12 @@ export default function ForgotPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check session status on component mount
+  // check session status on component mount
   useEffect(() => {
     if (status === "loading") return;
 
     if (session) {
-      // If user is already logged in, redirect to dashboard
+      // if user is already logged in, redirect to dashboard
       router.push("/dashboard");
       return;
     }
@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  // Consistent input styling
+  // consistent input styles
   const getInputClass = () =>
     `peer block w-full rounded-xl border border-gray-200 py-[8px] pl-10 text-sm outline-2 placeholder:text-gray-500`;
 

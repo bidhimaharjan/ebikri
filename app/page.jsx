@@ -10,86 +10,88 @@ export default function Page() {
   // list of feature cards with their icons, descriptions, and animation delay
   const features = [
     {
-      title: "Sales Tracking",
-      description: "Real-time sales monitoring with insightful analytics",
+      title: "Flexible Payment Options",
+      description: "Both cash and digital payment tracking",
       icon: <CurrencyDollarIcon className="h-10 w-10 text-green-500" />,
       delay: 0.1
     },
     {
       title: "Inventory Management",
-      description: "Automated stock tracking with low-level alerts",
+      description: "Automated stock tracking and management",
       icon: <ShoppingCartIcon className="h-10 w-10 text-blue-500" />,
       delay: 0.2
     },
     {
       title: "Customer Insights",
-      description: "Comprehensive customer profiles and purchase history",
+      description: "Customer profiles and purchase history",
       icon: <UserGroupIcon className="h-10 w-10 text-purple-500" />,
       delay: 0.3
     },
     {
-      title: "Mobile Ready",
-      description: "Fully responsive design works on all devices",
+      title: "Mobile Dashboard",
+      description: "Mobile friendly dashboard for on-the-go access",
       icon: <DevicePhoneMobileIcon className="h-10 w-10 text-orange-500" />,
       delay: 0.4
     },
     {
       title: "Secure Platform",
-      description: "Enterprise-grade security for your business data",
+      description: "High-level security for your business data",
       icon: <ShieldCheckIcon className="h-10 w-10 text-red-500" />,
       delay: 0.5
     },
     {
-      title: "Customizable",
-      description: "Tailor the system to your business needs",
-      icon: <CogIcon className="h-10 w-10 text-yellow-500" />,
+      title: "Sales Analytics",
+      description: "Detailed sales reports to track performance",
+      icon: <ChartBarIcon className="h-10 w-10 text-green-600" />,
       delay: 0.6
     }
   ];
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    {/* Logo Header Section */}
-    <header className="px-4 sm:px-6 lg:px-8 py-4 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{
-            type: "spring",
-            duration: 0.8,
-            delay: 0.2
-          }}
-          className="flex items-center mt-6"
-        >
-          <Image
-            src="/eBikri-logo-purple.svg"
-            alt="eBikri Logo"
-            width={120}
-            height={30}
-            className="h-12 w-auto cursor-pointer transition-transform hover:scale-105"
-            onClick={() => window.location.href = "/"}
-            priority
-          />
-        </motion.div>
-      </div>
-    </header>
+      {/* Logo Header Section */}
+      <header className="px-4 sm:px-6 lg:px-8 py-4 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{
+              type: "spring",
+              duration: 0.8,
+              delay: 0.2,
+            }}
+            className="flex items-center mt-6"
+          >
+            <Image
+              src="/eBikri-logo-purple.svg"
+              alt="eBikri Logo"
+              width={120}
+              height={30}
+              className="h-12 w-auto cursor-pointer transition-transform hover:scale-105"
+              onClick={() => (window.location.href = "/")}
+              priority
+            />
+          </motion.div>
+        </div>
+      </header>
 
       {/* Main Headline Section */}
       <section className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-24">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               className="space-y-8"
             >
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                Grow Your Business With <span className="text-purple-600">eBikri</span>
+                Grow Your Business With{" "}
+                <span className="text-purple-600">eBikri</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-600">
-                The complete retail management solution designed for small businesses to streamline operations and boost sales.
+                The complete retail management solution designed for small
+                businesses to streamline operations and boost sales.
               </p>
               {/* Sign up and Log in Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
@@ -113,22 +115,22 @@ export default function Page() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <Image 
-                src="/dashboard-preview.png" 
-                alt="eBikri Dashboard Preview" 
-                width={800} 
-                height={600} 
+              <Image
+                src="/dashboard-preview.png"
+                alt="eBikri Dashboard Preview"
+                width={800}
+                height={600}
                 className="rounded-xl shadow-2xl border border-gray-200"
               />
               {/* Floating Animated Card */}
-              <motion.div 
-                animate={{ 
+              <motion.div
+                animate={{
                   y: [0, -10, 0],
                 }}
                 transition={{
                   duration: 4,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
                 className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg border border-gray-200"
               >
@@ -146,7 +148,7 @@ export default function Page() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -162,7 +164,8 @@ export default function Page() {
               viewport={{ once: true }}
               className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Powerful tools designed to help small businesses thrive in the digital marketplace.
+              Powerful tools designed to help small businesses thrive in the
+              digital marketplace.
             </motion.p>
           </div>
 
@@ -178,10 +181,10 @@ export default function Page() {
                 whileHover={{ y: -5 }}
                 className="bg-gray-50 p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow"
               >
-                <div className="mb-6">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <div className="mb-6">{feature.icon}</div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  {feature.title}
+                </h3>
                 <p className="text-gray-600">{feature.description}</p>
               </motion.div>
             ))}
@@ -192,7 +195,7 @@ export default function Page() {
       {/* User Review Section */}
       <section className="py-20 bg-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
@@ -201,11 +204,14 @@ export default function Page() {
           >
             <div className="grid grid-cols-1 md:grid-cols-2">
               <div className="p-12 flex flex-col items-center justify-center">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Trusted by Local Businesses</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                  Trusted by Local Businesses
+                </h2>
                 <div className="space-y-8">
                   <div>
                     <p className="text-lg text-gray-600 italic mb-4">
-                      "eBikri transformed how we manage our inventory and sales. Our efficiency improved by 40% in just two months!"
+                      "eBikri transformed how we manage our inventory and sales.
+                      Our efficiency improved by 40% in just two months!"
                     </p>
                     <div className="flex items-center">
                       <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
@@ -213,31 +219,22 @@ export default function Page() {
                       </div>
                       <div className="mt-4">
                         <p className="font-semibold">Binod Shrestha</p>
-                        <p className="text-gray-500">Online Shoes Business Owner</p>
+                        <p className="text-gray-500">
+                          Online Shoes Business Owner
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="bg-purple-600 p-12 flex items-center justify-center">
-                <motion.div
-                  animate={{ 
-                    rotate: [0, 5, -5, 0],
-                  }}
-                  transition={{
-                    duration: 8,
-                    repeat: Infinity,
-                    repeatType: "reverse"
-                  }}
-                >
-                  <Image 
-                    src="/happy-customer.jpg" 
-                    alt="Happy Business Owner" 
-                    width={370} 
-                    height={370} 
-                    className="rounded-lg shadow-2xl"
-                  />
-                </motion.div>
+                <Image
+                  src="/happy-customer.jpg"
+                  alt="Happy Business Owner"
+                  width={370}
+                  height={370}
+                  className="rounded-lg shadow-2xl"
+                />
               </div>
             </div>
           </motion.div>
@@ -247,7 +244,7 @@ export default function Page() {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-purple-600 to-indigo-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -263,7 +260,7 @@ export default function Page() {
             viewport={{ once: true }}
             className="text-xl text-purple-100 mb-8 max-w-3xl mx-auto"
           >
-            Join hundreds of businesses already growing with eBikri. Start your 14-day free trial today.
+            Join hundreds of businesses already growing with eBikri.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -279,11 +276,11 @@ export default function Page() {
           </motion.div>
         </div>
       </section>
-      
+
       {/* Footer Section */}
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-center text-white text-sm py-4">
-          &copy; {new Date().getFullYear()} eBikri. All Rights Reserved
-        </div>
+        &copy; {new Date().getFullYear()} eBikri. All Rights Reserved
+      </div>
     </main>
   );
 }
