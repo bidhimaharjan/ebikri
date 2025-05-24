@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Bars3Icon, HomeIcon, CubeIcon, ShoppingCartIcon, UserIcon, ChartBarIcon, PaperClipIcon, CogIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, CubeIcon, ShoppingCartIcon, UserIcon, ChartBarIcon, PaperClipIcon, CogIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import ConfirmationDialog from './confirmation-dialog'
@@ -51,10 +51,6 @@ const Navbar = ({ isNavbarOpen, setIsNavbarOpen }) => {
               priority
             />
           </Link>
-          <Bars3Icon
-            className="h-6 w-6 text-white cursor-pointer md:hidden"
-            onClick={() => setIsNavbarOpen(!isNavbarOpen)}
-          />
         </div>
 
         <nav className="mt-2">

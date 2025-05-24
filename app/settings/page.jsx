@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, Bars3Icon } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import Navbar from "@/components/navbar";
 import BusinessName from "@/components/businessname";
@@ -14,6 +14,7 @@ import EditPaymentForm from "@/components/settings/edit-payment-key-form";
 
 const SettingsLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(true);
   // payment integration state
@@ -32,6 +33,22 @@ const SettingsLayout = () => {
       panNumber: "",
     },
   });
+
+  // toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMobileMenuOpen && !event.target.closest('.mobile-menu-container')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobileMenuOpen]);
 
   // function to fetch user data
   const fetchUserData = async () => {
@@ -88,13 +105,43 @@ const SettingsLayout = () => {
 
   return (
     <div className="flex h-screen">
-      {/* Navigation Bar */}
+      {/* Navigation Bar - Desktop */}
       <Navbar isNavbarOpen={isNavbarOpen} setIsNavbarOpen={setIsNavbarOpen} />
 
       {/* Main Content Area */}
-      <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
-        {/* Profile Button */}
-        <div className="flex justify-end mb-2">
+      <div className="flex-1 bg-gray-100 p-4 md:p-10 overflow-y-auto">
+        {/* Mobile Header */}
+        <div className="md:hidden flex justify-between items-center mb-4">
+          {/* Mobile Menu Button */}
+          <button 
+            onClick={toggleMobileMenu}
+            className="p-2 rounded-md text-gray-700 hover:bg-gray-200"
+          >
+            <Bars3Icon className="h-6 w-6" />
+          </button>
+          
+          {/* Profile Button - Mobile */}
+          <Link href="/profile" passHref prefetch>
+            <button className="flex items-center px-3 py-1 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
+              <UserCircleIcon className="h-4 w-4 mr-1" />
+              <BusinessName userId={session.user.id} />
+            </button>
+          </Link>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="mobile-menu-container md:hidden fixed inset-0 z-50 bg-white p-4 shadow-lg">
+            <Navbar 
+              isNavbarOpen={true} 
+              setIsNavbarOpen={setIsMobileMenuOpen} 
+              mobileView={true}
+            />
+          </div>
+        )}
+
+        {/* Profile Button - Desktop */}
+        <div className="hidden md:flex justify-end mb-2">
           <Link href="/profile" passHref prefetch>
             <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
               <UserCircleIcon className="h-5 w-5 mr-2" />

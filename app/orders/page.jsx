@@ -10,6 +10,7 @@ import {
   CreditCardIcon,
   PencilIcon,
   TrashIcon,
+  Bars3Icon,
 } from "@heroicons/react/24/outline";
 import AddOrderForm from "@/components/orders/add-order-form";
 import EditOrderForm from "@/components/orders/edit-order-form";
@@ -22,6 +23,7 @@ import Link from 'next/link';
 
 const OrdersLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddOrderFormOpen, setIsAddOrderFormOpen] = useState(false);
   const [isEditOrderFormOpen, setIsEditOrderFormOpen] = useState(false);
@@ -35,6 +37,22 @@ const OrdersLayout = () => {
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false); // confirmation dialog state
   const rowsPerPage = 3;
+
+  // toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMobileMenuOpen && !event.target.closest('.mobile-menu-container')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobileMenuOpen]);
 
   // function to fetch order data
   const fetchOrders = async () => {
@@ -158,13 +176,43 @@ const OrdersLayout = () => {
 
   return (
     <div className="flex h-screen">
-      {/* Navigation Bar */}
+      {/* Navigation Bar - Desktop */}
       <Navbar isNavbarOpen={isNavbarOpen} setIsNavbarOpen={setIsNavbarOpen} />
 
       {/* Main Content Area */}
-      <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
-        {/* Profile Button */}
-        <div className="flex justify-end mb-2">
+      <div className="flex-1 bg-gray-100 p-4 md:p-10 overflow-y-auto">
+        {/* Mobile Header */}
+        <div className="md:hidden flex justify-between items-center mb-4">
+          {/* Mobile Menu Button */}
+          <button 
+            onClick={toggleMobileMenu}
+            className="p-2 rounded-md text-gray-700 hover:bg-gray-200"
+          >
+            <Bars3Icon className="h-6 w-6" />
+          </button>
+
+          {/* Profile Button - Mobile */}
+          <Link href="/profile" passHref prefetch>
+            <button className="flex items-center px-3 py-1 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
+              <UserCircleIcon className="h-4 w-4 mr-1" />
+              <BusinessName userId={session.user.id} />
+            </button>
+          </Link>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="mobile-menu-container md:hidden fixed inset-0 z-50 bg-white p-4 shadow-lg">
+            <Navbar 
+              isNavbarOpen={true} 
+              setIsNavbarOpen={setIsMobileMenuOpen} 
+              mobileView={true}
+            />
+          </div>
+        )}
+
+        {/* Profile Button - Desktop */}
+        <div className="hidden md:flex justify-end mb-2">
           <Link href="/profile" passHref prefetch>
             <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
               <UserCircleIcon className="h-5 w-5 mr-2" />
@@ -181,44 +229,45 @@ const OrdersLayout = () => {
           <p className="text-gray-600">Manage and track customer orders and payments information</p>
         </div>
 
-        <div className="flex justify-between items-center mb-4">
+        {/* Search and Add Order */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4 md:gap-0">
           {/* New Order Button */}
           <button
-            className="h-10 px-4 py-2 bg-purple-500 text-white text-sm rounded-md flex items-center hover:bg-purple-400"
+            className="w-full md:w-auto h-10 px-4 py-2 bg-purple-500 text-white text-sm rounded-md flex items-center justify-center hover:bg-purple-400"
             onClick={() => setIsAddOrderFormOpen(true)}
           >
-            <PlusIcon className="h-4 w-4 mr-1" /> New Order
+            <PlusIcon className="h-4 w-4 mr-1" /> 
+            <span className="md:hidden">New Order</span>
+            <span className="hidden md:inline">New Order</span>
           </button>
 
           {/* Search Bar */}
-          <div className="flex-1 flex justify-center">
-            <div className="relative w-1/2">
-              <input
-                type="text"
-                placeholder="Search an order..."
-                className="w-full h-10 px-4 pl-10 py-2 text-sm border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
-            </div>
+          <div className="w-full md:w-1/2 relative">
+            <input
+              type="text"
+              placeholder="Search an order..."
+              className="w-full h-10 px-4 pl-10 py-2 text-sm border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
           </div>
 
           {/* Configure Payment Button (only shown when payment secret is missing) */}
           {!hasPaymentSecret && (
             <Link href="/settings" passHref>
-              <button className="h-10 px-4 py-2 bg-purple-500 text-white text-sm rounded-md flex items-center hover:bg-purple-400">
+              <button className="w-full md:w-auto h-10 px-4 py-2 bg-purple-500 text-white text-sm rounded-md flex items-center justify-center hover:bg-purple-400">
                 <CreditCardIcon className="h-4 w-4 mr-2" />
-                Configure Payment
+                <span className="md:hidden">Configure</span>
+                <span className="hidden md:inline">Configure Payment</span>
               </button>
             </Link>
           )}
-
         </div>
 
         {/* Orders Table */}
         <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
-          <table className="w-full border-collapse">
+          <table className="w-full min-w-[800px] md:min-w-full border-collapse">
             <thead>
               <tr className="text-gray-800 text-center border-b">
                 <th className="px-4 py-2">ID</th>

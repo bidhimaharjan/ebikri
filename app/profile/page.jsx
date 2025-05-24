@@ -3,13 +3,14 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
-import { UserCircleIcon, PencilIcon, BuildingOfficeIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, PencilIcon, BuildingOfficeIcon, Bars3Icon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import BusinessName from "@/components/businessname";
 
 const ProfileLayout = () => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession();
   const [userData, setUserData] = useState({
     name: "",
@@ -22,6 +23,22 @@ const ProfileLayout = () => {
     businessEmail: "",
     panNumber: "",
   });
+
+  // toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMobileMenuOpen && !event.target.closest('.mobile-menu-container')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobileMenuOpen]);
 
   // fetch user and business data
   const fetchProfileData = async () => {
@@ -83,17 +100,49 @@ const ProfileLayout = () => {
 
   return (
     <div className="flex h-screen">
-      {/* Navigation Bar */}
+      {/* Navigation Bar - Desktop */}
       <Navbar isNavbarOpen={isNavbarOpen} setIsNavbarOpen={setIsNavbarOpen} />
 
       {/* Main Content Area */}
-      <div className="flex-1 bg-gray-100 p-10 overflow-y-auto">
-        {/* Profile Button */}
-        <div className="flex justify-end mb-2">
-          <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
-            <UserCircleIcon className="h-5 w-5 mr-2" />
-            <BusinessName userId={session.user.id} />
+      <div className="flex-1 bg-gray-100 p-4 md:p-10 overflow-y-auto">
+        {/* Mobile Header */}
+        <div className="md:hidden flex justify-between items-center mb-4">
+          {/* Mobile Menu Button */}
+          <button 
+            onClick={toggleMobileMenu}
+            className="p-2 rounded-md text-gray-700 hover:bg-gray-200"
+          >
+            <Bars3Icon className="h-6 w-6" />
           </button>
+          
+          {/* Profile Button - Mobile */}
+          <Link href="/profile" passHref prefetch>
+            <button className="flex items-center px-3 py-1 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
+              <UserCircleIcon className="h-4 w-4 mr-1" />
+              <BusinessName userId={session.user.id} />
+            </button>
+          </Link>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="mobile-menu-container md:hidden fixed inset-0 z-50 bg-white p-4 shadow-lg">
+            <Navbar 
+              isNavbarOpen={true} 
+              setIsNavbarOpen={setIsMobileMenuOpen} 
+              mobileView={true}
+            />
+          </div>
+        )}
+
+        {/* Profile Button - Desktop */}
+        <div className="hidden md:flex justify-end mb-2">
+          <Link href="/profile" passHref prefetch>
+            <button className="flex items-center px-4 py-2 bg-white text-purple-400 font-bold border border-purple-400 rounded-full hover:bg-purple-400 hover:text-white">
+              <UserCircleIcon className="h-5 w-5 mr-2" />
+              <BusinessName userId={session.user.id} />
+            </button>
+          </Link>
         </div>
 
         {/* Profile Title */}
@@ -106,13 +155,13 @@ const ProfileLayout = () => {
 
         {/* Edit Profile Button */}
         <Link href="/settings" passHref prefetch>
-          <button className="h-10 px-4 py-2 mb-4 bg-purple-500 text-white text-sm font-medium rounded-md flex items-center hover:bg-purple-400">
+          <button className="w-full md:w-full lg:w-auto h-10 px-4 py-2 mb-4 bg-purple-500 text-white text-sm font-medium rounded-md flex items-center justify-center hover:bg-purple-400">
             <PencilIcon className="h-4 w-4 mr-2" /> Edit Profile
           </button>
         </Link>
 
         {/* Cards Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Personal Information Card */}
           <div className="bg-white rounded-lg shadow-sm p-10">
             <div className="flex items-center mb-4 pb-4 border-b border-gray-200">

@@ -47,28 +47,26 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
   // function to get input class based on error state
   const getInputClass = (name) => {
-    return `peer block w-full rounded-xl border ${
+    return `peer block w-full rounded-lg border ${
       getFieldError(name) ? 'border-red-500' : 'border-gray-200'
-    } py-[8px] pl-4 text-xs outline-2 placeholder:text-gray-500`;
+    } py-2 pl-3 text-sm outline-2 placeholder:text-gray-500 md:rounded-xl md:py-[8px] md:pl-4 md:text-xs`;
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-3">
-      <div className="flex-1 rounded-lg bg-gray-50 px-6">
-        <h1
-          className={`${lusitana.className} text-xl font-bold text-purple-500`}
-        >
+      <div className="flex-1 rounded-lg bg-gray-50 px-4 py-4 md:px-6">
+        <h1 className={`${lusitana.className} text-lg font-bold text-purple-500 md:text-xl`}>
           Register Your Business
         </h1>
 
         {/* Step 1: User Details */}
-        <h3 className="text-base font-semibold text-purple-500 mt-4 mb-2">
+        <h3 className="text-sm font-semibold text-purple-500 mt-3 mb-2 md:text-base md:mt-4">
           Step 1: User Details
         </h3>
-        <div className="w-full flex gap-4">
+        <div className="w-full flex flex-col gap-3 md:flex-row md:gap-4">
           {/* Name Field */}
           <div className="flex-1">
-            <label className="mb-3 block font-medium text-sm text-gray-900" htmlFor="name">
+            <label className="mb-2 block text-xs font-medium text-gray-900 md:text-sm" htmlFor="name">
               Name *
             </label>
             <input
@@ -88,7 +86,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
           {/* Phone Number Field */}
           <div className="flex-1">
-            <label className="mb-3 block font-medium text-sm text-gray-900" htmlFor="phoneNumber">
+            <label className="mb-2 block text-xs font-medium text-gray-900 md:text-sm" htmlFor="phoneNumber">
               Phone Number *
             </label>
             <input
@@ -109,7 +107,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
         {/* Email Field */}
         <div>
-          <label className="mb-3 mt-5 block font-medium text-sm text-gray-900" htmlFor="email">
+          <label className="mb-2 mt-3 block text-xs font-medium text-gray-900 md:text-sm md:mt-5" htmlFor="email">
             Email *
           </label>
           <input
@@ -131,9 +129,9 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         </div>
 
         {/* Password Fields */}
-        <div className="w-full flex gap-4">
+        <div className="w-full flex flex-col gap-3 md:flex-row md:gap-4">
           <div className="flex-1">
-            <label className="mb-3 mt-5 block font-medium text-sm text-gray-900" htmlFor="password">
+            <label className="mb-2 mt-3 block text-xs font-medium text-gray-900 md:text-sm md:mt-5" htmlFor="password">
               Password *
             </label>
             <div className="relative">
@@ -153,9 +151,9 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <EyeSlashIcon className="h-5 w-5" />
+                  <EyeSlashIcon className="h-4 w-4 md:h-5 md:w-5" />
                 ) : (
-                  <EyeIcon className="h-5 w-5" />
+                  <EyeIcon className="h-4 w-4 md:h-5 md:w-5" />
                 )}
               </button>
             </div>
@@ -190,7 +188,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
           
           {/* Confirm Password Field */}
           <div className="flex-1">
-            <label className="mb-3 mt-5 block font-medium text-sm text-gray-900" htmlFor="confirmPassword">
+            <label className="mb-2 mt-3 block text-xs font-medium text-gray-900 md:text-sm md:mt-5" htmlFor="confirmPassword">
               Confirm Password *
             </label>
             <div className="relative">
@@ -210,9 +208,9 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? (
-                  <EyeSlashIcon className="h-5 w-5" />
+                  <EyeSlashIcon className="h-4 w-4 md:h-5 md:w-5" />
                 ) : (
-                  <EyeIcon className="h-5 w-5" />
+                  <EyeIcon className="h-4 w-4 md:h-5 md:w-5" />
                 )}
               </button>
             </div>
@@ -223,13 +221,13 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         </div>
 
         {/* Step 2: Business Details */}
-        <h3 className="mt-8 text-base font-semibold text-purple-500 mb-2">
+        <h3 className="mt-6 text-sm font-semibold text-purple-500 mb-2 md:text-base md:mt-8">
           Step 2: Business Details
         </h3>
-        <div className="w-full flex gap-4">
+        <div className="w-full flex flex-col gap-3 md:flex-row md:gap-4">
           {/* Business Name Field */}
           <div className="flex-1">
-            <label className="mb-3 block font-medium text-sm text-gray-900" htmlFor="businessName">
+            <label className="mb-2 block text-xs font-medium text-gray-900 md:text-sm" htmlFor="businessName">
               Business Name *
             </label>
             <input
@@ -249,7 +247,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
           {/* Business Type Field */}
           <div className="flex-1">
-            <label className="mb-3 block font-medium text-sm text-gray-900" htmlFor="businessType">
+            <label className="mb-2 block text-xs font-medium text-gray-900 md:text-sm" htmlFor="businessType">
               Business Type *
             </label>
             <select
@@ -274,10 +272,10 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
           </div>
         </div>
 
-        {/* Business Email Field */}
-        <div className="w-full flex gap-4">
+        {/* Business Email and PAN Fields */}
+        <div className="w-full flex flex-col gap-3 md:flex-row md:gap-4">
           <div className="flex-1">
-            <label className="mt-5 mb-3 block font-medium text-sm text-gray-900" htmlFor="businessEmail">
+            <label className="mt-3 mb-2 block text-xs font-medium text-gray-900 md:text-sm md:mt-5" htmlFor="businessEmail">
               Business Email
             </label>
             <input
@@ -300,7 +298,7 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
 
           {/* PAN Number Field */}
           <div className="flex-1">
-            <label className="mt-5 mb-3 block font-medium text-sm text-gray-900" htmlFor="panNumber">
+            <label className="mt-3 mb-2 block text-xs font-medium text-gray-900 md:text-sm md:mt-5" htmlFor="panNumber">
               PAN Number
             </label>
             <input
@@ -323,10 +321,10 @@ export default function SignupForm({ formData, onChange, onSubmit }) {
         <div className="flex justify-center items-center h-full">
           <Button
             type="submit"
-            className="flex items-center gap-4 rounded-xl bg-purple-500 px-4 py-2 mt-4 text-base font-medium text-white transition-colors hover:bg-purple-400"
+            className="w-full flex items-center justify-center gap-2 rounded-lg bg-purple-500 px-4 py-3 mt-4 text-sm font-medium text-white transition-colors hover:bg-purple-400 md:w-auto md:rounded-xl md:gap-4 md:text-base md:py-2"
             disabled={Object.keys(fieldErrors).some(key => fieldErrors[key])}
           >
-            <span>Sign up</span> <ArrowRightIcon className="w-4" />
+            <span>Sign up</span> <ArrowRightIcon className="w-3 md:w-4" />
           </Button>
         </div>
       </div>

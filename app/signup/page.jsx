@@ -77,22 +77,16 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col p-4 bg-gray-50">
-      {/* <div className="flex h-20 shrink-0 items-end rounded-lg bg-purple-500 p-4 md:h-20">
-        <EbikriLogo />
-        </div> */}
-
+    <main className="flex min-h-screen flex-col p-2 bg-gray-50">
       <div className="flex grow flex-col gap-4 md:flex-row">
-        {/* Left Section */}
-        <div className="flex flex-col justify-center gap-10 px-6 py-10 md:w-1/2 md:px-20">
-          <p className={`text-xl text-gray-800 md:text-4xl md:leading-normal`}>
+        {/* Left Section - Desktop */}
+        <div className="hidden lg:flex flex-col justify-center gap-6 px-6 py-10 lg:w-1/2 xl:px-20">
+          <p className="text-3xl text-gray-800 xl:text-4xl">
             <strong>Welcome to eBikri</strong>
           </p>
-          <p>
-            <span className="text-xl">
-              eBikri is a complete Retail Business Management Application for
-              your small online business.
-            </span>
+          <p className="text-lg xl:text-xl">
+            eBikri is a complete Retail Business Management Application for
+            your small online business.
           </p>
 
           <div className="flex items-center gap-3">
@@ -106,24 +100,34 @@ export default function SignupPage() {
         </div>
 
         {/* Vertical line */}
-        <div className="hidden md:block w-px bg-gray-300"></div>
+        <div className="hidden lg:block w-px bg-gray-300"></div>
 
         {/* Right Section */}
-        <div className="flex flex-col justify-center gap-2 px-6 py-10 md:w-1/2 md:px-20">
+        <div className="flex flex-col justify-center gap-2 px-4 py-6 w-full lg:w-1/2 lg:px-8 xl:px-20">
+          {/* Login Button - Mobile and Medium */}
+          <div className="flex items-center justify-center gap-3 mb-4 lg:hidden">
+            <p className="text-sm">Already have an account?</p>
+            <Link href="/login">
+              <Button className="flex items-center gap-2 rounded-xl bg-purple-500 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-purple-400">
+                <span>Log in</span> <ArrowRightIcon className="w-3" />
+              </Button>
+            </Link>
+          </div>
+
           <SignupForm
             formData={formData}
             onChange={handleChange}
             onSubmit={handleSubmit}
           />
 
-          {/* Add Google Sign-In Button */}
-          <div className="relative flex items-center px-6">
+          {/* Google Sign in Button */}
+          <div className="relative flex items-center px-4">
             <div className="flex-grow border-t border-gray-300"></div>
-            <span className="flex-shrink mx-4 text-gray-400 mb-4">OR</span>
+            <span className="flex-shrink mx-4 text-gray-400 mb-4 text-sm">OR</span>
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
 
-          <div className="relative flex items-center px-6">
+          <div className="relative flex items-center px-4">
             <GoogleSignInButton />
           </div>
         </div>
