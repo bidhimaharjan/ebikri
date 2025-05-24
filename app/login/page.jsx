@@ -104,7 +104,7 @@ export default function LoginPage() {
         </div>
 
         {/* Vertical line */}
-        <div className="hidden lg:block w-px bg-gray-300"></div>
+        <div className="hidden lg:block w-px bg-gray-300 h-auto min-h-[600px]"></div>
 
         {/* Right Section */}
         <div className="hidden lg:flex flex-col justify-center gap-6 rounded-lg px-6 py-10 lg:w-1/2 xl:px-20">

@@ -242,7 +242,7 @@ const OrdersLayout = () => {
           </button>
 
           {/* Search Bar */}
-          <div className="w-full md:w-1/2 relative">
+          <div className="w-full md:w-1/3 relative">
             <input
               type="text"
               placeholder="Search an order..."

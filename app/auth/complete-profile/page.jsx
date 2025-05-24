@@ -89,29 +89,29 @@ export default function CompleteProfile() {
     }
   };
 
-  // function for consistent input styling
+  // function for consistent input styles
   const getInputClass = (name) =>
-    `peer block w-full rounded-xl border border-gray-200 py-[8px] pl-4 text-xs outline-2 placeholder:text-gray-500`;
+    `peer block w-full rounded-lg md:rounded-xl border border-gray-200 py-2 md:py-[8px] pl-3 md:pl-4 text-xs outline-2 placeholder:text-gray-500`;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-xl shadow-lg px-6 py-8 w-full max-w-xl space-y-5"
+        className="bg-white rounded-lg md:rounded-xl shadow-lg px-4 py-6 md:px-6 md:py-8 w-full max-w-md md:max-w-xl space-y-4 md:space-y-5"
       >
         {/* Title */}
-        <h1 className={`$ text-xl font-bold text-purple-500 text-center`}>
+        <h1 className="text-lg md:text-xl font-bold text-purple-500 text-center">
           Complete Your Profile
         </h1>
 
-        <p className="text-sm text-gray-600 text-center">
+        <p className="text-xs md:text-sm text-gray-600 text-center">
           Please provide your personal and business details to continue.
         </p>
 
         {/* Phone Number Field */}
         <div>
           <label
-            className="block font-medium text-sm text-gray-900 mb-2"
+            className="block font-medium text-xs md:text-sm text-gray-900 mb-1 md:mb-2"
             htmlFor="phoneNumber"
           >
             Phone Number *
@@ -120,7 +120,6 @@ export default function CompleteProfile() {
             id="phoneNumber"
             name="phoneNumber"
             type="tel"
-
             placeholder="Enter a 10-digit phone number"
             value={formData.phoneNumber}
             onChange={handleChange}
@@ -131,7 +130,7 @@ export default function CompleteProfile() {
         {/* Business Name Field */}
         <div>
           <label
-            className="block font-medium text-sm text-gray-900 mb-2"
+            className="block font-medium text-xs md:text-sm text-gray-900 mb-1 md:mb-2"
             htmlFor="businessName"
           >
             Business Name *
@@ -150,7 +149,7 @@ export default function CompleteProfile() {
         {/* Business Type Field */}
         <div>
           <label
-            className="block font-medium text-sm text-gray-900 mb-2"
+            className="block font-medium text-xs md:text-sm text-gray-900 mb-1 md:mb-2"
             htmlFor="businessType"
           >
             Business Type *
@@ -175,7 +174,7 @@ export default function CompleteProfile() {
         {/* Business Email Field */}
         <div>
           <label
-            className="block font-medium text-sm text-gray-900 mb-2"
+            className="block font-medium text-xs md:text-sm text-gray-900 mb-1 md:mb-2"
             htmlFor="businessEmail"
           >
             Business Email
@@ -194,7 +193,7 @@ export default function CompleteProfile() {
         {/* PAN Number Field */}
         <div>
           <label
-            className="block font-medium text-sm text-gray-900 mb-2"
+            className="block font-medium text-xs md:text-sm text-gray-900 mb-1 md:mb-2"
             htmlFor="panNumber"
           >
             PAN Number
@@ -214,14 +213,14 @@ export default function CompleteProfile() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-purple-500 text-white py-2 px-4 rounded-xl hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-sm disabled:opacity-50"
+          className="w-full bg-purple-500 text-white py-2 px-4 rounded-lg md:rounded-xl hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-xs md:text-sm disabled:opacity-50"
         >
           {isSubmitting ? "Submitting..." : "Complete Profile"}
         </button>
       </form>
 
       {/* Footer */}
-      <div className="text-center text-gray-500 text-sm mt-8">
+      <div className="text-center text-gray-500 text-xs md:text-sm mt-6 md:mt-8">
         &copy; {new Date().getFullYear()} eBikri. All Rights Reserved
       </div>
     </div>

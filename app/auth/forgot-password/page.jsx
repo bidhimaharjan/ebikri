@@ -75,15 +75,15 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-xl shadow-lg px-8 py-8 w-full max-w-md space-y-5"
+        className="bg-white rounded-lg md:rounded-xl shadow-lg px-6 py-6 md:px-8 md:py-8 w-full max-w-md space-y-4 md:space-y-5"
       >
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-purple-500">Forgot Password</h1>
-          <p className="text-sm text-gray-600 mt-2">
+          <h1 className="text-xl md:text-2xl font-bold text-purple-500">Forgot Password</h1>
+          <p className="text-xs md:text-sm text-gray-600 mt-1 md:mt-2">
             Enter your email to receive a reset link
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
         {/* Email Field */}
         <div>
           <label
-            className="block font-medium text-sm text-gray-900 mb-2"
+            className="block font-medium text-xs md:text-sm text-gray-900 mb-1 md:mb-2"
             htmlFor="email"
           >
             Email *
@@ -104,10 +104,10 @@ export default function ForgotPasswordPage() {
               placeholder="Enter your email address"
               value={formData.email}
               onChange={handleChange}
-              className={getInputClass()}
+              className="peer block w-full rounded-lg md:rounded-xl border border-gray-200 py-2 md:py-[8px] pl-8 md:pl-10 text-xs md:text-sm outline-2 placeholder:text-gray-500"
               required
             />
-            <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            <AtSymbolIcon className="pointer-events-none absolute left-2 md:left-3 top-1/2 h-4 w-4 md:h-[18px] md:w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
           </div>
         </div>
 
@@ -115,24 +115,21 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-purple-500 text-white py-2 px-4 rounded-xl hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-sm disabled:opacity-50"
+          className="w-full bg-purple-500 text-white py-2 px-4 rounded-lg md:rounded-xl hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-xs md:text-sm disabled:opacity-50"
         >
           {isSubmitting ? "Sending..." : "Send Reset Link"}
         </button>
 
         {/* Back to Login Link */}
-        <div className="text-center text-sm mt-4">
-          <Link
-            href="/login"
-            className="text-purple-500 hover:underline"
-          >
+        <div className="text-center text-xs md:text-sm mt-3 md:mt-4">
+          <Link href="/login" className="text-purple-500 hover:underline">
             Back to login
           </Link>
         </div>
       </form>
 
       {/* Footer */}
-      <div className="text-center text-gray-500 text-sm mt-8">
+      <div className="text-center text-gray-500 text-xs md:text-sm mt-6 md:mt-8">
         &copy; {new Date().getFullYear()} eBikri. All Rights Reserved
       </div>
     </div>
