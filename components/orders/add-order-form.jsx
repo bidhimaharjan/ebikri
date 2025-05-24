@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { validateOrderForm } from "@/app/validation/order";
 import { validateCustomerForm } from "@/app/validation/customer";
+import { downloadQR } from '@/lib/downloadQR';
 
 const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
   const [products, setProducts] = useState([{ productId: "", quantity: 1 }]);
@@ -299,6 +300,24 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
       toast.error(error.message || "Error refreshing payment status");
     } finally {
       setIsRefreshing(false);
+    }
+  };
+
+  // handle QR code download button click
+  const handleDownloadQR = async () => {
+    if (!qrCodeUrl) return;
+  
+    try {
+      // find the QR code SVG element
+      const qrCodeElement = document.querySelector('svg[role="img"]');
+      // download with custom filename
+      await downloadQR(
+        qrCodeElement,
+        `payment-qr-${orderData?.order?.id || ''}`
+      );
+    } catch (error) {
+      console.error('Error saving QR code:', error);
+      toast.error('Failed to save QR code');
     }
   };
 
@@ -744,7 +763,7 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
               </h3>
 
               {/* Payment Status Refresh Button */}
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-6">
                 <button
                   onClick={handleRefreshPayment}
                   disabled={isRefreshing}
@@ -760,6 +779,28 @@ const AddOrderForm = ({ isOpen, onClose, onConfirm }) => {
                     <ArrowPathIcon className="h-4 w-4" />
                   )}
                   {isRefreshing ? "Refreshing..." : "Refresh"}
+                </button>
+
+                {/* Save QR Button */}
+                <button
+                  onClick={handleDownloadQR}
+                  className="flex items-center gap-1 text-sm font-semibold text-green-500 hover:text-green-700"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-4 w-4" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" 
+                    />
+                  </svg>
+                  Save QR
                 </button>
               </div>
 
